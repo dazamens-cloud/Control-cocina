@@ -2,43 +2,41 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cocina Inteligente Pro</title>
+    <title>Cocina Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         body { font-family: sans-serif; background: #f0f2f5; padding: 10px; text-align: center; }
         .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-main { background: #007bff; color: white; font-size: 16px; }
+        button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .btn-recipe { background: #6c757d; color: white; width: 48%; display: inline-block; }
-        .btn-sub { background: #ffc107; color: black; width: 47%; display: inline-block; font-size: 13px; min-height: 45px; vertical-align: top; }
-        .selected { background: #28a745 !important; color: white; transform: scale(0.98); border: 2px solid #1e7e34; }
-        #preview { width: 100%; border-radius: 10px; margin-top: 10px; display: none; border: 2px solid #ddd; }
+        .btn-sub { background: #ffc107; color: black; width: 47%; display: inline-block; font-size: 13px; min-height: 45px; }
+        .btn-main { background: #007bff; color: white; }
+        .selected { background: #28a745 !important; color: white; border: 2px solid #1e7e34; }
         video { width: 100%; border-radius: 10px; background: #000; }
         .hidden { display: none; }
-        h3 { margin-top: 0; color: #333; font-size: 1.1em; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h3>1. Selecciona Elaboración</h3>
+    <h3>1. Elaboración</h3>
     <div id="main-recipes">
-        <button class="btn-recipe" onclick="setMain('Salsa')">Salsas</button>
-        <button class="btn-recipe" onclick="setMain('Boloñesa')">Boloñesa</button>
-        <button class="btn-recipe" onclick="setMain('Lasaña')">Lasaña</button>
-        <button class="btn-recipe" onclick="setMain('Berenjena')">Berenjena Parm.</button>
-        <button class="btn-recipe" onclick="setMain('Caneloni')">Caneloni</button>
-        <button class="btn-recipe" onclick="setMain('Ravioli', true)">Ravioli ⬇️</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this, 'Salsa')">Salsas</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this, 'Boloñesa')">Boloñesa</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this, 'Lasaña')">Lasaña</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this, 'Berenjena')">Berenjena</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this, 'Caneloni')">Caneloni</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this, 'Ravioli', true)">Ravioli ⬇️</button>
     </div>
     
-    <div id="sub-ravioli" class="hidden" style="margin-top:10px; border-top: 1px solid #eee; pt-10px;">
-        <p><b>Relleno / Tipo:</b></p>
-        <button class="btn-sub" onclick="setSub('Masa')">Masa</button>
-        <button class="btn-sub" onclick="setSub('Ricotta/Espinaca')">Ricotta/Espinaca</button>
-        <button class="btn-sub" onclick="setSub('Carne')">Carne</button>
-        <button class="btn-sub" onclick="setSub('Queso')">Queso</button>
-        <button class="btn-sub" onclick="setSub('Porcini')">Porcini</button>
-        <button class="btn-sub" onclick="setSub('Pescado')">Pescado</button>
+    <div id="sub-ravioli" class="hidden">
+        <p><b>Relleno:</b></p>
+        <button type="button" class="btn-sub" onclick="setSub(this, 'Masa')">Masa</button>
+        <button type="button" class="btn-sub" onclick="setSub(this, 'Ricotta/Espinaca')">Ricotta</button>
+        <button type="button" class="btn-sub" onclick="setSub(this, 'Carne')">Carne</button>
+        <button type="button" class="btn-sub" onclick="setSub(this, 'Queso')">Queso</button>
+        <button type="button" class="btn-sub" onclick="setSub(this, 'Porcini')">Porcini</button>
+        <button type="button" class="btn-sub" onclick="setSub(this, 'Pescado')">Pescado</button>
     </div>
 </div>
 
@@ -46,14 +44,13 @@
     <video id="webcam" autoplay playsinline></video>
     <button class="btn-main" onclick="scanCode()">📷 ESCANEAR BARRAS</button>
     <p id="resultName"><b>Producto:</b> ---</p>
-    <button class="btn-main" style="background:#6f42c1" onclick="takePhoto()">📸 FOTO LOTE / INFO</button>
-    <img id="preview">
+    <button class="btn-main" style="background:#6f42c1" onclick="takePhoto()">📸 FOTO LOTE</button>
+    <img id="preview" style="width:100%; display:none; border-radius:10px; margin-top:10px;">
 </div>
 
-<button id="btnSave" class="btn-main" style="background:#28a745; font-size:1.4em; height: 60px;" onclick="saveAll()">✅ GUARDAR EN EXCEL</button>
+<button id="btnSave" class="btn-main" style="background:#28a745; height: 60px;" onclick="saveAll()">✅ GUARDAR EN EXCEL</button>
 
 <script>
-    // PEGA TU ENLACE AQUÍ ABAJO:
     const urlScript = "https://script.google.com/macros/s/AKfycby-RIRixdbuJ_8vpcIcrESUHBqej8UamZdmWlaHRI8Okri7LXu9jkmOgpJ-zrlKzbeT9w/exec"; 
     
     let selectedMain = ""; let selectedSub = ""; let currentCode = ""; let photoBase64 = null;
@@ -61,17 +58,17 @@
     const video = document.getElementById('webcam');
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(s => video.srcObject = s);
 
-    function setMain(val, hasSub) {
+    function setMain(elem, val, hasSub) {
         selectedMain = val; selectedSub = "";
         document.querySelectorAll('.btn-recipe').forEach(b => b.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
-        document.getElementById('sub-ravioli').className = hasSub ? '' : 'hidden';
+        elem.classList.add('selected');
+        document.getElementById('sub-ravioli').style.display = hasSub ? 'block' : 'none';
     }
 
-    function setSub(val) {
+    function setSub(elem, val) {
         selectedSub = val;
         document.querySelectorAll('.btn-sub').forEach(b => b.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
+        elem.classList.add('selected');
     }
 
     function scanCode() {
@@ -82,11 +79,7 @@
             if(r) { 
                 currentCode = r.codeResult.code; 
                 document.getElementById('resultName').innerHTML = "<b>Código:</b> " + currentCode;
-                // Pequeña vibración para confirmar
-                if(navigator.vibrate) navigator.vibrate(100);
-            } else {
-                alert("No detectado. Intenta centrar las barras.");
-            }
+            } else { alert("No detectado."); }
         });
     }
 
@@ -94,10 +87,19 @@
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth; canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
-        photoBase64 = canvas.toDataURL('image/jpeg', 0.7); // 0.7 para que no pese tanto
+        photoBase64 = canvas.toDataURL('image/jpeg', 0.6);
         document.getElementById('preview').src = photoBase64;
         document.getElementById('preview').style.display = 'block';
     }
 
-    async
-    
+    async function saveAll() {
+        if(!selectedMain) return alert("Selecciona elaboración");
+        const btn = document.getElementById('btnSave'); btn.innerText = "Enviando...";
+        const payload = { producto: "Manual", codigoBarras: currentCode, preparacion: selectedMain, subTipo: selectedSub, imagen: photoBase64 };
+        await fetch(urlScript, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        alert("✅ Guardado");
+        location.reload();
+    }
+</script>
+</body>
+</html>
