@@ -1,26 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cocina Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistema de Cocina Profesional</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; padding: 10px; text-align: center; }
-        .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-recipe { background: #6c757d; color: white; width: 48%; display: inline-block; }
-        .btn-sub { background: #ffc107; color: black; width: 47%; display: inline-block; font-size: 13px; min-height: 45px; }
-        .btn-main { background: #007bff; color: white; }
-        .selected { background: #28a745 !important; color: white; border: 2px solid #1e7e34; }
-        video { width: 100%; border-radius: 10px; background: #000; }
+        body { font-family: -apple-system, sans-serif; background: #f4f7f6; padding: 10px; margin: 0; text-align: center; color: #333; }
+        .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        h3 { margin: 0 0 10px 0; font-size: 1.1em; color: #555; }
+        button { border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .grid-recipes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-recipe { background: #e9ecef; color: #495057; padding: 15px; font-size: 15px; }
+        .grid-sub { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        .btn-sub { background: #fff3cd; color: #856404; padding: 10px 5px; font-size: 12px; }
+        .selected { background: #28a745 !important; color: white !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
+        video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; }
+        .btn-scan { background: #007bff; color: white; width: 100%; padding: 15px; margin-bottom: 10px; font-size: 16px; }
+        .btn-photo { background: #6f42c1; color: white; width: 100%; padding: 12px; font-size: 14px; }
+        #preview { width: 100%; border-radius: 10px; display: none; margin-top: 10px; border: 2px solid #28a745; }
+        .btn-save { background: #28a745; color: white; width: 100%; padding: 20px; font-size: 1.3em; margin-top: 20px; box-shadow: 0 4px 15px rgba(40,167,69,0.3); }
+        .btn-save:disabled { background: #ccc; box-shadow: none; }
         .hidden { display: none; }
+        #status { font-weight: bold; margin: 10px 0; color: #007bff; min-height: 24px; }
+        #camError { color: #dc3545; font-size: 0.9em; margin-top: 8px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h3>1. Elaboración</h3>
-    <div id="main-recipes">
+    <h3>1. ¿Qué estás preparando?</h3>
+    <div class="grid-recipes">
         <button type="button" class="btn-recipe" onclick="setMain(this, 'Salsa')">Salsas</button>
         <button type="button" class="btn-recipe" onclick="setMain(this, 'Boloñesa')">Boloñesa</button>
         <button type="button" class="btn-recipe" onclick="setMain(this, 'Lasaña')">Lasaña</button>
@@ -28,41 +38,65 @@
         <button type="button" class="btn-recipe" onclick="setMain(this, 'Caneloni')">Caneloni</button>
         <button type="button" class="btn-recipe" onclick="setMain(this, 'Ravioli', true)">Ravioli ⬇️</button>
     </div>
-    
     <div id="sub-ravioli" class="hidden">
-        <p><b>Relleno:</b></p>
-        <button type="button" class="btn-sub" onclick="setSub(this, 'Masa')">Masa</button>
-        <button type="button" class="btn-sub" onclick="setSub(this, 'Ricotta/Espinaca')">Ricotta</button>
-        <button type="button" class="btn-sub" onclick="setSub(this, 'Carne')">Carne</button>
-        <button type="button" class="btn-sub" onclick="setSub(this, 'Queso')">Queso</button>
-        <button type="button" class="btn-sub" onclick="setSub(this, 'Porcini')">Porcini</button>
-        <button type="button" class="btn-sub" onclick="setSub(this, 'Pescado')">Pescado</button>
+        <div class="grid-sub">
+            <button type="button" class="btn-sub" onclick="setSub(this, 'Masa')">Masa</button>
+            <button type="button" class="btn-sub" onclick="setSub(this, 'Ricotta/Esp')">Ricotta</button>
+            <button type="button" class="btn-sub" onclick="setSub(this, 'Carne')">Carne</button>
+            <button type="button" class="btn-sub" onclick="setSub(this, 'Queso')">Queso</button>
+            <button type="button" class="btn-sub" onclick="setSub(this, 'Porcini')">Porcini</button>
+            <button type="button" class="btn-sub" onclick="setSub(this, 'Pescado')">Pescado</button>
+        </div>
     </div>
 </div>
 
 <div class="card">
     <video id="webcam" autoplay playsinline></video>
-    <button class="btn-main" onclick="scanCode()">📷 ESCANEAR BARRAS</button>
-    <p id="resultName"><b>Producto:</b> ---</p>
-    <button class="btn-main" style="background:#6f42c1" onclick="takePhoto()">📸 FOTO LOTE</button>
-    <img id="preview" style="width:100%; display:none; border-radius:10px; margin-top:10px;">
+    <div id="camError">⚠️ No se pudo acceder a la cámara. Revisa los permisos del navegador.</div>
+    <button type="button" class="btn-scan" onclick="scanCode()">📷 ESCANEAR CÓDIGO DE BARRAS</button>
+    <div id="status">Producto: ---</div>
+    <button type="button" class="btn-photo" onclick="takePhoto()">📸 FOTO DEL LOTE</button>
+    <img id="preview" alt="Vista previa del lote">
 </div>
 
-<button id="btnSave" class="btn-main" style="background:#28a745; height: 60px;" onclick="saveAll()">✅ GUARDAR EN EXCEL</button>
+<button id="btnSave" class="btn-save" onclick="saveAll()">✅ CONFIRMAR Y GUARDAR</button>
 
 <script>
-    const urlScript = "https://script.google.com/macros/s/AKfycby-RIRixdbuJ_8vpcIcrESUHBqej8UamZdmWlaHRI8Okri7LXu9jkmOgpJ-zrlKzbeT9w/exec"; 
-    
-    let selectedMain = ""; let selectedSub = ""; let currentCode = ""; let photoBase64 = null;
+    const urlScript = "https://script.google.com/macros/s/AKfycby-RIRixdbuJ_8vpcIcrESUHBqej8UamZdmWlaHRI8Okri7LXu9jkmOgpJ-zrlKzbeT9w/exec";
 
+    let selectedMain = "";
+    let selectedSub = "";
+    let currentCode = "";
+    let photoBase64 = null;
+    let cameraStream = null;
+
+    // Iniciar Cámara
     const video = document.getElementById('webcam');
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(s => video.srcObject = s);
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(stream => {
+            cameraStream = stream;
+            video.srcObject = stream;
+        })
+        .catch(err => {
+            console.error("Error cámara:", err);
+            document.getElementById('camError').style.display = 'block';
+            video.style.display = 'none';
+        });
+
+    // Liberar cámara al salir de la página
+    window.addEventListener('beforeunload', () => {
+        if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+    });
 
     function setMain(elem, val, hasSub) {
-        selectedMain = val; selectedSub = "";
+        selectedMain = val;
+        selectedSub = "";
         document.querySelectorAll('.btn-recipe').forEach(b => b.classList.remove('selected'));
+        document.querySelectorAll('.btn-sub').forEach(b => b.classList.remove('selected'));
         elem.classList.add('selected');
-        document.getElementById('sub-ravioli').style.display = hasSub ? 'block' : 'none';
+        const subMenu = document.getElementById('sub-ravioli');
+        subMenu.classList.toggle('hidden', !hasSub);
     }
 
     function setSub(elem, val) {
@@ -72,33 +106,96 @@
     }
 
     function scanCode() {
+        // Verificar que la cámara esté lista
+        if (!video.videoWidth || video.videoWidth === 0) {
+            document.getElementById('status').innerHTML = "⚠️ La cámara aún no está lista, espera un momento.";
+            return;
+        }
+
+        // Verificar que Quagga esté disponible
+        if (typeof Quagga === 'undefined' || typeof Quagga.decodeSingle !== 'function') {
+            document.getElementById('status').innerHTML = "⚠️ Error: librería de escaneo no cargada.";
+            return;
+        }
+
+        document.getElementById('status').innerHTML = "🔍 Escaneando...";
+
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
-        Quagga.decodeSingle({ src: canvas.toDataURL(), decoder: { readers: ["ean_reader", "ean_8_reader"] } }, r => {
-            if(r) { 
-                currentCode = r.codeResult.code; 
-                document.getElementById('resultName').innerHTML = "<b>Código:</b> " + currentCode;
-            } else { alert("No detectado."); }
+
+        Quagga.decodeSingle({
+            src: canvas.toDataURL(),
+            numOfWorkers: 0,
+            decoder: { readers: ["ean_reader", "ean_8_reader", "code_128_reader"] }
+        }, function(result) {
+            if (result && result.codeResult) {
+                currentCode = result.codeResult.code;
+                document.getElementById('status').innerHTML = "✅ CÓDIGO: " + currentCode;
+                if (navigator.vibrate) navigator.vibrate(100);
+            } else {
+                document.getElementById('status').innerHTML = "❌ No detectado. Intenta con más luz o acerca el código.";
+            }
         });
     }
 
     function takePhoto() {
+        if (!video.videoWidth || video.videoWidth === 0) {
+            alert("La cámara aún no está lista.");
+            return;
+        }
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
         photoBase64 = canvas.toDataURL('image/jpeg', 0.6);
-        document.getElementById('preview').src = photoBase64;
-        document.getElementById('preview').style.display = 'block';
+        const preview = document.getElementById('preview');
+        preview.src = photoBase64;
+        preview.style.display = 'block';
+        document.getElementById('status').innerHTML = "📸 Foto capturada correctamente.";
     }
 
     async function saveAll() {
-        if(!selectedMain) return alert("Selecciona elaboración");
-        const btn = document.getElementById('btnSave'); btn.innerText = "Enviando...";
-        const payload = { producto: "Manual", codigoBarras: currentCode, preparacion: selectedMain, subTipo: selectedSub, imagen: photoBase64 };
-        await fetch(urlScript, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-        alert("✅ Guardado");
-        location.reload();
+        if (!selectedMain) return alert("Selecciona una elaboración primero.");
+        if (selectedMain === "Ravioli" && !selectedSub) return alert("Selecciona el tipo de Ravioli.");
+        if (!photoBase64) {
+            if (!confirm("No has tomado foto del lote. ¿Continuar igualmente?")) return;
+        }
+
+        const btn = document.getElementById('btnSave');
+        btn.disabled = true;
+        btn.innerHTML = "⌛ GUARDANDO...";
+
+        const payload = {
+            producto: "Registro Manual",
+            codigoBarras: currentCode || "Sin escanear",
+            preparacion: selectedMain,
+            subTipo: selectedSub || "N/A",
+            imagen: photoBase64 || ""
+        };
+
+        try {
+            const response = await fetch(urlScript, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            // Con no-cors no podemos leer la respuesta, pero si llegamos aquí sin excepción
+            // asumimos que la petición salió. El servidor debe validar por su parte.
+            alert("✅ Datos enviados. Comprueba tu hoja de cálculo para confirmar.");
+            if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+            location.reload();
+
+        } catch (error) {
+            console.error("Error al enviar:", error);
+            alert("❌ Error de red al enviar los datos. Comprueba tu conexión e inténtalo de nuevo.");
+            btn.disabled = false;
+            btn.innerHTML = "✅ CONFIRMAR Y GUARDAR";
+        }
     }
 </script>
 </body>
