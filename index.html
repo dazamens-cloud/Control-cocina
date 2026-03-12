@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Control Cocina</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        :root {
+            --bg: #0a0a0a; --surface: #141414; --surface2: #1e1e1e;
+            --border: #2a2a2a; --green: #00e676; --green-dim: #00c853;
+            --orange: #ff6d00; --text: #f0f0f0; --muted: #888; --danger: #ff1744;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); padding: 12px 12px 110px; min-height: 100vh; }
+        .app-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 0 20px; }
+        .app-title { font-family: 'Bebas Neue', sans-serif; font-size: 2em; letter-spacing: 3px; color: var(--green); text-shadow: 0 0 20px rgba(0,230,118,0.3); }
+        .app-subtitle { font-size: 0.75em; color: var(--muted); letter-spacing: 1px; }
+        .steps { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; }
+        .step { display: flex; align-items: center; gap: 5px; font-size: 0.72em; color: var(--muted); font-weight: 600; transition: color 0.3s; }
+        .step-num { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.85em; transition: all 0.3s; flex-shrink: 0; }
+        .step.done { color: var(--green); }
+        .step.done .step-num { background: var(--green); border-color: var(--green); color: #000; font-weight: 700; }
+        .step.active { color: var(--text); }
+        .step.active .step-num { border-color: var(--green); color: var(--green); }
+        .step-line { flex: 1; height: 1px; background: var(--border); transition: background 0.3s; }
+        .step-line.done { background: var(--green); }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; transition: border-color 0.3s; }
+        .card.completed { border-color: rgba(0,230,118,0.3); }
+        .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .card-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--surface2); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
+        .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1em; letter-spacing: 1.5px; }
+        .card-check { margin-left: auto; color: var(--green); font-size: 1.1em; opacity: 0; transition: opacity 0.3s; }
+        .card.completed .card-check { opacity: 1; }
+        .grid-recipes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn-recipe { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); border-radius: 10px; padding: 16px 10px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-recipe:active { transform: scale(0.97); }
+        .btn-recipe.selected { background: rgba(0,230,118,0.12); border-color: var(--green); color: var(--green); }
+        .grid-sub { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+        .btn-sub { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); border-radius: 8px; padding: 10px 4px; font-size: 11px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-sub.selected { background: rgba(255,109,0,0.15); border-color: var(--orange); color: var(--orange); }
+        video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; min-height: 200px; border: 1px solid var(--border); display: none; }
+        .btn-cam { width: 100%; padding: 16px; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; cursor: pointer; border: none; transition: all 0.2s; margin-bottom: 8px; font-size: 15px; color: white; }
+        .btn-cam:active { transform: scale(0.98); }
+        #btnCamera { background: linear-gradient(135deg, #005599, #003377); }
+        #btnScan { background: linear-gradient(135deg, #0066cc, #0044aa); display: none; }
+        #btnPhoto { background: linear-gradient(135deg, #4a1080, #6f42c1); margin-bottom: 0; }
+        #camError { font-size: 0.82em; margin-bottom: 8px; display: none; line-height: 1.5; color: var(--danger); }
+        #status { font-size: 0.85em; font-weight: 600; min-height: 20px; color: var(--muted); margin: 8px 0; transition: color 0.3s; }
+        #status.ok { color: var(--green); }
+        #status.err { color: var(--danger); }
+        .input-group { margin-top: 10px; }
+        .input-group label { font-size: 0.75em; color: var(--muted); display: block; margin-bottom: 5px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 13px 14px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.2s; }
+        .input-group input::placeholder { color: #444; }
+        .input-group input:focus { border-color: #555; }
+        .input-group input.filled { border-color: var(--green); }
+        #preview { width: 100%; border-radius: 10px; display: none; margin-top: 12px; border: 2px solid var(--green); max-height: 300px; object-fit: cover; }
+        .action-buttons { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 12px 20px; background: linear-gradient(transparent, var(--bg) 30%); display: flex; flex-direction: column; gap: 8px; }
+        .btn-save { background: linear-gradient(135deg, var(--green-dim), var(--green)); color: #000; width: 100%; padding: 18px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2.5px; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(0,230,118,0.25); font-size: 1em; }
+        .btn-inventory { background: linear-gradient(135deg, #cc5500, var(--orange)); color: white; width: 100%; padding: 16px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(255,109,0,0.2); font-size: 0.95em; }
+        .btn-save:active, .btn-inventory:active { transform: scale(0.98); }
+        .btn-save:disabled, .btn-inventory:disabled { background: var(--surface2); color: var(--muted); box-shadow: none; cursor: not-allowed; }
+        .success-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.93); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .success-overlay.show { opacity: 1; pointer-events: all; }
+        .success-icon { font-size: 5em; animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; margin-bottom: 16px; }
+        .success-text { font-family: 'Bebas Neue', sans-serif; font-size: 2.8em; color: var(--green); letter-spacing: 4px; text-align: center; text-shadow: 0 0 30px rgba(0,230,118,0.5); animation: slideUp 0.4s 0.2s ease both; }
+        .success-sub { font-size: 0.9em; color: var(--muted); margin-top: 8px; text-align: center; padding: 0 20px; animation: slideUp 0.4s 0.35s ease both; }
+        @keyframes popIn { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+        @keyframes slideUp { 0%{transform:translateY(20px);opacity:0} 100%{transform:translateY(0);opacity:1} }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        .scanning-indicator { animation: pulse 1s infinite; }
+        .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+
+<div class="app-header">
+    <div>
+        <div class="app-title">CONTROL COCINA</div>
+        <div class="app-subtitle">SISTEMA DE REGISTRO PROFESIONAL</div>
+    </div>
+    <div style="font-size:1.8em">🍝</div>
+</div>
+
+<div class="steps">
+    <div class="step active" id="step1"><div class="step-num" id="stepNum1">1</div><span>Elaboracion</span></div>
+    <div class="step-line" id="line1"></div>
+    <div class="step" id="step2"><div class="step-num" id="stepNum2">2</div><span>Producto</span></div>
+    <div class="step-line" id="line2"></div>
+    <div class="step" id="step3"><div class="step-num" id="stepNum3">3</div><span>Foto</span></div>
+</div>
+
+<div class="card" id="card1">
+    <div class="card-header">
+        <div class="card-icon">🍳</div>
+        <div class="card-title">QUE ESTAS PREPARANDO?</div>
+        <div class="card-check">✔</div>
+    </div>
+    <div class="grid-recipes">
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Salsa')">Salsas</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Bolonesa')">Bolonesa</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Lasana')">Lasana</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Berenjena')">Berenjena</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Caneloni')">Caneloni</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Ravioli',true)">Ravioli</button>
+    </div>
+    <div id="sub-ravioli" class="hidden">
+        <div class="grid-sub">
+            <button type="button" class="btn-sub" onclick="setSub(this,'Masa')">Masa</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Ricotta')">Ricotta</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Carne')">Carne</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Queso')">Queso</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Porcini')">Porcini</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Pescado')">Pescado</button>
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card2">
+    <div class="card-header">
+        <div class="card-icon">📷</div>
+        <div class="card-title">ESCANEAR Y DATOS</div>
+        <div class="card-check">✔</div>
+    </div>
+    <video id="webcam" autoplay playsinline muted></video>
+    <div id="camError"></div>
+    <button type="button" class="btn-cam" id="btnCamera" onclick="startCamera()">🎥 ACTIVAR CAMARA</button>
+    <button type="button" class="btn-cam" id="btnScan" onclick="scanCode()">📷 ESCANEAR CODIGO DE BARRAS</button>
+    <div id="status">Pulsa Activar Camara para empezar</div>
+    <div class="input-group">
+        <label>Nombre del producto *</label>
+        <input type="text" id="nombreProducto" placeholder="Ej: Harina 00, Ricotta fresca..." oninput="onFieldInput(this)">
+    </div>
+    <div class="input-group">
+        <label>Numero de lote</label>
+        <input type="text" id="loteProducto" placeholder="Ej: L2024-001" oninput="onFieldInput(this)">
+    </div>
+    <div class="input-group">
+        <label>Cantidad</label>
+        <input type="text" id="cantidadProducto" placeholder="Ej: 5 kg, 3 unidades..." oninput="onFieldInput(this)">
+    </div>
+</div>
+
+<div class="card" id="card3">
+    <div class="card-header">
+        <div class="card-icon">📸</div>
+        <div class="card-title">FOTO DEL LOTE</div>
+        <div class="card-check">✔</div>
+    </div>
+    <button type="button" class="btn-cam" id="btnPhoto" onclick="takePhoto()">📸 TOMAR FOTO DEL LOTE</button>
+    <img id="preview" alt="Vista previa del lote">
+</div>
+
+<div class="action-buttons">
+    <button id="btnSave" class="btn-save" onclick="saveAll('cocina')">CONFIRMAR Y GUARDAR EN REGISTROS</button>
+    <button id="btnInventory" class="btn-inventory" onclick="saveAll('inventario')">AÑADIR A COMPRAS DEL MES</button>
+</div>
+
+<div class="success-overlay" id="successOverlay">
+    <div class="success-icon" id="successIcon">✅</div>
+    <div class="success-text">OIDO COCINA!</div>
+    <div class="success-sub" id="successSub">Datos guardados correctamente</div>
+</div>
+<script>
+    var urlScript = "https://script.google.com/macros/s/AKfycbxe-5kU1gr8kMfMxVhpDJOTE4TjRDXcwx__j5YD-J-ousV-zMZ8ZCr8L-7yN9TH7RYnKA/exec";
+    var selectedMain = "", selectedSub = "", currentCode = "", photoBase64 = null, cameraStream = null, isScanning = false;
+    var video = document.getElementById('webcam');
+
+    async function startCamera() {
+        var btnCamera = document.getElementById('btnCamera');
+        var btnScan   = document.getElementById('btnScan');
+        var camError  = document.getElementById('camError');
+        btnCamera.innerHTML = "Iniciando...";
+        btnCamera.disabled  = true;
+        camError.style.display = 'none';
+
+        var modos = [
+            { video: { facingMode: { exact: "environment" } } },
+            { video: { facingMode: "environment" } },
+            { video: true }
+        ];
+        var stream = null, lastErr = null;
+        for (var i = 0; i < modos.length; i++) {
+            try { stream = await navigator.mediaDevices.getUserMedia(modos[i]); break; }
+            catch(e) { lastErr = e; }
+        }
+        if (stream) {
+            cameraStream = stream;
+            video.srcObject = stream;
+            video.style.display = 'block';
+            try { await video.play(); } catch(e) {}
+            btnCamera.style.display = 'none';
+            btnScan.style.display   = 'block';
+            setStatus("Camara activa. Listo para escanear.", 'ok');
+        } else {
+            btnCamera.innerHTML = "🎥 ACTIVAR CAMARA";
+            btnCamera.disabled  = false;
+            camError.style.display = 'block';
+            camError.innerHTML = "No se pudo abrir la camara: " + (lastErr ? lastErr.name + " - " + lastErr.message : "error") +
+                ". Ve a Ajustes, Aplicaciones, tu navegador, Permisos, Camara, Permitir siempre.";
+        }
+    }
+
+    window.addEventListener('beforeunload', function() {
+        if (cameraStream) cameraStream.getTracks().forEach(function(t){ t.stop(); });
+    });
+
+    function updateSteps() {
+        var s1 = !!selectedMain && (selectedMain !== 'Ravioli' || !!selectedSub);
+        var s2 = !!document.getElementById('nombreProducto').value.trim();
+        var s3 = !!photoBase64;
+        setStep(1, s1, true); setStep(2, s2, s1); setStep(3, s3, s2);
+        document.getElementById('card1').classList.toggle('completed', s1);
+        document.getElementById('card2').classList.toggle('completed', s2);
+        document.getElementById('card3').classList.toggle('completed', s3);
+    }
+
+    function setStep(n, done, prev) {
+        var step = document.getElementById('step' + n);
+        var num  = document.getElementById('stepNum' + n);
+        step.classList.remove('done','active');
+        if (done) { step.classList.add('done'); num.innerHTML = '✔'; }
+        else if (prev) { step.classList.add('active'); num.innerHTML = n; }
+        else { num.innerHTML = n; }
+        if (n < 3) document.getElementById('line' + n).classList.toggle('done', done);
+    }
+
+    function setMain(elem, val, hasSub) {
+        selectedMain = val; selectedSub = "";
+        document.querySelectorAll('.btn-recipe').forEach(function(b){ b.classList.remove('selected'); });
+        document.querySelectorAll('.btn-sub').forEach(function(b){ b.classList.remove('selected'); });
+        elem.classList.add('selected');
+        document.getElementById('sub-ravioli').classList.toggle('hidden', !hasSub);
+        updateSteps();
+    }
+
+    function setSub(elem, val) {
+        selectedSub = val;
+        document.querySelectorAll('.btn-sub').forEach(function(b){ b.classList.remove('selected'); });
+        elem.classList.add('selected');
+        updateSteps();
+    }
+
+    function captureFrame() {
+        var c = document.createElement('canvas');
+        c.width = video.videoWidth; c.height = video.videoHeight;
+        c.getContext('2d').drawImage(video, 0, 0);
+        return c;
+    }
+
+    function scanCode() {
+        if (isScanning) return;
+        if (!video.videoWidth) { setStatus("Camara no lista, espera.", 'err'); return; }
+        if (typeof Quagga === 'undefined') { setStatus("Libreria de escaneo no cargada.", 'err'); return; }
+        isScanning = true;
+        setStatus('Escaneando...', '');
+        Quagga.decodeSingle({
+            src: captureFrame().toDataURL('image/png'),
+            numOfWorkers: 0, locate: true,
+            decoder: { readers: ["ean_reader","ean_8_reader","code_128_reader","upc_reader"] }
+        }, function(result) {
+            isScanning = false;
+            if (result && result.codeResult) {
+                currentCode = result.codeResult.code;
+                var campo = document.getElementById('nombreProducto');
+                if (!campo.value.trim()) { campo.value = currentCode; campo.classList.add('filled'); }
+                setStatus("Codigo: " + currentCode, 'ok');
+                if (navigator.vibrate) navigator.vibrate([100,50,100]);
+                updateSteps();
+            } else {
+                setStatus("No detectado. Ajusta la luz e intentalo de nuevo.", 'err');
+            }
+        });
+    }
+  function onFieldInput(input) {
+        input.classList.toggle('filled', input.value.trim().length > 0);
+        if (input.id === 'nombreProducto') currentCode = "";
+        updateSteps();
+    }
+
+    function takePhoto() {
+        if (!video.videoWidth) { alert("Activa la camara primero."); return; }
+        photoBase64 = captureFrame().toDataURL('image/jpeg', 0.7);
+        var preview = document.getElementById('preview');
+        preview.style.display = 'none'; preview.src = '';
+        requestAnimationFrame(function() {
+            preview.src = photoBase64;
+            preview.style.display = 'block';
+            setStatus("Foto capturada.", 'ok');
+            updateSteps();
+        });
+    }
+
+    function showSuccess(modo) {
+        var overlay = document.getElementById('successOverlay');
+        document.getElementById('successIcon').innerHTML = modo === 'cocina' ? '✅' : '📦';
+        document.getElementById('successSub').textContent = modo === 'cocina'
+            ? 'Guardado en Registros. Verifica en Sheets.'
+            : 'Guardado en Compras del mes. Verifica en Sheets.';
+        overlay.classList.add('show');
+        if (navigator.vibrate) navigator.vibrate([100,80,200]);
+        setTimeout(function() {
+            if (cameraStream) cameraStream.getTracks().forEach(function(t){ t.stop(); });
+            location.reload();
+        }, 2800);
+    }
+
+    async function saveAll(modo) {
+        var producto = document.getElementById('nombreProducto').value.trim();
+        var lote     = document.getElementById('loteProducto').value.trim();
+        var cantidad = document.getElementById('cantidadProducto').value.trim();
+        if (!producto) return alert("Escribe o escanea el nombre del producto.");
+        if (modo === 'cocina') {
+            if (!selectedMain) return alert("Selecciona una elaboracion primero.");
+            if (selectedMain === 'Ravioli' && !selectedSub) return alert("Selecciona el tipo de Ravioli.");
+        }
+        if (!photoBase64 && !confirm("No has tomado foto. Continuar igualmente?")) return;
+
+        var btnSave = document.getElementById('btnSave');
+        var btnInv  = document.getElementById('btnInventory');
+        btnSave.disabled = btnInv.disabled = true;
+        (modo === 'cocina' ? btnSave : btnInv).innerHTML = "GUARDANDO...";
+
+        var payload = {
+            modo: modo, producto: producto,
+            lote: lote || "Sin lote", cantidad: cantidad || "Sin especificar",
+            preparacion: selectedMain || "INVENTARIO", subTipo: selectedSub || "N/A",
+            codigoBarras: currentCode || "Sin escanear", imagen: photoBase64 || ""
+        };
+
+        try {
+            await fetch(urlScript, {
+                method: 'POST', mode: 'no-cors', cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            showSuccess(modo);
+        } catch(err) {
+            console.error(err);
+            alert("Error de red. Comprueba tu conexion.");
+            btnSave.disabled = btnInv.disabled = false;
+            btnSave.innerHTML = "CONFIRMAR Y GUARDAR EN REGISTROS";
+            btnInv.innerHTML  = "AÑADIR A COMPRAS DEL MES";
+        }
+    }
+
+    function setStatus(html, cls) {
+        var el = document.getElementById('status');
+        el.innerHTML = html; el.className = cls || '';
+    }
+
+    updateSteps();
+</script>
+</body>
+</html>
