@@ -6,24 +6,33 @@
     <title>Sistema de Cocina Profesional</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
+        * { box-sizing: border-box; }
         body { font-family: -apple-system, sans-serif; background: #f4f7f6; padding: 10px; margin: 0; text-align: center; color: #333; }
         .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        h3 { margin: 0 0 10px 0; font-size: 1.1em; color: #555; }
+        h3 { margin: 0 0 12px 0; font-size: 1.05em; color: #444; }
         button { border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .grid-recipes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn-recipe { background: #e9ecef; color: #495057; padding: 15px; font-size: 15px; }
         .grid-sub { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
         .btn-sub { background: #fff3cd; color: #856404; padding: 10px 5px; font-size: 12px; }
         .selected { background: #28a745 !important; color: white !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
-        video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; }
-        .btn-scan { background: #007bff; color: white; width: 100%; padding: 15px; margin-bottom: 10px; font-size: 16px; }
-        .btn-photo { background: #6f42c1; color: white; width: 100%; padding: 12px; font-size: 14px; }
+        video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; min-height: 180px; }
+        .btn-scan { background: #007bff; color: white; width: 100%; padding: 15px; margin-bottom: 8px; font-size: 16px; }
+        .btn-photo { background: #6f42c1; color: white; width: 100%; padding: 12px; font-size: 14px; margin-top: 8px; }
         #preview { width: 100%; border-radius: 10px; display: none; margin-top: 10px; border: 2px solid #28a745; }
-        .btn-save { background: #28a745; color: white; width: 100%; padding: 20px; font-size: 1.3em; margin-top: 20px; box-shadow: 0 4px 15px rgba(40,167,69,0.3); }
-        .btn-save:disabled { background: #ccc; box-shadow: none; }
+        .input-group { margin-top: 12px; text-align: left; }
+        .input-group label { font-size: 0.82em; color: #666; display: block; margin-bottom: 4px; font-weight: 600; }
+        .input-group input { width: 100%; padding: 12px; border: 1.5px solid #dee2e6; border-radius: 8px; font-size: 15px; outline: none; transition: border 0.2s; background: #fafafa; }
+        .input-group input:focus { border-color: #007bff; background: white; }
+        .input-group input.filled { border-color: #28a745; background: #f0fff4; }
+        .btn-save      { background: #28a745; color: white; width: 100%; padding: 18px; font-size: 1.15em; margin-top: 10px; display: block; box-shadow: 0 4px 15px rgba(40,167,69,0.3); }
+        .btn-inventory { background: #fd7e14; color: white; width: 100%; padding: 18px; font-size: 1.15em; margin-top: 10px; display: block; box-shadow: 0 4px 15px rgba(253,126,20,0.3); }
+        .btn-save:disabled, .btn-inventory:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
         .hidden { display: none; }
-        #status { font-weight: bold; margin: 10px 0; color: #007bff; min-height: 24px; }
+        #status { font-weight: bold; margin: 10px 0; color: #007bff; min-height: 22px; font-size: 0.92em; }
         #camError { color: #dc3545; font-size: 0.9em; margin-top: 8px; display: none; }
+        .scanning-indicator { animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
     </style>
 </head>
 <body>
@@ -31,72 +40,83 @@
 <div class="card">
     <h3>1. ¿Qué estás preparando?</h3>
     <div class="grid-recipes">
-        <button type="button" class="btn-recipe" onclick="setMain(this, 'Salsa')">Salsas</button>
-        <button type="button" class="btn-recipe" onclick="setMain(this, 'Boloñesa')">Boloñesa</button>
-        <button type="button" class="btn-recipe" onclick="setMain(this, 'Lasaña')">Lasaña</button>
-        <button type="button" class="btn-recipe" onclick="setMain(this, 'Berenjena')">Berenjena</button>
-        <button type="button" class="btn-recipe" onclick="setMain(this, 'Caneloni')">Caneloni</button>
-        <button type="button" class="btn-recipe" onclick="setMain(this, 'Ravioli', true)">Ravioli ⬇️</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Salsa')">Salsas</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Boloñesa')">Boloñesa</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Lasaña')">Lasaña</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Berenjena')">Berenjena</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Caneloni')">Caneloni</button>
+        <button type="button" class="btn-recipe" onclick="setMain(this,'Ravioli',true)">Ravioli ⬇️</button>
     </div>
     <div id="sub-ravioli" class="hidden">
         <div class="grid-sub">
-            <button type="button" class="btn-sub" onclick="setSub(this, 'Masa')">Masa</button>
-            <button type="button" class="btn-sub" onclick="setSub(this, 'Ricotta/Esp')">Ricotta</button>
-            <button type="button" class="btn-sub" onclick="setSub(this, 'Carne')">Carne</button>
-            <button type="button" class="btn-sub" onclick="setSub(this, 'Queso')">Queso</button>
-            <button type="button" class="btn-sub" onclick="setSub(this, 'Porcini')">Porcini</button>
-            <button type="button" class="btn-sub" onclick="setSub(this, 'Pescado')">Pescado</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Masa')">Masa</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Ricotta/Esp')">Ricotta</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Carne')">Carne</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Queso')">Queso</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Porcini')">Porcini</button>
+            <button type="button" class="btn-sub" onclick="setSub(this,'Pescado')">Pescado</button>
         </div>
     </div>
 </div>
 
 <div class="card">
+    <h3>2. Escanear producto</h3>
     <video id="webcam" autoplay playsinline></video>
-    <div id="camError">⚠️ No se pudo acceder a la cámara. Revisa los permisos del navegador.</div>
+    <div id="camError">⚠️ No se pudo acceder a la cámara. Revisa los permisos.</div>
     <button type="button" class="btn-scan" onclick="scanCode()">📷 ESCANEAR CÓDIGO DE BARRAS</button>
-    <div id="status">Producto: ---</div>
-    <button type="button" class="btn-photo" onclick="takePhoto()">📸 FOTO DEL LOTE</button>
+    <div id="status">Esperando escaneo...</div>
+</div>
+
+<div class="card">
+    <h3>3. Datos del producto</h3>
+    <div class="input-group">
+        <label>📦 Nombre del producto *</label>
+        <input type="text" id="nombreProducto" placeholder="Ej: Harina 00, Ricotta fresca..." oninput="onFieldInput(this)">
+    </div>
+    <div class="input-group">
+        <label>🔢 Número de lote</label>
+        <input type="text" id="loteProducto" placeholder="Ej: L2024-001" oninput="onFieldInput(this)">
+    </div>
+    <div class="input-group">
+        <label>⚖️ Cantidad</label>
+        <input type="text" id="cantidadProducto" placeholder="Ej: 5 kg, 3 unidades..." oninput="onFieldInput(this)">
+    </div>
+</div>
+
+<div class="card">
+    <h3>4. Foto del lote (opcional)</h3>
+    <button type="button" class="btn-photo" onclick="takePhoto()">📸 TOMAR FOTO DEL LOTE</button>
     <img id="preview" alt="Vista previa del lote">
 </div>
 
-<button id="btnSave" class="btn-save" onclick="saveAll()">✅ CONFIRMAR Y GUARDAR</button>
+<button id="btnSave"      class="btn-save"      onclick="saveAll('cocina')">✅ CONFIRMAR Y GUARDAR EN REGISTROS</button>
+<button id="btnInventory" class="btn-inventory" onclick="saveAll('inventario')">📦 AÑADIR A COMPRAS DEL MES</button>
 
 <script>
-    const urlScript = "https://script.google.com/macros/s/AKfycby-RIRixdbuJ_8vpcIcrESUHBqej8UamZdmWlaHRI8Okri7LXu9jkmOgpJ-zrlKzbeT9w/exec";
+    const urlScript = "https://script.google.com/macros/s/AKfycbxe-5kU1gr8kMfMxVhpDJOTE4TjRDXcwx__j5YD-J-ousV-zMZ8ZCr8L-7yN9TH7RYnKA/exec";
 
-    let selectedMain = "";
-    let selectedSub = "";
-    let currentCode = "";
-    let photoBase64 = null;
-    let cameraStream = null;
+    let selectedMain = "", selectedSub = "", currentCode = "", photoBase64 = null, cameraStream = null, isScanning = false;
 
-    // Iniciar Cámara
     const video = document.getElementById('webcam');
-
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(stream => {
-            cameraStream = stream;
-            video.srcObject = stream;
-        })
+        .then(stream => { cameraStream = stream; video.srcObject = stream; })
         .catch(err => {
             console.error("Error cámara:", err);
             document.getElementById('camError').style.display = 'block';
             video.style.display = 'none';
         });
 
-    // Liberar cámara al salir de la página
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener('beforeunload', stopCamera);
+    function stopCamera() {
         if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
-    });
+    }
 
     function setMain(elem, val, hasSub) {
-        selectedMain = val;
-        selectedSub = "";
+        selectedMain = val; selectedSub = "";
         document.querySelectorAll('.btn-recipe').forEach(b => b.classList.remove('selected'));
         document.querySelectorAll('.btn-sub').forEach(b => b.classList.remove('selected'));
         elem.classList.add('selected');
-        const subMenu = document.getElementById('sub-ravioli');
-        subMenu.classList.toggle('hidden', !hasSub);
+        document.getElementById('sub-ravioli').classList.toggle('hidden', !hasSub);
     }
 
     function setSub(elem, val) {
@@ -105,97 +125,116 @@
         elem.classList.add('selected');
     }
 
-    function scanCode() {
-        // Verificar que la cámara esté lista
-        if (!video.videoWidth || video.videoWidth === 0) {
-            document.getElementById('status').innerHTML = "⚠️ La cámara aún no está lista, espera un momento.";
-            return;
-        }
-
-        // Verificar que Quagga esté disponible
-        if (typeof Quagga === 'undefined' || typeof Quagga.decodeSingle !== 'function') {
-            document.getElementById('status').innerHTML = "⚠️ Error: librería de escaneo no cargada.";
-            return;
-        }
-
-        document.getElementById('status').innerHTML = "🔍 Escaneando...";
-
+    function captureFrame() {
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
+        return canvas;
+    }
+
+    function scanCode() {
+        if (isScanning) return;
+        if (!video.videoWidth) { setStatus("⚠️ Cámara no lista, espera."); return; }
+        if (typeof Quagga === 'undefined') { setStatus("⚠️ Librería de escaneo no cargada."); return; }
+
+        isScanning = true;
+        setStatus('<span class="scanning-indicator">🔍 Escaneando...</span>');
 
         Quagga.decodeSingle({
-            src: canvas.toDataURL(),
+            src: captureFrame().toDataURL('image/png'),
             numOfWorkers: 0,
-            decoder: { readers: ["ean_reader", "ean_8_reader", "code_128_reader"] }
+            locate: true,
+            decoder: { readers: ["ean_reader","ean_8_reader","code_128_reader","upc_reader"] }
         }, function(result) {
+            isScanning = false;
             if (result && result.codeResult) {
                 currentCode = result.codeResult.code;
-                document.getElementById('status').innerHTML = "✅ CÓDIGO: " + currentCode;
-                if (navigator.vibrate) navigator.vibrate(100);
+                const campo = document.getElementById('nombreProducto');
+                if (!campo.value.trim()) {
+                    campo.value = currentCode;
+                    campo.classList.add('filled');
+                }
+                setStatus("✅ Código: " + currentCode);
+                if (navigator.vibrate) navigator.vibrate([100,50,100]);
             } else {
-                document.getElementById('status').innerHTML = "❌ No detectado. Intenta con más luz o acerca el código.";
+                setStatus("❌ No detectado. Ajusta la luz e inténtalo de nuevo.");
             }
         });
     }
 
-    function takePhoto() {
-        if (!video.videoWidth || video.videoWidth === 0) {
-            alert("La cámara aún no está lista.");
-            return;
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        photoBase64 = canvas.toDataURL('image/jpeg', 0.6);
-        const preview = document.getElementById('preview');
-        preview.src = photoBase64;
-        preview.style.display = 'block';
-        document.getElementById('status').innerHTML = "📸 Foto capturada correctamente.";
+    function onFieldInput(input) {
+        input.classList.toggle('filled', input.value.trim().length > 0);
+        if (input.id === 'nombreProducto') currentCode = "";
     }
 
-    async function saveAll() {
-        if (!selectedMain) return alert("Selecciona una elaboración primero.");
-        if (selectedMain === "Ravioli" && !selectedSub) return alert("Selecciona el tipo de Ravioli.");
-        if (!photoBase64) {
-            if (!confirm("No has tomado foto del lote. ¿Continuar igualmente?")) return;
-        }
+    function takePhoto() {
+        if (!video.videoWidth) { alert("La cámara aún no está lista."); return; }
+        photoBase64 = captureFrame().toDataURL('image/jpeg', 0.7);
+        const preview = document.getElementById('preview');
+        preview.style.display = 'none';
+        preview.src = '';
+        requestAnimationFrame(() => {
+            preview.src = photoBase64;
+            preview.style.display = 'block';
+            setStatus("📸 Foto capturada correctamente.");
+        });
+    }
 
-        const btn = document.getElementById('btnSave');
-        btn.disabled = true;
-        btn.innerHTML = "⌛ GUARDANDO...";
+    async function saveAll(modo) {
+        const producto = document.getElementById('nombreProducto').value.trim();
+        const lote     = document.getElementById('loteProducto').value.trim();
+        const cantidad = document.getElementById('cantidadProducto').value.trim();
+
+        if (!producto) return alert("Escribe o escanea el nombre del producto.");
+        if (modo === 'cocina') {
+            if (!selectedMain) return alert("Selecciona una elaboración primero.");
+            if (selectedMain === "Ravioli" && !selectedSub) return alert("Selecciona el tipo de Ravioli.");
+        }
+        if (!photoBase64 && !confirm("No has tomado foto del lote. ¿Continuar igualmente?")) return;
+
+        const btnSave = document.getElementById('btnSave');
+        const btnInv  = document.getElementById('btnInventory');
+        btnSave.disabled = btnInv.disabled = true;
+        (modo === 'cocina' ? btnSave : btnInv).innerHTML = "⌛ Guardando...";
 
         const payload = {
-            producto: "Registro Manual",
-            codigoBarras: currentCode || "Sin escanear",
-            preparacion: selectedMain,
-            subTipo: selectedSub || "N/A",
-            imagen: photoBase64 || ""
+            modo,
+            producto,
+            lote:         lote      || "Sin lote",
+            cantidad:     cantidad  || "Sin especificar",
+            preparacion:  selectedMain || "INVENTARIO",
+            subTipo:      selectedSub  || "N/A",
+            codigoBarras: currentCode  || "Sin escanear",
+            imagen:       photoBase64  || ""
         };
 
         try {
-            const response = await fetch(urlScript, {
+            await fetch(urlScript, {
                 method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
+                mode:   'no-cors',
+                cache:  'no-cache',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
-            // Con no-cors no podemos leer la respuesta, pero si llegamos aquí sin excepción
-            // asumimos que la petición salió. El servidor debe validar por su parte.
-            alert("✅ Datos enviados. Comprueba tu hoja de cálculo para confirmar.");
-            if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+            alert(modo === 'cocina'
+                ? "✅ Guardado en Registros. Verifica en tu hoja de cálculo."
+                : "📦 Guardado en Compras del mes. Verifica en tu hoja de cálculo.");
+            stopCamera();
             location.reload();
 
-        } catch (error) {
-            console.error("Error al enviar:", error);
-            alert("❌ Error de red al enviar los datos. Comprueba tu conexión e inténtalo de nuevo.");
-            btn.disabled = false;
-            btn.innerHTML = "✅ CONFIRMAR Y GUARDAR";
+        } catch (err) {
+            console.error(err);
+            alert("❌ Error de red. Comprueba tu conexión e inténtalo de nuevo.");
+            btnSave.disabled = btnInv.disabled = false;
+            btnSave.innerHTML = "✅ CONFIRMAR Y GUARDAR EN REGISTROS";
+            btnInv.innerHTML  = "📦 AÑADIR A COMPRAS DEL MES";
         }
+    }
+
+    function setStatus(html) {
+        document.getElementById('status').innerHTML = html;
     }
 </script>
 </body>
