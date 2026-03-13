@@ -759,11 +759,13 @@ function procesarTexto() {
 }
 
 function buscarUnidadLibreria(nombreProducto) {
-    var nombre = nombreProducto.toLowerCase();
+    if (!productosLibreria || !productosLibreria.length) return "";
+    var nombre = (nombreProducto || "").toLowerCase();
     var encontrado = productosLibreria.find(function(p){
+        if (!p || !p.nombre) return false;
         return nombre.includes(p.nombre.toLowerCase()) || p.nombre.toLowerCase().includes(nombre);
     });
-    return encontrado ? encontrado.unidad : "";
+    return encontrado ? (encontrado.unidad || "") : "";
 }
 
 function updateFila(i, campo, valor) {
