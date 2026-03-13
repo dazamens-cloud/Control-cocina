@@ -463,14 +463,7 @@ var URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxFwybPB0TY67DyJWYwN7Z
 
 var selectedMain = "", selectedSub = "", currentCode = "", photoBase64 = null, photoProductoBase64 = null;
 var cameraStream = null, isScanning = false;
-productosLibreria = (data.productos || []).map(function(p) {
-    return {
-        nombre:    p.nombre    || p[0] || "",
-        codigo:    p.codigo    || p[1] || "",
-        unidad:    p.unidad    || p[2] || "",
-        proveedor: p.proveedor || p[3] || ""
-    };
-});
+var productosLibreria = [];
 
 // ── NAVEGACION ──
 function irA(screenId) {
