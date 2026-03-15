@@ -768,7 +768,7 @@ function cargarProductosProveedor() {
             return '<div class="pedido-item">' +
                 '<input type="checkbox" class="pedido-item-check" id="pcheck-'+i+'" checked>' +
                 '<div class="pedido-item-nombre">' + p.nombre + '</div>' +
-                '<input type="number" class="pedido-item-cant" id="pcant-'+i+'" value="1" min="0">' +
+                '<input type="number" class="pedido-item-cant" id="pcant-'+i+'" value="0" min="0">' +
                 '<div class="pedido-item-unidad">' + (p.unidad||'') + '</div>' +
             '</div>';
         }).join('');
