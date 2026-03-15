@@ -84,6 +84,8 @@
         #preview,#previewProducto { width:100%; border-radius:10px; display:none; margin-top:12px; border:2px solid var(--gold-dim); max-height:280px; object-fit:cover; }
         .producto-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; }
         .producto-item-top { display:flex; align-items:center; gap:10px; }
+        .producto-item-foto { width:48px; height:48px; border-radius:8px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; background:var(--bg); }
+        .producto-item-foto-placeholder { width:48px; height:48px; border-radius:8px; border:1px solid var(--border); flex-shrink:0; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:1.4em; }
         .producto-item-info { flex:1; }
         .producto-item-nombre { font-weight:600; font-size:0.95em; color:var(--cream); }
         .producto-item-detalle { font-size:0.75em; color:var(--muted); margin-top:2px; }
@@ -95,6 +97,10 @@
         .edit-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
         .edit-input { width:100%; padding:8px 10px; background:var(--bg); border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; }
         .edit-input:focus { border-color:var(--gold-dim); }
+        .edit-foto-preview { width:100%; max-height:160px; object-fit:cover; border-radius:8px; border:1px solid var(--border); display:none; margin-bottom:8px; }
+        .edit-foto-buttons { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+        .btn-edit-foto { padding:8px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--gold-dim); font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; text-align:center; transition:all 0.2s; }
+        .btn-edit-foto:hover { border-color:var(--gold); color:var(--gold); }
         .btn-edit-save { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-family:'Bebas Neue',sans-serif; letter-spacing:1px; cursor:pointer; }
         .btn-edit-cancel { background:var(--surface2); color:var(--muted); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; cursor:pointer; margin-left:6px; }
         .compras-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:0.85em; }
@@ -146,7 +152,7 @@
     <div class="home-buttons">
         <button class="btn-home" onclick="irA('screenCocina')">
             <div class="btn-home-icon">🍳</div>
-            <div class="btn-home-text"><div class="btn-home-title">Registro Cocina</div><div class="btn-home-desc">Registra elaboraciones del día con producto y lote</div></div>
+            <div class="btn-home-text"><div class="btn-home-title">Registro Cocina</div><div class="btn-home-desc">Registra elaboraciones del dia con producto y lote</div></div>
         </button>
         <button class="btn-home" onclick="irA('screenProductos')">
             <div class="btn-home-icon">📚</div>
@@ -167,7 +173,7 @@
     </div>
     <div class="screen-content">
         <div class="steps">
-            <div class="step active" id="step1"><div class="step-num" id="stepNum1">1</div><span>Elaboración</span></div>
+            <div class="step active" id="step1"><div class="step-num" id="stepNum1">1</div><span>Elaboracion</span></div>
             <div class="step-line" id="line1"></div>
             <div class="step" id="step2"><div class="step-num" id="stepNum2">2</div><span>Producto</span></div>
             <div class="step-line" id="line2"></div>
@@ -248,7 +254,7 @@
         </div>
         <div class="card">
             <div class="card-header"><div class="card-icon">📋</div><div class="card-title">Biblioteca</div></div>
-            <input type="text" id="buscadorProductos" class="buscador-productos" placeholder="🔍 Buscar por nombre, proveedor o unidad..." oninput="filtrarProductos(this.value)">
+            <input type="text" id="buscadorProductos" class="buscador-productos" placeholder="Buscar por nombre, proveedor o unidad..." oninput="filtrarProductos(this.value)">
             <div id="listaProductos"><div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div></div>
         </div>
     </div>
@@ -332,11 +338,16 @@
     <div class="success-sub" id="successSub">Guardado correctamente</div>
 </div>
 
+<!-- INPUT OCULTO PARA GALERIA -->
+<input type="file" id="inputGaleria" accept="image/*" style="display:none" onchange="onGaleriaSelected(event)">
+
 <script>
 var URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxFwybPB0TY67DyJWYwN7Z5FpbtYa36R1UPVt7lsPwJTrC0gdpt3scbJRNNk2wvhRflXg/exec";
 var selectedMain = "", selectedSub = "", currentCode = "", photoBase64 = null, photoProductoBase64 = null;
 var cameraStream = null, isScanning = false;
 var productosLibreria = [];
+var editFotoIndex = -1;
+var editFotoBase64 = null;
 
 // NAVEGACION
 function irA(screenId) {
@@ -408,24 +419,12 @@ function captureFrame() {
 
 function scanCode() {
     if (isScanning) return;
-    if (!video.videoWidth || video.videoWidth === 0) {
-        setStatus("Camara no lista, espera un momento.", 'err');
-        isScanning = false;
-        return;
-    }
-    if (typeof Quagga === 'undefined') {
-        setStatus("Libreria de escaneo no disponible.", 'err');
-        isScanning = false;
-        return;
-    }
+    if (!video.videoWidth || video.videoWidth === 0) { setStatus("Camara no lista.", 'err'); isScanning = false; return; }
+    if (typeof Quagga === 'undefined') { setStatus("Libreria no disponible.", 'err'); isScanning = false; return; }
     isScanning = true;
     setStatus('<span class="scanning-indicator">Escaneando...</span>', '');
     var canvas = captureFrame();
-    if (!canvas.width || !canvas.height) {
-        setStatus("Error al capturar imagen.", 'err');
-        isScanning = false;
-        return;
-    }
+    if (!canvas.width || !canvas.height) { setStatus("Error al capturar.", 'err'); isScanning = false; return; }
     Quagga.decodeSingle({
         src: canvas.toDataURL('image/png'),
         numOfWorkers: 0, locate: true,
@@ -439,7 +438,7 @@ function scanCode() {
             buscarEnLibreria(currentCode);
             if (navigator.vibrate) navigator.vibrate([100,50,100]);
         } else {
-            setStatus("No detectado. Ajusta la luz e intentalo de nuevo.", 'err');
+            setStatus("No detectado. Ajusta la luz e intentalo.", 'err');
         }
     });
 }
@@ -479,7 +478,6 @@ function setStep(n, done, prev) {
     if (n<3) document.getElementById('line'+n).classList.toggle('done',done);
 }
 
-// ELABORACION
 function setMain(elem, val, hasSub) {
     selectedMain = val; selectedSub = "";
     document.querySelectorAll('.btn-recipe').forEach(function(b){ b.classList.remove('selected'); });
@@ -500,7 +498,7 @@ function onFieldInput(input) {
     updateSteps();
 }
 
-// FOTO
+// FOTO COCINA
 function takePhoto() {
     if (!video.videoWidth) { alert("Activa la camara primero."); return; }
     photoBase64 = captureFrame().toDataURL('image/jpeg', 0.7);
@@ -515,6 +513,30 @@ function fotoProducto() {
     var preview = document.getElementById('previewProducto');
     preview.style.display='none'; preview.src='';
     requestAnimationFrame(function(){ preview.src=photoProductoBase64; preview.style.display='block'; });
+}
+
+// FOTO EDICION DESDE GALERIA
+function abrirGaleriaParaEditar(i) {
+    editFotoIndex = i;
+    editFotoBase64 = null;
+    var input = document.getElementById('inputGaleria');
+    input.click();
+}
+
+function onGaleriaSelected(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        editFotoBase64 = e.target.result;
+        var preview = document.getElementById('editFotoPreview-' + editFotoIndex);
+        if (preview) {
+            preview.src = editFotoBase64;
+            preview.style.display = 'block';
+        }
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
 }
 
 // PRODUCTOS
@@ -540,10 +562,13 @@ function renderListaProductos() {
         return;
     }
     lista.innerHTML = productosLibreria.map(function(p, i) {
-        var nombreSafe = (p.nombre||'').replace(/'/g, "");
+        var nombreSafe = (p.nombre||'').replace(/'/g,"").replace(/"/g,"");
+        var fotoHtml = p.foto
+            ? '<img class="producto-item-foto" src="' + p.foto + '" onerror="this.style.display=\'none\'">'
+            : '<div class="producto-item-foto-placeholder">📦</div>';
         return '<div class="producto-item" id="pitem-'+i+'">' +
             '<div class="producto-item-top">' +
-                '<div style="font-size:1.4em">📦</div>' +
+                fotoHtml +
                 '<div class="producto-item-info">' +
                     '<div class="producto-item-nombre">' + (p.nombre||'') + '</div>' +
                     '<div class="producto-item-detalle">' + (p.unidad||'Sin unidad') + (p.proveedor ? ' · '+p.proveedor : '') + '</div>' +
@@ -553,12 +578,17 @@ function renderListaProductos() {
             '</div>' +
             '<div class="edit-form" id="editform-'+i+'">' +
                 '<div class="edit-row">' +
-                    '<input class="edit-input" id="en-'+i+'" value="'+(p.nombre||'')+'" placeholder="Nombre">' +
+                    '<input class="edit-input" id="en-'+i+'" value="'+nombreSafe+'" placeholder="Nombre">' +
                     '<input class="edit-input" id="ec-'+i+'" value="'+(p.codigo||'')+'" placeholder="Codigo">' +
                 '</div>' +
                 '<div class="edit-row">' +
                     '<input class="edit-input" id="eu-'+i+'" value="'+(p.unidad||'')+'" placeholder="Unidad">' +
                     '<input class="edit-input" id="ep-'+i+'" value="'+(p.proveedor||'')+'" placeholder="Proveedor">' +
+                '</div>' +
+                '<img class="edit-foto-preview" id="editFotoPreview-'+i+'" src="" alt="Foto">' +
+                '<div class="edit-foto-buttons">' +
+                    '<button class="btn-edit-foto" onclick="abrirGaleriaParaEditar('+i+')">🖼 Elegir de galeria</button>' +
+                    (cameraStream ? '<button class="btn-edit-foto" onclick="tomarFotoEdicion('+i+')">📷 Tomar foto</button>' : '<button class="btn-edit-foto" style="opacity:0.4;cursor:default;">📷 Activa camara</button>') +
                 '</div>' +
                 '<button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+nombreSafe+'\')">Guardar</button>' +
                 '<button class="btn-edit-cancel" onclick="toggleEdit('+i+')">Cancelar</button>' +
@@ -567,7 +597,14 @@ function renderListaProductos() {
     }).join('');
 }
 
-// BUSCADOR
+function tomarFotoEdicion(i) {
+    if (!cameraStream || !video.videoWidth) { alert("Activa la camara primero."); return; }
+    editFotoIndex = i;
+    editFotoBase64 = captureFrame().toDataURL('image/jpeg', 0.7);
+    var preview = document.getElementById('editFotoPreview-' + i);
+    if (preview) { preview.src = editFotoBase64; preview.style.display = 'block'; }
+}
+
 function filtrarProductos(texto) {
     var termino = (texto||'').toLowerCase().trim();
     var lista = document.getElementById('listaProductos');
@@ -583,10 +620,13 @@ function filtrarProductos(texto) {
     }
     lista.innerHTML = filtrados.map(function(p) {
         var i = productosLibreria.indexOf(p);
-        var nombreSafe = (p.nombre||'').replace(/'/g, "");
+        var nombreSafe = (p.nombre||'').replace(/'/g,"").replace(/"/g,"");
+        var fotoHtml = p.foto
+            ? '<img class="producto-item-foto" src="' + p.foto + '" onerror="this.style.display=\'none\'">'
+            : '<div class="producto-item-foto-placeholder">📦</div>';
         return '<div class="producto-item">' +
             '<div class="producto-item-top">' +
-                '<div style="font-size:1.4em">📦</div>' +
+                fotoHtml +
                 '<div class="producto-item-info">' +
                     '<div class="producto-item-nombre">' + (p.nombre||'') + '</div>' +
                     '<div class="producto-item-detalle">' + (p.unidad||'Sin unidad') + (p.proveedor ? ' · '+p.proveedor : '') + '</div>' +
@@ -596,12 +636,17 @@ function filtrarProductos(texto) {
             '</div>' +
             '<div class="edit-form" id="editform-'+i+'">' +
                 '<div class="edit-row">' +
-                    '<input class="edit-input" id="en-'+i+'" value="'+(p.nombre||'')+'" placeholder="Nombre">' +
+                    '<input class="edit-input" id="en-'+i+'" value="'+nombreSafe+'" placeholder="Nombre">' +
                     '<input class="edit-input" id="ec-'+i+'" value="'+(p.codigo||'')+'" placeholder="Codigo">' +
                 '</div>' +
                 '<div class="edit-row">' +
                     '<input class="edit-input" id="eu-'+i+'" value="'+(p.unidad||'')+'" placeholder="Unidad">' +
                     '<input class="edit-input" id="ep-'+i+'" value="'+(p.proveedor||'')+'" placeholder="Proveedor">' +
+                '</div>' +
+                '<img class="edit-foto-preview" id="editFotoPreview-'+i+'" src="" alt="Foto">' +
+                '<div class="edit-foto-buttons">' +
+                    '<button class="btn-edit-foto" onclick="abrirGaleriaParaEditar('+i+')">🖼 Elegir de galeria</button>' +
+                    '<button class="btn-edit-foto" onclick="tomarFotoEdicion('+i+')">📷 Tomar foto</button>' +
                 '</div>' +
                 '<button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+nombreSafe+'\')">Guardar</button>' +
                 '<button class="btn-edit-cancel" onclick="toggleEdit('+i+')">Cancelar</button>' +
@@ -616,13 +661,15 @@ function toggleEdit(i) {
 }
 
 async function guardarEdicion(i, nombreOriginal) {
+    var fotoParaEnviar = (editFotoIndex === i && editFotoBase64) ? editFotoBase64 : "";
     var payload = {
         modo: 'editarProducto',
         nombreOriginal: nombreOriginal,
         nombre:    document.getElementById('en-'+i) ? document.getElementById('en-'+i).value.trim() : '',
         codigo:    document.getElementById('ec-'+i) ? document.getElementById('ec-'+i).value.trim() : '',
         unidad:    document.getElementById('eu-'+i) ? document.getElementById('eu-'+i).value.trim() : '',
-        proveedor: document.getElementById('ep-'+i) ? document.getElementById('ep-'+i).value.trim() : ''
+        proveedor: document.getElementById('ep-'+i) ? document.getElementById('ep-'+i).value.trim() : '',
+        imagen:    fotoParaEnviar
     };
     try {
         await fetch(URL_SCRIPT, {
@@ -630,8 +677,9 @@ async function guardarEdicion(i, nombreOriginal) {
             headers:{'Content-Type':'application/json'},
             body: JSON.stringify(payload)
         });
+        editFotoIndex = -1; editFotoBase64 = null;
         setTimeout(function(){ cargarProductos(); }, 1500);
-        showSuccess("Producto Actualizado", "Cambios guardados en tu biblioteca", "✏️");
+        showSuccess("Producto Actualizado", "Cambios guardados", "✏️");
     } catch(err) { alert("Error de red."); }
 }
 
@@ -640,46 +688,33 @@ async function guardarProducto() {
     if (!nombre) return alert("El nombre es obligatorio.");
     var btn = document.querySelector('#screenProductos .btn-save');
     btn.disabled = true; btn.innerHTML = "Guardando...";
-
-    var payload = {
-        modo: 'inventario', producto: nombre,
-        codigo:    document.getElementById('pCodigo').value.trim(),
-        unidad:    document.getElementById('pUnidad').value.trim(),
-        proveedor: document.getElementById('pProveedor').value,
-        imagen:    photoProductoBase64 || ""
-    };
-
     try {
         await fetch(URL_SCRIPT, {
             method:'POST', mode:'no-cors', cache:'no-cache',
             headers:{'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                modo:'inventario', producto:nombre,
+                codigo:    document.getElementById('pCodigo').value.trim(),
+                unidad:    document.getElementById('pUnidad').value.trim(),
+                proveedor: document.getElementById('pProveedor').value,
+                imagen:    photoProductoBase64||""
+            })
         });
-
-        // Limpiar campos
         document.getElementById('pNombre').value = '';
         document.getElementById('pCodigo').value = '';
         document.getElementById('pUnidad').value = '';
         document.getElementById('pProveedor').value = '';
         document.getElementById('previewProducto').style.display = 'none';
         photoProductoBase64 = null;
-
-        // Recargar biblioteca despues de 2 segundos
         btn.innerHTML = "Guardado ✔ Recargando...";
-        setTimeout(function(){
-            cargarProductos();
-            btn.disabled = false;
-            btn.innerHTML = "Guardar en Biblioteca";
-        }, 2000);
-
+        setTimeout(function(){ cargarProductos(); btn.disabled=false; btn.innerHTML="Guardar en Biblioteca"; }, 2000);
     } catch(err) {
         alert("Error de red.");
-        btn.disabled = false;
-        btn.innerHTML = "Guardar en Biblioteca";
+        btn.disabled=false; btn.innerHTML="Guardar en Biblioteca";
     }
 }
 
-// COMPRAS REGISTRAR
+// COMPRAS
 function procesarTexto() {
     var texto = document.getElementById('cTexto').value.trim();
     if (!texto) return alert("Pega el texto del pedido primero.");
@@ -691,20 +726,13 @@ function procesarTexto() {
         if (skipWords.some(function(w){ return linea.toLowerCase().includes(w); })) return;
         var match = linea.match(/^(.+?)\s+([\d,.]+)\s*(.*)$/);
         if (match) {
-            filas.push({
-                producto: match[1].trim(),
-                cantidad: match[2].trim(),
-                unidad:   match[3].trim() || buscarUnidadLibreria(match[1].trim())
-            });
+            filas.push({ producto:match[1].trim(), cantidad:match[2].trim(), unidad:match[3].trim()||buscarUnidadLibreria(match[1].trim()) });
         }
     });
     if (!filas.length) return alert("No se encontraron productos.");
     var tbody = document.getElementById('tablaComprasBody');
     tbody.innerHTML = filas.map(function(f){
-        return '<tr><td><input value="'+f.producto+'"></td>' +
-               '<td><input value="'+f.cantidad+'" style="width:50px"></td>' +
-               '<td><input value="'+f.unidad+'"></td>' +
-               '<td><button class="btn-del-row" onclick="eliminarFila(this)">✕</button></td></tr>';
+        return '<tr><td><input value="'+f.producto+'"></td><td><input value="'+f.cantidad+'" style="width:50px"></td><td><input value="'+f.unidad+'"></td><td><button class="btn-del-row" onclick="eliminarFila(this)">✕</button></td></tr>';
     }).join('');
     document.getElementById('cardTablaCompras').classList.remove('hidden');
     document.getElementById('btnGuardarCompra').classList.remove('hidden');
@@ -751,7 +779,6 @@ async function guardarCompras() {
     } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar en Compras del Mes"; }
 }
 
-// GENERAR PEDIDO
 function cargarProductosProveedor() {
     var proveedor = document.getElementById('gProveedor').value;
     if (!proveedor) return;
@@ -779,7 +806,6 @@ function cargarProductosProveedor() {
 }
 
 function generarMensajeWhatsApp() {
-    var proveedor = document.getElementById('gProveedor').value;
     var filtrados = window.productosProveedor || [];
     var lineas = [];
     filtrados.forEach(function(p,i){
@@ -789,10 +815,9 @@ function generarMensajeWhatsApp() {
             lineas.push(p.nombre + ' ' + cant.value + (p.unidad ? ' ' + p.unidad : ''));
         }
     });
-    if (!lineas.length) return alert("Selecciona al menos un producto.");
+    if (!lineas.length) return alert("Pon cantidad a al menos un producto.");
     var mensaje = "Hola buenas, del rest. Divina Italia El Charco\n" + lineas.join('\n') + "\nMuchas gracias";
-    var url = "https://wa.me/?text=" + encodeURIComponent(mensaje);
-    window.open(url, '_blank');
+    window.open("https://wa.me/?text=" + encodeURIComponent(mensaje), '_blank');
 }
 
 async function guardarPedidoGenerado() {
@@ -807,7 +832,7 @@ async function guardarPedidoGenerado() {
             lineas.push({ producto:p.nombre, cantidad:cant.value, unidad:p.unidad||"" });
         }
     });
-    if (!lineas.length) return alert("Selecciona productos.");
+    if (!lineas.length) return alert("Pon cantidad a al menos un producto.");
     try {
         await fetch(URL_SCRIPT, {
             method:'POST', mode:'no-cors', cache:'no-cache',
@@ -818,7 +843,6 @@ async function guardarPedidoGenerado() {
     } catch(err) { alert("Error de red."); }
 }
 
-// GUARDAR COCINA
 async function guardarCocina() {
     var producto = document.getElementById('nombreProducto').value.trim();
     var lote     = document.getElementById('loteProducto').value.trim();
@@ -844,7 +868,6 @@ async function guardarCocina() {
     } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Confirmar y Guardar en Registros"; }
 }
 
-// SUCCESS
 function showSuccess(titulo, sub, icon) {
     document.getElementById('successIcon').innerHTML  = icon||'✅';
     document.getElementById('successText').innerHTML  = titulo;
