@@ -80,17 +80,17 @@
         .input-group input:focus,.input-group select:focus,.input-group textarea:focus { border-color:var(--gold-dim); }
         .input-group input.filled,.input-group select.filled { border-color:var(--green); }
         .input-group select option { background:var(--surface2); }
-        .input-group textarea { resize:vertical; min-height:100px; }
+        .input-group textarea { resize:vertical; min-height:80px; }
         #preview,#previewProducto { width:100%; border-radius:10px; display:none; margin-top:12px; border:2px solid var(--gold-dim); max-height:280px; object-fit:cover; }
         .producto-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; }
         .producto-item-top { display:flex; align-items:center; gap:10px; }
         .producto-item-foto { width:48px; height:48px; border-radius:8px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; background:var(--bg); }
         .producto-item-foto-placeholder { width:48px; height:48px; border-radius:8px; border:1px solid var(--border); flex-shrink:0; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:1.4em; }
-        .producto-item-info { flex:1; }
+        .producto-item-info { flex:1; min-width:0; }
         .producto-item-nombre { font-weight:600; font-size:0.95em; color:var(--cream); }
         .producto-item-detalle { font-size:0.75em; color:var(--muted); margin-top:2px; }
         .producto-item-codigo { font-size:0.7em; color:var(--gold-dim); margin-top:2px; font-family:monospace; }
-        .btn-edit-producto { background:none; border:1px solid var(--border); border-radius:6px; color:var(--gold-dim); padding:6px 10px; font-size:0.75em; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+        .btn-edit-producto { background:none; border:1px solid var(--border); border-radius:6px; color:var(--gold-dim); padding:6px 10px; font-size:0.75em; cursor:pointer; transition:all 0.2s; white-space:nowrap; flex-shrink:0; }
         .btn-edit-producto:hover { border-color:var(--gold); color:var(--gold); }
         .edit-form { margin-top:10px; padding-top:10px; border-top:1px solid var(--border); display:none; }
         .edit-form.open { display:block; }
@@ -118,7 +118,14 @@
         .btn-save { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; width:100%; padding:18px; font-family:'Bebas Neue',sans-serif; letter-spacing:2.5px; border:none; border-radius:12px; cursor:pointer; font-size:1em; transition:all 0.2s; box-shadow:0 4px 20px rgba(74,140,92,0.25); }
         .btn-save:active { transform:scale(0.98); }
         .btn-save:disabled { background:var(--surface2); color:var(--muted); box-shadow:none; cursor:not-allowed; }
-        .btn-whatsapp { background:linear-gradient(135deg,#1a5c2a,#25a244); color:#fff; width:100%; padding:16px; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; border:none; border-radius:12px; cursor:pointer; font-size:0.95em; transition:all 0.2s; }
+        .btn-whatsapp { background:linear-gradient(135deg,#1a5c2a,#25a244); color:#fff; width:100%; padding:18px; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; border:none; border-radius:12px; cursor:pointer; font-size:1em; transition:all 0.2s; box-shadow:0 4px 20px rgba(37,162,68,0.25); }
+        .btn-whatsapp:active { transform:scale(0.98); }
+        /* STOCK SEMANAL */
+        .semana-badge { display:inline-block; background:rgba(201,169,110,0.15); border:1px solid var(--gold-dim); border-radius:8px; padding:8px 14px; font-family:'Bebas Neue',sans-serif; letter-spacing:1.5px; color:var(--gold); font-size:0.9em; margin-bottom:14px; }
+        .stock-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+        .stock-item-elab { flex:1; font-weight:600; font-size:0.9em; color:var(--cream); }
+        .stock-item-cantidad { font-size:0.85em; color:var(--gold-dim); }
+        .stock-item-fecha { font-size:0.72em; color:var(--muted); }
         .success-overlay { position:fixed; inset:0; background:rgba(10,7,2,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:999; opacity:0; pointer-events:none; transition:opacity 0.3s; }
         .success-overlay.show { opacity:1; pointer-events:all; }
         .success-icon { font-size:4.5em; animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; margin-bottom:16px; }
@@ -161,6 +168,10 @@
         <button class="btn-home" onclick="irA('screenCompras')">
             <div class="btn-home-icon">📊</div>
             <div class="btn-home-text"><div class="btn-home-title">Compras del Mes</div><div class="btn-home-desc">Registra pedidos y genera mensajes para proveedores</div></div>
+        </button>
+        <button class="btn-home" onclick="irA('screenStock')">
+            <div class="btn-home-icon">📦</div>
+            <div class="btn-home-text"><div class="btn-home-title">Stock Semanal</div><div class="btn-home-desc">Registra el stock disponible de cada elaboracion</div></div>
         </button>
     </div>
 </div>
@@ -242,9 +253,15 @@
                 <label>Proveedor</label>
                 <select id="pProveedor">
                     <option value="">Seleccionar...</option>
-                    <option>Matteo Comit</option><option>Tias Fruit</option><option>Chacon</option>
-                    <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
-                    <option>Roper</option><option>Ortidal</option><option>Otro</option>
+                    <option>Matteo Comit</option>
+                    <option>T&#237;as Fruit</option>
+                    <option>Chacon</option>
+                    <option>ReyesyBouzon</option>
+                    <option>Canarymeat</option>
+                    <option>Pescasol</option>
+                    <option>Roper</option>
+                    <option>Ortidal</option>
+                    <option>Otro</option>
                 </select>
             </div>
             <div class="input-group" style="margin-top:12px;">
@@ -281,9 +298,15 @@
                     <label>Proveedor</label>
                     <select id="cProveedor">
                         <option value="">Seleccionar...</option>
-                        <option>Matteo Comit</option><option>Tias Fruit</option><option>Chacon</option>
-                        <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
-                        <option>Roper</option><option>Ortidal</option><option>Otro</option>
+                        <option>Matteo Comit</option>
+                        <option>T&#237;as Fruit</option>
+                        <option>Chacon</option>
+                        <option>ReyesyBouzon</option>
+                        <option>Canarymeat</option>
+                        <option>Pescasol</option>
+                        <option>Roper</option>
+                        <option>Ortidal</option>
+                        <option>Otro</option>
                     </select>
                 </div>
                 <div class="input-group" style="margin-top:10px;">
@@ -312,9 +335,15 @@
                     <label>Proveedor</label>
                     <select id="gProveedor" onchange="cargarProductosProveedor()">
                         <option value="">Seleccionar proveedor...</option>
-                        <option>Matteo Comit</option><option>Tias Fruit</option><option>Chacon</option>
-                        <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
-                        <option>Roper</option><option>Ortidal</option><option>Otro</option>
+                        <option>Matteo Comit</option>
+                        <option>T&#237;as Fruit</option>
+                        <option>Chacon</option>
+                        <option>ReyesyBouzon</option>
+                        <option>Canarymeat</option>
+                        <option>Pescasol</option>
+                        <option>Roper</option>
+                        <option>Ortidal</option>
+                        <option>Otro</option>
                     </select>
                 </div>
             </div>
@@ -324,10 +353,64 @@
             </div>
             <div style="height:120px"></div>
             <div class="action-buttons" id="actionGenerar" style="display:none">
-                <button class="btn-whatsapp" onclick="generarMensajeWhatsApp()">📱 ENVIAR POR WHATSAPP</button>
-                <button class="btn-save" onclick="guardarPedidoGenerado()">Guardar en Compras del Mes</button>
+                <button class="btn-whatsapp" onclick="enviarYGuardarPedido()">📱 ENVIAR POR WHATSAPP Y GUARDAR</button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- STOCK SEMANAL -->
+<div id="screenStock" class="screen">
+    <div class="top-bar">
+        <button class="btn-back" onclick="irA('screenHome')">←</button>
+        <div class="top-bar-title">Stock Semanal</div>
+    </div>
+    <div class="screen-content">
+
+        <div class="card">
+            <div class="card-header"><div class="card-icon">📦</div><div class="card-title">Registrar Stock</div></div>
+            <div class="semana-badge" id="semanaActual">Cargando semana...</div>
+
+            <div class="input-group">
+                <label>Elaboracion *</label>
+                <select id="sElaboracion">
+                    <option value="">Seleccionar...</option>
+                    <option>Salsa</option>
+                    <option>Bolonesa Lasana</option>
+                    <option>Bolonesa Pasta</option>
+                    <option>Lasana</option>
+                    <option>Berenjena</option>
+                    <option>Caneloni</option>
+                    <option>Ravioli - Masa</option>
+                    <option>Ravioli - Ricotta</option>
+                    <option>Ravioli - Carne</option>
+                    <option>Ravioli - Queso</option>
+                    <option>Ravioli - Porcini</option>
+                    <option>Ravioli - Pescado</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Cantidad *</label>
+                <input type="text" id="sCantidad" placeholder="Ej: 15 kg, 200 unidades, 3 bandejas...">
+            </div>
+            <div class="input-group">
+                <label>Unidad</label>
+                <input type="text" id="sUnidad" placeholder="Ej: kg, unidades, bandejas...">
+            </div>
+            <div class="input-group">
+                <label>Notas</label>
+                <textarea id="sNotas" placeholder="Ej: Recien hecho, congelado, para el fin de semana..."></textarea>
+            </div>
+        </div>
+
+        <div class="card" id="cardStockReciente">
+            <div class="card-header"><div class="card-icon">📋</div><div class="card-title">Stock Esta Semana</div></div>
+            <div id="listaStock"><div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div></div>
+        </div>
+
+    </div>
+    <div class="action-buttons">
+        <button class="btn-save" onclick="guardarStock()">Guardar Stock</button>
     </div>
 </div>
 
@@ -338,7 +421,6 @@
     <div class="success-sub" id="successSub">Guardado correctamente</div>
 </div>
 
-<!-- INPUT OCULTO PARA GALERIA -->
 <input type="file" id="inputGaleria" accept="image/*" style="display:none" onchange="onGaleriaSelected(event)">
 
 <script>
@@ -346,8 +428,15 @@ var URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxFwybPB0TY67DyJWYwN7Z
 var selectedMain = "", selectedSub = "", currentCode = "", photoBase64 = null, photoProductoBase64 = null;
 var cameraStream = null, isScanning = false;
 var productosLibreria = [];
-var editFotoIndex = -1;
-var editFotoBase64 = null;
+var editFotoIndex = -1, editFotoBase64 = null;
+
+// SEMANA ACTUAL
+function getSemanaActual() {
+    var now = new Date();
+    var startOfYear = new Date(now.getFullYear(), 0, 1);
+    var weekNum = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+    return "Semana " + weekNum + " - " + now.getFullYear();
+}
 
 // NAVEGACION
 function irA(screenId) {
@@ -355,6 +444,7 @@ function irA(screenId) {
     var screen = document.getElementById(screenId);
     if (screen) screen.classList.add('active');
     if (screenId === 'screenProductos') cargarProductos();
+    if (screenId === 'screenStock') iniciarStock();
     if (screenId === 'screenHome') pararCamara();
     window.scrollTo(0,0);
 }
@@ -376,8 +466,7 @@ async function startCamera() {
     var btnScan   = document.getElementById('btnScan');
     var camError  = document.getElementById('camError');
     var wrapper   = document.getElementById('cameraWrapper');
-    btnCamera.innerHTML = "Iniciando...";
-    btnCamera.disabled  = true;
+    btnCamera.innerHTML = "Iniciando..."; btnCamera.disabled = true;
     camError.style.display = 'none';
     var modos = [
         { video:{ facingMode:{ exact:"environment" } } },
@@ -393,12 +482,10 @@ async function startCamera() {
         cameraStream = stream; video.srcObject = stream;
         wrapper.style.display = 'block';
         try { await video.play(); } catch(e) {}
-        btnCamera.style.display = 'none';
-        btnScan.style.display   = 'block';
-        setStatus("Camara activa. Lista para escanear.", 'ok');
+        btnCamera.style.display = 'none'; btnScan.style.display = 'block';
+        setStatus("Camara activa.", 'ok');
     } else {
-        btnCamera.innerHTML = "🎥 ACTIVAR CAMARA";
-        btnCamera.disabled  = false;
+        btnCamera.innerHTML = "🎥 ACTIVAR CAMARA"; btnCamera.disabled = false;
         camError.style.display = 'block';
         camError.innerHTML = "No se pudo acceder a la camara: " + (lastErr ? lastErr.name : "error");
     }
@@ -409,7 +496,6 @@ function pararCamara() {
 }
 window.addEventListener('beforeunload', pararCamara);
 
-// ESCANEAR
 function captureFrame() {
     var c = document.createElement('canvas');
     c.width = video.videoWidth; c.height = video.videoHeight;
@@ -419,16 +505,15 @@ function captureFrame() {
 
 function scanCode() {
     if (isScanning) return;
-    if (!video.videoWidth || video.videoWidth === 0) { setStatus("Camara no lista.", 'err'); isScanning = false; return; }
+    if (!video.videoWidth) { setStatus("Camara no lista.", 'err'); isScanning = false; return; }
     if (typeof Quagga === 'undefined') { setStatus("Libreria no disponible.", 'err'); isScanning = false; return; }
     isScanning = true;
     setStatus('<span class="scanning-indicator">Escaneando...</span>', '');
     var canvas = captureFrame();
-    if (!canvas.width || !canvas.height) { setStatus("Error al capturar.", 'err'); isScanning = false; return; }
+    if (!canvas.width || !canvas.height) { setStatus("Error captura.", 'err'); isScanning = false; return; }
     Quagga.decodeSingle({
-        src: canvas.toDataURL('image/png'),
-        numOfWorkers: 0, locate: true,
-        decoder: { readers: ["ean_reader","ean_8_reader","code_128_reader","upc_reader"] }
+        src: canvas.toDataURL('image/png'), numOfWorkers:0, locate:true,
+        decoder:{ readers:["ean_reader","ean_8_reader","code_128_reader","upc_reader"] }
     }, function(result) {
         isScanning = false;
         if (result && result.codeResult) {
@@ -437,9 +522,7 @@ function scanCode() {
             setTimeout(function(){ document.getElementById('scanBox').classList.remove('detected'); }, 1000);
             buscarEnLibreria(currentCode);
             if (navigator.vibrate) navigator.vibrate([100,50,100]);
-        } else {
-            setStatus("No detectado. Ajusta la luz e intentalo.", 'err');
-        }
+        } else { setStatus("No detectado. Ajusta la luz.", 'err'); }
     });
 }
 
@@ -448,16 +531,15 @@ function buscarEnLibreria(codigo) {
     if (encontrado) {
         document.getElementById('nombreProducto').value = encontrado.nombre;
         document.getElementById('nombreProducto').classList.add('filled');
-        if (encontrado.unidad) document.getElementById('cantidadProducto').placeholder = "Unidad habitual: " + encontrado.unidad;
+        if (encontrado.unidad) document.getElementById('cantidadProducto').placeholder = "Unidad: " + encontrado.unidad;
         setStatus("Encontrado: " + encontrado.nombre, 'ok');
     } else {
         document.getElementById('nombreProducto').value = codigo;
-        setStatus("Codigo: " + codigo + " (no esta en tu biblioteca)", 'ok');
+        setStatus("Codigo: " + codigo, 'ok');
     }
     updateSteps();
 }
 
-// STEPS
 function updateSteps() {
     var s1 = !!selectedMain && (selectedMain !== 'Ravioli' || !!selectedSub);
     var s2 = !!document.getElementById('nombreProducto').value.trim();
@@ -498,7 +580,6 @@ function onFieldInput(input) {
     updateSteps();
 }
 
-// FOTO COCINA
 function takePhoto() {
     if (!video.videoWidth) { alert("Activa la camara primero."); return; }
     photoBase64 = captureFrame().toDataURL('image/jpeg', 0.7);
@@ -515,12 +596,9 @@ function fotoProducto() {
     requestAnimationFrame(function(){ preview.src=photoProductoBase64; preview.style.display='block'; });
 }
 
-// FOTO EDICION DESDE GALERIA
 function abrirGaleriaParaEditar(i) {
-    editFotoIndex = i;
-    editFotoBase64 = null;
-    var input = document.getElementById('inputGaleria');
-    input.click();
+    editFotoIndex = i; editFotoBase64 = null;
+    document.getElementById('inputGaleria').click();
 }
 
 function onGaleriaSelected(event) {
@@ -530,13 +608,18 @@ function onGaleriaSelected(event) {
     reader.onload = function(e) {
         editFotoBase64 = e.target.result;
         var preview = document.getElementById('editFotoPreview-' + editFotoIndex);
-        if (preview) {
-            preview.src = editFotoBase64;
-            preview.style.display = 'block';
-        }
+        if (preview) { preview.src = editFotoBase64; preview.style.display = 'block'; }
     };
     reader.readAsDataURL(file);
     event.target.value = '';
+}
+
+function tomarFotoEdicion(i) {
+    if (!cameraStream || !video.videoWidth) { alert("Activa la camara primero."); return; }
+    editFotoIndex = i;
+    editFotoBase64 = captureFrame().toDataURL('image/jpeg', 0.7);
+    var preview = document.getElementById('editFotoPreview-' + i);
+    if (preview) { preview.src = editFotoBase64; preview.style.display = 'block'; }
 }
 
 // PRODUCTOS
@@ -554,55 +637,45 @@ function cargarProductos() {
         });
 }
 
+function itemHTML(p, i) {
+    var nombreSafe = (p.nombre||'').replace(/'/g,"").replace(/"/g,"");
+    var fotoHtml = p.foto
+        ? '<img class="producto-item-foto" src="'+p.foto+'" onerror="this.style.display=\'none\'">'
+        : '<div class="producto-item-foto-placeholder">📦</div>';
+    return '<div class="producto-item" id="pitem-'+i+'">' +
+        '<div class="producto-item-top">' + fotoHtml +
+            '<div class="producto-item-info">' +
+                '<div class="producto-item-nombre">' + (p.nombre||'') + '</div>' +
+                '<div class="producto-item-detalle">' + (p.unidad||'Sin unidad') + (p.proveedor ? ' · '+p.proveedor : '') + '</div>' +
+                (p.codigo ? '<div class="producto-item-codigo">' + p.codigo + '</div>' : '') +
+            '</div>' +
+            '<button class="btn-edit-producto" onclick="toggleEdit('+i+')">✏️ Editar</button>' +
+        '</div>' +
+        '<div class="edit-form" id="editform-'+i+'">' +
+            '<div class="edit-row">' +
+                '<input class="edit-input" id="en-'+i+'" value="'+nombreSafe+'" placeholder="Nombre">' +
+                '<input class="edit-input" id="ec-'+i+'" value="'+(p.codigo||'')+'" placeholder="Codigo">' +
+            '</div>' +
+            '<div class="edit-row">' +
+                '<input class="edit-input" id="eu-'+i+'" value="'+(p.unidad||'')+'" placeholder="Unidad">' +
+                '<input class="edit-input" id="ep-'+i+'" value="'+(p.proveedor||'')+'" placeholder="Proveedor">' +
+            '</div>' +
+            '<img class="edit-foto-preview" id="editFotoPreview-'+i+'" src="" alt="Foto nueva">' +
+            '<div class="edit-foto-buttons">' +
+                '<button class="btn-edit-foto" onclick="abrirGaleriaParaEditar('+i+')">🖼 Galeria</button>' +
+                '<button class="btn-edit-foto" onclick="tomarFotoEdicion('+i+')">📷 Camara</button>' +
+            '</div>' +
+            '<button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+nombreSafe+'\')">Guardar</button>' +
+            '<button class="btn-edit-cancel" onclick="toggleEdit('+i+')">Cancelar</button>' +
+        '</div>' +
+    '</div>';
+}
+
 function renderListaProductos() {
     var lista = document.getElementById('listaProductos');
     if (!lista) return;
-    if (!productosLibreria.length) {
-        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Aun no hay productos.</div>';
-        return;
-    }
-    lista.innerHTML = productosLibreria.map(function(p, i) {
-        var nombreSafe = (p.nombre||'').replace(/'/g,"").replace(/"/g,"");
-        var fotoHtml = p.foto
-            ? '<img class="producto-item-foto" src="' + p.foto + '" onerror="this.style.display=\'none\'">'
-            : '<div class="producto-item-foto-placeholder">📦</div>';
-        return '<div class="producto-item" id="pitem-'+i+'">' +
-            '<div class="producto-item-top">' +
-                fotoHtml +
-                '<div class="producto-item-info">' +
-                    '<div class="producto-item-nombre">' + (p.nombre||'') + '</div>' +
-                    '<div class="producto-item-detalle">' + (p.unidad||'Sin unidad') + (p.proveedor ? ' · '+p.proveedor : '') + '</div>' +
-                    (p.codigo ? '<div class="producto-item-codigo">' + p.codigo + '</div>' : '') +
-                '</div>' +
-                '<button class="btn-edit-producto" onclick="toggleEdit('+i+')">✏️ Editar</button>' +
-            '</div>' +
-            '<div class="edit-form" id="editform-'+i+'">' +
-                '<div class="edit-row">' +
-                    '<input class="edit-input" id="en-'+i+'" value="'+nombreSafe+'" placeholder="Nombre">' +
-                    '<input class="edit-input" id="ec-'+i+'" value="'+(p.codigo||'')+'" placeholder="Codigo">' +
-                '</div>' +
-                '<div class="edit-row">' +
-                    '<input class="edit-input" id="eu-'+i+'" value="'+(p.unidad||'')+'" placeholder="Unidad">' +
-                    '<input class="edit-input" id="ep-'+i+'" value="'+(p.proveedor||'')+'" placeholder="Proveedor">' +
-                '</div>' +
-                '<img class="edit-foto-preview" id="editFotoPreview-'+i+'" src="" alt="Foto">' +
-                '<div class="edit-foto-buttons">' +
-                    '<button class="btn-edit-foto" onclick="abrirGaleriaParaEditar('+i+')">🖼 Elegir de galeria</button>' +
-                    (cameraStream ? '<button class="btn-edit-foto" onclick="tomarFotoEdicion('+i+')">📷 Tomar foto</button>' : '<button class="btn-edit-foto" style="opacity:0.4;cursor:default;">📷 Activa camara</button>') +
-                '</div>' +
-                '<button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+nombreSafe+'\')">Guardar</button>' +
-                '<button class="btn-edit-cancel" onclick="toggleEdit('+i+')">Cancelar</button>' +
-            '</div>' +
-        '</div>';
-    }).join('');
-}
-
-function tomarFotoEdicion(i) {
-    if (!cameraStream || !video.videoWidth) { alert("Activa la camara primero."); return; }
-    editFotoIndex = i;
-    editFotoBase64 = captureFrame().toDataURL('image/jpeg', 0.7);
-    var preview = document.getElementById('editFotoPreview-' + i);
-    if (preview) { preview.src = editFotoBase64; preview.style.display = 'block'; }
+    if (!productosLibreria.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Aun no hay productos.</div>'; return; }
+    lista.innerHTML = productosLibreria.map(function(p,i){ return itemHTML(p,i); }).join('');
 }
 
 function filtrarProductos(texto) {
@@ -614,45 +687,8 @@ function filtrarProductos(texto) {
                (p.proveedor||'').toLowerCase().includes(termino) ||
                (p.unidad||'').toLowerCase().includes(termino);
     });
-    if (!filtrados.length) {
-        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">No se encontraron productos.</div>';
-        return;
-    }
-    lista.innerHTML = filtrados.map(function(p) {
-        var i = productosLibreria.indexOf(p);
-        var nombreSafe = (p.nombre||'').replace(/'/g,"").replace(/"/g,"");
-        var fotoHtml = p.foto
-            ? '<img class="producto-item-foto" src="' + p.foto + '" onerror="this.style.display=\'none\'">'
-            : '<div class="producto-item-foto-placeholder">📦</div>';
-        return '<div class="producto-item">' +
-            '<div class="producto-item-top">' +
-                fotoHtml +
-                '<div class="producto-item-info">' +
-                    '<div class="producto-item-nombre">' + (p.nombre||'') + '</div>' +
-                    '<div class="producto-item-detalle">' + (p.unidad||'Sin unidad') + (p.proveedor ? ' · '+p.proveedor : '') + '</div>' +
-                    (p.codigo ? '<div class="producto-item-codigo">' + p.codigo + '</div>' : '') +
-                '</div>' +
-                '<button class="btn-edit-producto" onclick="toggleEdit('+i+')">✏️ Editar</button>' +
-            '</div>' +
-            '<div class="edit-form" id="editform-'+i+'">' +
-                '<div class="edit-row">' +
-                    '<input class="edit-input" id="en-'+i+'" value="'+nombreSafe+'" placeholder="Nombre">' +
-                    '<input class="edit-input" id="ec-'+i+'" value="'+(p.codigo||'')+'" placeholder="Codigo">' +
-                '</div>' +
-                '<div class="edit-row">' +
-                    '<input class="edit-input" id="eu-'+i+'" value="'+(p.unidad||'')+'" placeholder="Unidad">' +
-                    '<input class="edit-input" id="ep-'+i+'" value="'+(p.proveedor||'')+'" placeholder="Proveedor">' +
-                '</div>' +
-                '<img class="edit-foto-preview" id="editFotoPreview-'+i+'" src="" alt="Foto">' +
-                '<div class="edit-foto-buttons">' +
-                    '<button class="btn-edit-foto" onclick="abrirGaleriaParaEditar('+i+')">🖼 Elegir de galeria</button>' +
-                    '<button class="btn-edit-foto" onclick="tomarFotoEdicion('+i+')">📷 Tomar foto</button>' +
-                '</div>' +
-                '<button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+nombreSafe+'\')">Guardar</button>' +
-                '<button class="btn-edit-cancel" onclick="toggleEdit('+i+')">Cancelar</button>' +
-            '</div>' +
-        '</div>';
-    }).join('');
+    if (!filtrados.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">No encontrado.</div>'; return; }
+    lista.innerHTML = filtrados.map(function(p){ return itemHTML(p, productosLibreria.indexOf(p)); }).join('');
 }
 
 function toggleEdit(i) {
@@ -663,8 +699,7 @@ function toggleEdit(i) {
 async function guardarEdicion(i, nombreOriginal) {
     var fotoParaEnviar = (editFotoIndex === i && editFotoBase64) ? editFotoBase64 : "";
     var payload = {
-        modo: 'editarProducto',
-        nombreOriginal: nombreOriginal,
+        modo:'editarProducto', nombreOriginal:nombreOriginal,
         nombre:    document.getElementById('en-'+i) ? document.getElementById('en-'+i).value.trim() : '',
         codigo:    document.getElementById('ec-'+i) ? document.getElementById('ec-'+i).value.trim() : '',
         unidad:    document.getElementById('eu-'+i) ? document.getElementById('eu-'+i).value.trim() : '',
@@ -672,14 +707,10 @@ async function guardarEdicion(i, nombreOriginal) {
         imagen:    fotoParaEnviar
     };
     try {
-        await fetch(URL_SCRIPT, {
-            method:'POST', mode:'no-cors', cache:'no-cache',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
-        });
-        editFotoIndex = -1; editFotoBase64 = null;
-        setTimeout(function(){ cargarProductos(); }, 1500);
-        showSuccess("Producto Actualizado", "Cambios guardados", "✏️");
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+        editFotoIndex=-1; editFotoBase64=null;
+        setTimeout(function(){ cargarProductos(); }, 2000);
+        showSuccess("Producto Actualizado","Cambios guardados","✏️");
     } catch(err) { alert("Error de red."); }
 }
 
@@ -687,31 +718,21 @@ async function guardarProducto() {
     var nombre = document.getElementById('pNombre').value.trim();
     if (!nombre) return alert("El nombre es obligatorio.");
     var btn = document.querySelector('#screenProductos .btn-save');
-    btn.disabled = true; btn.innerHTML = "Guardando...";
+    btn.disabled=true; btn.innerHTML="Guardando...";
     try {
-        await fetch(URL_SCRIPT, {
-            method:'POST', mode:'no-cors', cache:'no-cache',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({
-                modo:'inventario', producto:nombre,
-                codigo:    document.getElementById('pCodigo').value.trim(),
-                unidad:    document.getElementById('pUnidad').value.trim(),
-                proveedor: document.getElementById('pProveedor').value,
-                imagen:    photoProductoBase64||""
-            })
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ modo:'inventario', producto:nombre,
+                codigo:document.getElementById('pCodigo').value.trim(),
+                unidad:document.getElementById('pUnidad').value.trim(),
+                proveedor:document.getElementById('pProveedor').value,
+                imagen:photoProductoBase64||"" })
         });
-        document.getElementById('pNombre').value = '';
-        document.getElementById('pCodigo').value = '';
-        document.getElementById('pUnidad').value = '';
-        document.getElementById('pProveedor').value = '';
-        document.getElementById('previewProducto').style.display = 'none';
-        photoProductoBase64 = null;
-        btn.innerHTML = "Guardado ✔ Recargando...";
+        document.getElementById('pNombre').value=''; document.getElementById('pCodigo').value='';
+        document.getElementById('pUnidad').value=''; document.getElementById('pProveedor').value='';
+        document.getElementById('previewProducto').style.display='none'; photoProductoBase64=null;
+        btn.innerHTML="Guardado ✔ Recargando...";
         setTimeout(function(){ cargarProductos(); btn.disabled=false; btn.innerHTML="Guardar en Biblioteca"; }, 2000);
-    } catch(err) {
-        alert("Error de red.");
-        btn.disabled=false; btn.innerHTML="Guardar en Biblioteca";
-    }
+    } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar en Biblioteca"; }
 }
 
 // COMPRAS
@@ -721,13 +742,10 @@ function procesarTexto() {
     var skipWords = ['hola','buenas','gracias','muchas','del','rest','charco','divina','italia','ok','perfecto'];
     var filas = [];
     texto.split('\n').forEach(function(linea) {
-        linea = linea.trim();
-        if (!linea) return;
+        linea = linea.trim(); if (!linea) return;
         if (skipWords.some(function(w){ return linea.toLowerCase().includes(w); })) return;
         var match = linea.match(/^(.+?)\s+([\d,.]+)\s*(.*)$/);
-        if (match) {
-            filas.push({ producto:match[1].trim(), cantidad:match[2].trim(), unidad:match[3].trim()||buscarUnidadLibreria(match[1].trim()) });
-        }
+        if (match) filas.push({ producto:match[1].trim(), cantidad:match[2].trim(), unidad:match[3].trim()||buscarUnidadLibreria(match[1].trim()) });
     });
     if (!filas.length) return alert("No se encontraron productos.");
     var tbody = document.getElementById('tablaComprasBody');
@@ -760,9 +778,8 @@ function anadirFilaCompra() {
 async function guardarCompras() {
     var proveedor = document.getElementById('cProveedor').value;
     if (!proveedor) return alert("Selecciona un proveedor.");
-    var tbody = document.getElementById('tablaComprasBody');
     var lineas = [];
-    Array.from(tbody.rows).forEach(function(row){
+    Array.from(document.getElementById('tablaComprasBody').rows).forEach(function(row){
         var inputs = row.querySelectorAll('input');
         if (inputs[0].value.trim()) lineas.push({ producto:inputs[0].value.trim(), cantidad:inputs[1].value.trim(), unidad:inputs[2].value.trim() });
     });
@@ -770,11 +787,8 @@ async function guardarCompras() {
     var btn = document.getElementById('btnGuardarCompra');
     btn.disabled=true; btn.innerHTML="Guardando...";
     try {
-        await fetch(URL_SCRIPT, {
-            method:'POST', mode:'no-cors', cache:'no-cache',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ modo:'compra', proveedor:proveedor, lineas:lineas })
-        });
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ modo:'compra', proveedor:proveedor, lineas:lineas }) });
         showSuccess("Pedido Registrado", lineas.length+" productos guardados","📊");
     } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar en Compras del Mes"; }
 }
@@ -784,12 +798,11 @@ function cargarProductosProveedor() {
     if (!proveedor) return;
     var filtrados = productosLibreria.filter(function(p){
         if (!p || !p.proveedor) return false;
-        return p.proveedor.toLowerCase() === proveedor.toLowerCase();
+        return p.proveedor.toLowerCase().trim() === proveedor.toLowerCase().trim();
     });
-    var card = document.getElementById('cardPedidoItems');
     var lista = document.getElementById('listaPedidoItems');
     if (!filtrados.length) {
-        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;padding:10px;">No tienes productos de este proveedor. Anadelos en Mis Productos.</div>';
+        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;padding:10px;">No tienes productos de este proveedor.</div>';
     } else {
         lista.innerHTML = filtrados.map(function(p,i){
             return '<div class="pedido-item">' +
@@ -800,47 +813,89 @@ function cargarProductosProveedor() {
             '</div>';
         }).join('');
     }
-    card.classList.remove('hidden');
+    document.getElementById('cardPedidoItems').classList.remove('hidden');
     document.getElementById('actionGenerar').style.display = 'flex';
     window.productosProveedor = filtrados;
 }
 
-function generarMensajeWhatsApp() {
+async function enviarYGuardarPedido() {
+    var proveedor = document.getElementById('gProveedor').value;
     var filtrados = window.productosProveedor || [];
     var lineas = [];
     filtrados.forEach(function(p,i){
         var check = document.getElementById('pcheck-'+i);
         var cant  = document.getElementById('pcant-'+i);
-        if (check && check.checked && cant && parseFloat(cant.value) > 0) {
-            lineas.push(p.nombre + ' ' + cant.value + (p.unidad ? ' ' + p.unidad : ''));
-        }
+        if (check && check.checked && cant && parseFloat(cant.value) > 0)
+            lineas.push({ producto:p.nombre, cantidad:cant.value, unidad:p.unidad||"" });
     });
     if (!lineas.length) return alert("Pon cantidad a al menos un producto.");
-    var mensaje = "Hola buenas, del rest. Divina Italia El Charco\n" + lineas.join('\n') + "\nMuchas gracias";
+    var mensaje = "Hola buenas, del rest. Divina Italia El Charco\n" +
+        lineas.map(function(l){ return l.producto+' '+l.cantidad+(l.unidad?' '+l.unidad:''); }).join('\n') + "\nMuchas gracias";
     window.open("https://wa.me/?text=" + encodeURIComponent(mensaje), '_blank');
+    try {
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ modo:'compra', proveedor:proveedor, lineas:lineas }) });
+        showSuccess("Pedido Enviado y Guardado", lineas.length+" productos en Compras del mes","📱");
+    } catch(err) { alert("WhatsApp abierto pero error al guardar."); }
 }
 
-async function guardarPedidoGenerado() {
-    var proveedor = document.getElementById('gProveedor').value;
-    if (!proveedor) return alert("Selecciona un proveedor.");
-    var filtrados = window.productosProveedor || [];
-    var lineas = [];
-    filtrados.forEach(function(p,i){
-        var check = document.getElementById('pcheck-'+i);
-        var cant  = document.getElementById('pcant-'+i);
-        if (check && check.checked && cant && parseFloat(cant.value) > 0) {
-            lineas.push({ producto:p.nombre, cantidad:cant.value, unidad:p.unidad||"" });
-        }
-    });
-    if (!lineas.length) return alert("Pon cantidad a al menos un producto.");
-    try {
-        await fetch(URL_SCRIPT, {
-            method:'POST', mode:'no-cors', cache:'no-cache',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ modo:'compra', proveedor:proveedor, lineas:lineas })
+// STOCK SEMANAL
+function iniciarStock() {
+    var semana = getSemanaActual();
+    document.getElementById('semanaActual').textContent = semana;
+    cargarStockSemana(semana);
+}
+
+function cargarStockSemana(semana) {
+    fetch(URL_SCRIPT + "?accion=listarStock&semana=" + encodeURIComponent(semana))
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+            var lista = document.getElementById('listaStock');
+            var items = data.stock || [];
+            if (!items.length) {
+                lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin registros esta semana.</div>';
+                return;
+            }
+            lista.innerHTML = items.map(function(s){
+                return '<div class="stock-item">' +
+                    '<div style="font-size:1.3em">📦</div>' +
+                    '<div style="flex:1">' +
+                        '<div class="stock-item-elab">' + (s.elaboracion||'') + '</div>' +
+                        '<div class="stock-item-cantidad">' + (s.cantidad||'') + ' ' + (s.unidad||'') + '</div>' +
+                        (s.notas ? '<div style="font-size:0.75em;color:var(--muted);margin-top:2px;">' + s.notas + '</div>' : '') +
+                    '</div>' +
+                    '<div class="stock-item-fecha">' + (s.fecha||'') + '</div>' +
+                '</div>';
+            }).join('');
+        })
+        .catch(function(){
+            document.getElementById('listaStock').innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>';
         });
-        showSuccess("Pedido Guardado","Guardado en Compras del mes","📊");
-    } catch(err) { alert("Error de red."); }
+}
+
+async function guardarStock() {
+    var elaboracion = document.getElementById('sElaboracion').value;
+    var cantidad    = document.getElementById('sCantidad').value.trim();
+    var unidad      = document.getElementById('sUnidad').value.trim();
+    var notas       = document.getElementById('sNotas').value.trim();
+    if (!elaboracion) return alert("Selecciona una elaboracion.");
+    if (!cantidad)    return alert("Introduce la cantidad.");
+    var btn = document.querySelector('#screenStock .btn-save');
+    btn.disabled=true; btn.innerHTML="Guardando...";
+    var semana = getSemanaActual();
+    try {
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ modo:'stock', elaboracion:elaboracion, cantidad:cantidad, unidad:unidad, notas:notas, semana:semana }) });
+        document.getElementById('sElaboracion').value='';
+        document.getElementById('sCantidad').value='';
+        document.getElementById('sUnidad').value='';
+        document.getElementById('sNotas').value='';
+        btn.innerHTML="Guardado ✔";
+        setTimeout(function(){
+            btn.disabled=false; btn.innerHTML="Guardar Stock";
+            cargarStockSemana(semana);
+        }, 1500);
+    } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar Stock"; }
 }
 
 async function guardarCocina() {
@@ -854,16 +909,9 @@ async function guardarCocina() {
     var btn = document.querySelector('#screenCocina .btn-save');
     btn.disabled=true; btn.innerHTML="Guardando...";
     try {
-        await fetch(URL_SCRIPT, {
-            method:'POST', mode:'no-cors', cache:'no-cache',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({
-                modo:'cocina', producto:producto,
-                lote:lote||"Sin lote", cantidad:cantidad||"Sin especificar",
-                preparacion:selectedMain, subTipo:selectedSub||"N/A",
-                codigoBarras:currentCode||"Sin escanear", imagen:photoBase64||""
-            })
-        });
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ modo:'cocina', producto:producto, lote:lote||"Sin lote", cantidad:cantidad||"Sin especificar",
+                preparacion:selectedMain, subTipo:selectedSub||"N/A", codigoBarras:currentCode||"Sin escanear", imagen:photoBase64||"" }) });
         showSuccess("Oido Cocina!","Guardado en Registros","🍝");
     } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Confirmar y Guardar en Registros"; }
 }
