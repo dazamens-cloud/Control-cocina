@@ -367,7 +367,8 @@ var URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxFwybPB0TY67DyJWYwN7Z
 var selectedMain = "", selectedSub = "", currentCode = "", photoBase64 = null, photoProductoBase64 = null;
 var cameraStream = null, isScanning = false;
 var productosLibreria = [];
-
+// Cargar productos al inicio también en pantalla de compras
+document.addEventListener('DOMContentLoaded', function(){ cargarProductos(); });
 // ── NAVEGACION ──
 function irA(screenId) {
     document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
