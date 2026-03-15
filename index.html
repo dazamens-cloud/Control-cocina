@@ -439,14 +439,29 @@ function captureFrame() {
 
 function scanCode() {
     if (isScanning) return;
-    if (!video.videoWidth) { setStatus("Cámara no lista.", 'err'); return; }
-    if (typeof Quagga === 'undefined') { setStatus("Librería no disponible.", 'err'); return; }
+    if (!video.videoWidth || video.videoWidth === 0) {
+        setStatus("Cámara no lista, espera un momento.", 'err');
+        isScanning = false;
+        return;
+    }
+    if (typeof Quagga === 'undefined') {
+        setStatus("Librería de escaneo no disponible.", 'err');
+        isScanning = false;
+        return;
+    }
     isScanning = true;
     setStatus('<span class="scanning-indicator">Escaneando...</span>', '');
+    var canvas = captureFrame();
+    if (!canvas.width || !canvas.height) {
+        setStatus("Error al capturar imagen.", 'err');
+        isScanning = false;
+        return;
+    }
     Quagga.decodeSingle({
-        src: captureFrame().toDataURL('image/png'),
-        numOfWorkers:0, locate:true,
-        decoder:{ readers:["ean_reader","ean_8_reader","code_128_reader","upc_reader"] }
+        src: canvas.toDataURL('image/png'),
+        numOfWorkers: 0,
+        locate: true,
+        decoder: { readers: ["ean_reader","ean_8_reader","code_128_reader","upc_reader"] }
     }, function(result) {
         isScanning = false;
         if (result && result.codeResult) {
@@ -456,7 +471,7 @@ function scanCode() {
             buscarEnLibreria(currentCode);
             if (navigator.vibrate) navigator.vibrate([100,50,100]);
         } else {
-            setStatus("No detectado. Ajusta la luz e inténtalo.", 'err');
+            setStatus("No detectado. Ajusta la luz e inténtalo de nuevo.", 'err');
         }
     });
 }
