@@ -15,8 +15,6 @@
         }
         * { box-sizing:border-box; margin:0; padding:0; }
         body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
-
-        /* HOME */
         #screenHome { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px 20px; background:radial-gradient(ellipse at top,#2a1f0a 0%,#0f0a04 70%); }
         .logo-area { text-align:center; margin-bottom:40px; }
         .logo-icon { font-size:3.5em; margin-bottom:10px; }
@@ -29,16 +27,12 @@
         .btn-home-icon { font-size:1.8em; flex-shrink:0; }
         .btn-home-title { font-family:'Bebas Neue',sans-serif; font-size:1.1em; letter-spacing:2px; color:var(--gold); }
         .btn-home-desc { font-size:0.78em; color:var(--muted); margin-top:2px; }
-
-        /* SCREENS */
         .screen { display:none; flex-direction:column; min-height:100vh; }
         .screen.active { display:flex; }
         .top-bar { display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:10; }
         .btn-back { background:none; border:none; color:var(--gold); font-size:1.3em; cursor:pointer; padding:4px 8px; border-radius:6px; }
         .top-bar-title { font-family:'Playfair Display',serif; font-size:1.1em; color:var(--gold); font-style:italic; }
         .screen-content { padding:14px 14px 120px; flex:1; }
-
-        /* CARDS */
         .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:12px; transition:border-color 0.3s; }
         .card.completed { border-color:var(--green); }
         .card-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
@@ -46,8 +40,6 @@
         .card-title { font-family:'Bebas Neue',sans-serif; font-size:1em; letter-spacing:1.5px; color:var(--gold); }
         .card-check { margin-left:auto; color:var(--green); font-size:1.1em; opacity:0; transition:opacity 0.3s; }
         .card.completed .card-check { opacity:1; }
-
-        /* STEPS */
         .steps { display:flex; gap:6px; align-items:center; margin-bottom:16px; }
         .step { display:flex; align-items:center; gap:5px; font-size:0.72em; color:var(--muted); font-weight:600; transition:color 0.3s; }
         .step-num { width:22px; height:22px; border-radius:50%; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.85em; transition:all 0.3s; flex-shrink:0; }
@@ -57,8 +49,6 @@
         .step.active .step-num { border-color:var(--gold); color:var(--gold); }
         .step-line { flex:1; height:1px; background:var(--border); transition:background 0.3s; }
         .step-line.done { background:var(--green); }
-
-        /* RECIPE BUTTONS */
         .grid-recipes { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
         .btn-recipe { background:var(--surface2); color:var(--muted); border:1px solid var(--border); border-radius:10px; padding:14px 8px; font-size:13px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s; }
         .btn-recipe:active { transform:scale(0.97); }
@@ -66,8 +56,6 @@
         .grid-sub { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
         .btn-sub { background:var(--surface2); color:var(--muted); border:1px solid var(--border); border-radius:8px; padding:10px 4px; font-size:11px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s; }
         .btn-sub.selected { background:rgba(201,169,110,0.15); border-color:var(--gold); color:var(--gold); }
-
-        /* CAMERA */
         .camera-wrapper { position:relative; margin-bottom:10px; border-radius:12px; overflow:hidden; background:#000; display:none; }
         video { width:100%; display:block; min-height:220px; }
         .scan-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
@@ -76,20 +64,15 @@
         .scan-line { position:absolute; left:4px; right:4px; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); animation:scanMove 2s ease-in-out infinite; top:50%; }
         .scan-hint { position:absolute; bottom:-24px; left:0; right:0; text-align:center; font-size:0.7em; color:rgba(201,169,110,0.7); letter-spacing:1px; }
         @keyframes scanMove { 0%,100%{top:15%} 50%{top:80%} }
-
-        /* BUTTONS */
         .btn-cam { width:100%; padding:14px; border-radius:10px; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; cursor:pointer; border:none; transition:all 0.2s; margin-bottom:8px; font-size:14px; }
         .btn-cam:active { transform:scale(0.98); }
         #btnCamera { background:linear-gradient(135deg,var(--surface2),#3a2a10); color:var(--gold); border:1px solid var(--border); }
         #btnScan { background:linear-gradient(135deg,#2a4a3a,#1a3a2a); color:#6abf84; border:1px solid #2a5a3a; display:none; }
         #btnPhoto { background:linear-gradient(135deg,var(--surface2),#3a2a10); color:var(--gold); border:1px solid var(--border); margin-bottom:0; }
-
         #camError { font-size:0.82em; margin-bottom:8px; display:none; line-height:1.5; color:var(--danger); }
         #status { font-size:0.85em; font-weight:600; min-height:20px; color:var(--muted); margin:10px 0 6px; }
         #status.ok { color:#6abf84; }
         #status.err { color:var(--danger); }
-
-        /* INPUTS */
         .input-group { margin-top:10px; }
         .input-group label { font-size:0.72em; color:var(--gold-dim); display:block; margin-bottom:5px; font-weight:600; letter-spacing:1px; text-transform:uppercase; }
         .input-group input,.input-group select,.input-group textarea { width:100%; padding:13px 14px; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; font-size:15px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; transition:border-color 0.2s; }
@@ -98,11 +81,7 @@
         .input-group input.filled,.input-group select.filled { border-color:var(--green); }
         .input-group select option { background:var(--surface2); }
         .input-group textarea { resize:vertical; min-height:100px; }
-
-        /* PREVIEW */
         #preview,#previewProducto { width:100%; border-radius:10px; display:none; margin-top:12px; border:2px solid var(--gold-dim); max-height:280px; object-fit:cover; }
-
-        /* PRODUCTOS LISTA */
         .producto-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; }
         .producto-item-top { display:flex; align-items:center; gap:10px; }
         .producto-item-info { flex:1; }
@@ -118,36 +97,27 @@
         .edit-input:focus { border-color:var(--gold-dim); }
         .btn-edit-save { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-family:'Bebas Neue',sans-serif; letter-spacing:1px; cursor:pointer; }
         .btn-edit-cancel { background:var(--surface2); color:var(--muted); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; cursor:pointer; margin-left:6px; }
-
-        /* COMPRAS TABLA */
         .compras-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:0.85em; }
         .compras-table th { background:var(--surface2); color:var(--gold-dim); padding:8px; text-align:left; font-weight:600; border-bottom:1px solid var(--border); }
         .compras-table td { padding:8px; border-bottom:1px solid var(--border); color:var(--text); }
         .compras-table input { background:transparent; border:none; color:var(--text); font-size:0.95em; width:100%; outline:none; font-family:'DM Sans',sans-serif; }
         .compras-table input:focus { border-bottom:1px solid var(--gold); }
         .btn-del-row { background:none; border:none; color:var(--danger); cursor:pointer; font-size:1em; padding:2px 6px; }
-
-        /* GENERADOR PEDIDO */
         .pedido-item { display:flex; align-items:center; gap:8px; padding:8px; background:var(--surface2); border-radius:8px; margin-bottom:6px; border:1px solid var(--border); }
         .pedido-item-nombre { flex:1; font-size:0.9em; color:var(--cream); }
         .pedido-item-cant { width:60px; padding:6px 8px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:13px; color:var(--text); text-align:center; font-family:'DM Sans',sans-serif; outline:none; }
         .pedido-item-unidad { font-size:0.75em; color:var(--muted); white-space:nowrap; }
         .pedido-item-check { width:20px; height:20px; cursor:pointer; accent-color:var(--green); }
-
-        /* ACTION BUTTONS */
         .action-buttons { position:fixed; bottom:0; left:0; right:0; padding:10px 14px 20px; background:linear-gradient(transparent,var(--bg) 25%); display:flex; flex-direction:column; gap:8px; }
         .btn-save { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; width:100%; padding:18px; font-family:'Bebas Neue',sans-serif; letter-spacing:2.5px; border:none; border-radius:12px; cursor:pointer; font-size:1em; transition:all 0.2s; box-shadow:0 4px 20px rgba(74,140,92,0.25); }
         .btn-save:active { transform:scale(0.98); }
         .btn-save:disabled { background:var(--surface2); color:var(--muted); box-shadow:none; cursor:not-allowed; }
         .btn-whatsapp { background:linear-gradient(135deg,#1a5c2a,#25a244); color:#fff; width:100%; padding:16px; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; border:none; border-radius:12px; cursor:pointer; font-size:0.95em; transition:all 0.2s; }
-
-        /* SUCCESS */
         .success-overlay { position:fixed; inset:0; background:rgba(10,7,2,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:999; opacity:0; pointer-events:none; transition:opacity 0.3s; }
         .success-overlay.show { opacity:1; pointer-events:all; }
         .success-icon { font-size:4.5em; animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; margin-bottom:16px; }
         .success-text { font-family:'Playfair Display',serif; font-size:2.2em; color:var(--gold); letter-spacing:2px; text-align:center; font-style:italic; text-shadow:0 0 30px rgba(201,169,110,0.4); animation:slideUp 0.4s 0.2s ease both; }
         .success-sub { font-size:0.85em; color:var(--muted); margin-top:10px; text-align:center; padding:0 20px; animation:slideUp 0.4s 0.35s ease both; }
-
         @keyframes popIn { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
         @keyframes slideUp { 0%{transform:translateY(20px);opacity:0} 100%{transform:translateY(0);opacity:1} }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
@@ -158,6 +128,9 @@
         .tab-btn.active { background:rgba(201,169,110,0.15); border-color:var(--gold); color:var(--gold); }
         .tab-content { display:none; }
         .tab-content.active { display:block; }
+        .buscador-productos { width:100%; padding:10px 14px; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; font-size:14px; color:var(--text); outline:none; margin-bottom:12px; font-family:'DM Sans',sans-serif; transition:border-color 0.2s; }
+        .buscador-productos:focus { border-color:var(--gold-dim); }
+        .buscador-productos::placeholder { color:#5a4a2a; }
     </style>
 </head>
 <body>
@@ -201,12 +174,12 @@
             <div class="step" id="step3"><div class="step-num" id="stepNum3">3</div><span>Foto</span></div>
         </div>
         <div class="card" id="card1">
-            <div class="card-header"><div class="card-icon">🍳</div><div class="card-title">¿Qué estás preparando?</div><div class="card-check">✔</div></div>
+            <div class="card-header"><div class="card-icon">🍳</div><div class="card-title">Que estas preparando?</div><div class="card-check">✔</div></div>
             <div class="grid-recipes">
                 <button type="button" class="btn-recipe" onclick="setMain(this,'Salsa')">Salsas</button>
-                <button type="button" class="btn-recipe" onclick="setMain(this,'Bolonesa Lasana')">Boloñesa Lasaña</button>
-                <button type="button" class="btn-recipe" onclick="setMain(this,'Bolonesa Pasta')">Boloñesa Pasta</button>
-                <button type="button" class="btn-recipe" onclick="setMain(this,'Lasana')">Lasaña</button>
+                <button type="button" class="btn-recipe" onclick="setMain(this,'Bolonesa Lasana')">Bolonesa Lasana</button>
+                <button type="button" class="btn-recipe" onclick="setMain(this,'Bolonesa Pasta')">Bolonesa Pasta</button>
+                <button type="button" class="btn-recipe" onclick="setMain(this,'Lasana')">Lasana</button>
                 <button type="button" class="btn-recipe" onclick="setMain(this,'Berenjena')">Berenjena</button>
                 <button type="button" class="btn-recipe" onclick="setMain(this,'Caneloni')">Caneloni</button>
                 <button type="button" class="btn-recipe" onclick="setMain(this,'Ravioli',true)">Ravioli</button>
@@ -226,14 +199,14 @@
             <div class="card-header"><div class="card-icon">📷</div><div class="card-title">Escanear y Datos</div><div class="card-check">✔</div></div>
             <div class="camera-wrapper" id="cameraWrapper">
                 <video id="webcam" autoplay playsinline muted></video>
-                <div class="scan-overlay"><div class="scan-box" id="scanBox"><div class="scan-line"></div><div class="scan-hint">CENTRA EL CÓDIGO</div></div></div>
+                <div class="scan-overlay"><div class="scan-box" id="scanBox"><div class="scan-line"></div><div class="scan-hint">CENTRA EL CODIGO</div></div></div>
             </div>
             <div id="camError"></div>
-            <button type="button" class="btn-cam" id="btnCamera" onclick="startCamera()">🎥 ACTIVAR CÁMARA</button>
-            <button type="button" class="btn-cam" id="btnScan" onclick="scanCode()">📷 ESCANEAR CÓDIGO</button>
-            <div id="status">Activa la cámara o escribe el producto</div>
+            <button type="button" class="btn-cam" id="btnCamera" onclick="startCamera()">🎥 ACTIVAR CAMARA</button>
+            <button type="button" class="btn-cam" id="btnScan" onclick="scanCode()">📷 ESCANEAR CODIGO</button>
+            <div id="status">Activa la camara o escribe el producto</div>
             <div class="input-group"><label>Nombre del producto *</label><input type="text" id="nombreProducto" placeholder="Ej: Ricotta fresca, Harina 00..." oninput="onFieldInput(this)"></div>
-            <div class="input-group"><label>Número de lote</label><input type="text" id="loteProducto" placeholder="Ej: L2024-001" oninput="onFieldInput(this)"></div>
+            <div class="input-group"><label>Numero de lote</label><input type="text" id="loteProducto" placeholder="Ej: L2024-001" oninput="onFieldInput(this)"></div>
             <div class="input-group"><label>Cantidad</label><input type="text" id="cantidadProducto" placeholder="Ej: 5 kg, 3 unidades..." oninput="onFieldInput(this)"></div>
         </div>
         <div class="card" id="card3">
@@ -255,17 +228,17 @@
     </div>
     <div class="screen-content">
         <div class="card">
-            <div class="card-header"><div class="card-icon">➕</div><div class="card-title">Añadir Producto</div></div>
-            <div class="input-group"><label>Nombre del producto *</label><input type="text" id="pNombre" placeholder="Ej: Harina napolitana" oninput="onFieldInput(this)"></div>
-            <div class="input-group"><label>Código de barras</label><input type="text" id="pCodigo" placeholder="Escanea o escribe el código"></div>
+            <div class="card-header"><div class="card-icon">➕</div><div class="card-title">Anadir Producto</div></div>
+            <div class="input-group"><label>Nombre del producto *</label><input type="text" id="pNombre" placeholder="Ej: Harina napoletana" oninput="onFieldInput(this)"></div>
+            <div class="input-group"><label>Codigo de barras</label><input type="text" id="pCodigo" placeholder="Escanea o escribe el codigo"></div>
             <div class="input-group"><label>Unidad por defecto</label><input type="text" id="pUnidad" placeholder="Ej: saco 25kg, ud, caja, bolsa..."></div>
             <div class="input-group">
                 <label>Proveedor</label>
                 <select id="pProveedor">
                     <option value="">Seleccionar...</option>
-                    <option>Matteo Comit</option><option>Tías Fruit</option><option>Chacon</option>
-                    <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option><option>Otro</option><option>Roper</option>
-<option>Ortidal</option>
+                    <option>Matteo Comit</option><option>Tias Fruit</option><option>Chacon</option>
+                    <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
+                    <option>Roper</option><option>Ortidal</option><option>Otro</option>
                 </select>
             </div>
             <div class="input-group" style="margin-top:12px;">
@@ -275,7 +248,7 @@
         </div>
         <div class="card">
             <div class="card-header"><div class="card-icon">📋</div><div class="card-title">Biblioteca</div></div>
-<input type="text" id="buscadorProductos" placeholder="Buscar producto..." oninput="filtrarProductos(this.value)" style="width:100%;padding:10px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--text);outline:none;margin-bottom:10px;font-family:'DM Sans',sans-serif;">
+            <input type="text" id="buscadorProductos" class="buscador-productos" placeholder="🔍 Buscar por nombre, proveedor o unidad..." oninput="filtrarProductos(this.value)">
             <div id="listaProductos"><div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div></div>
         </div>
     </div>
@@ -295,8 +268,6 @@
             <button class="tab-btn active" onclick="switchTab('tabRegistrar')">📋 Registrar Pedido</button>
             <button class="tab-btn" onclick="switchTab('tabGenerar')">📤 Generar Pedido</button>
         </div>
-
-        <!-- TAB REGISTRAR -->
         <div id="tabRegistrar" class="tab-content active">
             <div class="card">
                 <div class="card-header"><div class="card-icon">💬</div><div class="card-title">Pegar Pedido de WhatsApp</div></div>
@@ -304,14 +275,14 @@
                     <label>Proveedor</label>
                     <select id="cProveedor">
                         <option value="">Seleccionar...</option>
-                        <option>Matteo Comit</option><option>Tías Fruit</option><option>Chacon</option>
-                        <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option><option>Otro</option><option>Roper</option>
-<option>Ortidal</option>
+                        <option>Matteo Comit</option><option>Tias Fruit</option><option>Chacon</option>
+                        <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
+                        <option>Roper</option><option>Ortidal</option><option>Otro</option>
                     </select>
                 </div>
                 <div class="input-group" style="margin-top:10px;">
                     <label>Texto del pedido</label>
-                    <textarea id="cTexto" placeholder="Pega aquí el mensaje de WhatsApp..."></textarea>
+                    <textarea id="cTexto" placeholder="Pega aqui el mensaje de WhatsApp..."></textarea>
                 </div>
                 <button type="button" class="btn-cam" style="margin-top:10px;background:linear-gradient(135deg,var(--surface2),#3a2a10);color:var(--gold);border:1px solid var(--border);" onclick="procesarTexto()">✨ PROCESAR Y REVISAR</button>
             </div>
@@ -321,15 +292,13 @@
                     <thead><tr><th>Producto</th><th>Cant.</th><th>Unidad</th><th></th></tr></thead>
                     <tbody id="tablaComprasBody"></tbody>
                 </table>
-                <button type="button" style="margin-top:10px;width:100%;padding:10px;background:var(--surface2);border:1px dashed var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="añadirFilaCompra()">+ Añadir línea</button>
+                <button type="button" style="margin-top:10px;width:100%;padding:10px;background:var(--surface2);border:1px dashed var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="anadirFilaCompra()">+ Anadir linea</button>
             </div>
             <div style="height:120px"></div>
             <div class="action-buttons" id="actionRegistrar">
                 <button class="btn-save hidden" id="btnGuardarCompra" onclick="guardarCompras()">Guardar en Compras del Mes</button>
             </div>
         </div>
-
-        <!-- TAB GENERAR -->
         <div id="tabGenerar" class="tab-content">
             <div class="card">
                 <div class="card-header"><div class="card-icon">📤</div><div class="card-title">Generar Pedido</div></div>
@@ -337,9 +306,9 @@
                     <label>Proveedor</label>
                     <select id="gProveedor" onchange="cargarProductosProveedor()">
                         <option value="">Seleccionar proveedor...</option>
-                        <option>Matteo Comit</option><option>Tías Fruit</option><option>Chacon</option>
-                        <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option><option>Otro</option><option>Roper</option>
-<option>Ortidal</option>
+                        <option>Matteo Comit</option><option>Tias Fruit</option><option>Chacon</option>
+                        <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
+                        <option>Roper</option><option>Ortidal</option><option>Otro</option>
                     </select>
                 </div>
             </div>
@@ -359,7 +328,7 @@
 <!-- SUCCESS -->
 <div class="success-overlay" id="successOverlay">
     <div class="success-icon" id="successIcon">✅</div>
-    <div class="success-text" id="successText">¡Oído Cocina!</div>
+    <div class="success-text" id="successText">Oido Cocina!</div>
     <div class="success-sub" id="successSub">Guardado correctamente</div>
 </div>
 
@@ -368,9 +337,8 @@ var URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxFwybPB0TY67DyJWYwN7Z
 var selectedMain = "", selectedSub = "", currentCode = "", photoBase64 = null, photoProductoBase64 = null;
 var cameraStream = null, isScanning = false;
 var productosLibreria = [];
-// Cargar productos al inicio también en pantalla de compras
-document.addEventListener('DOMContentLoaded', function(){ cargarProductos(); });
-// ── NAVEGACION ──
+
+// NAVEGACION
 function irA(screenId) {
     document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
     var screen = document.getElementById(screenId);
@@ -389,7 +357,7 @@ function switchTab(tabId) {
     document.getElementById('actionGenerar').style.display   = tabId === 'tabGenerar'   ? 'flex' : 'none';
 }
 
-// ── CAMARA ──
+// CAMARA
 var video = document.getElementById('webcam');
 
 async function startCamera() {
@@ -416,12 +384,12 @@ async function startCamera() {
         try { await video.play(); } catch(e) {}
         btnCamera.style.display = 'none';
         btnScan.style.display   = 'block';
-        setStatus("Cámara activa. Lista para escanear.", 'ok');
+        setStatus("Camara activa. Lista para escanear.", 'ok');
     } else {
-        btnCamera.innerHTML = "🎥 ACTIVAR CÁMARA";
+        btnCamera.innerHTML = "🎥 ACTIVAR CAMARA";
         btnCamera.disabled  = false;
         camError.style.display = 'block';
-        camError.innerHTML = "No se pudo acceder a la cámara: " + (lastErr ? lastErr.name : "error");
+        camError.innerHTML = "No se pudo acceder a la camara: " + (lastErr ? lastErr.name : "error");
     }
 }
 
@@ -430,7 +398,7 @@ function pararCamara() {
 }
 window.addEventListener('beforeunload', pararCamara);
 
-// ── ESCANEAR ──
+// ESCANEAR
 function captureFrame() {
     var c = document.createElement('canvas');
     c.width = video.videoWidth; c.height = video.videoHeight;
@@ -441,12 +409,12 @@ function captureFrame() {
 function scanCode() {
     if (isScanning) return;
     if (!video.videoWidth || video.videoWidth === 0) {
-        setStatus("Cámara no lista, espera un momento.", 'err');
+        setStatus("Camara no lista, espera un momento.", 'err');
         isScanning = false;
         return;
     }
     if (typeof Quagga === 'undefined') {
-        setStatus("Librería de escaneo no disponible.", 'err');
+        setStatus("Libreria de escaneo no disponible.", 'err');
         isScanning = false;
         return;
     }
@@ -460,8 +428,7 @@ function scanCode() {
     }
     Quagga.decodeSingle({
         src: canvas.toDataURL('image/png'),
-        numOfWorkers: 0,
-        locate: true,
+        numOfWorkers: 0, locate: true,
         decoder: { readers: ["ean_reader","ean_8_reader","code_128_reader","upc_reader"] }
     }, function(result) {
         isScanning = false;
@@ -472,7 +439,7 @@ function scanCode() {
             buscarEnLibreria(currentCode);
             if (navigator.vibrate) navigator.vibrate([100,50,100]);
         } else {
-            setStatus("No detectado. Ajusta la luz e inténtalo de nuevo.", 'err');
+            setStatus("No detectado. Ajusta la luz e intentalo de nuevo.", 'err');
         }
     });
 }
@@ -486,12 +453,12 @@ function buscarEnLibreria(codigo) {
         setStatus("Encontrado: " + encontrado.nombre, 'ok');
     } else {
         document.getElementById('nombreProducto').value = codigo;
-        setStatus("Código: " + codigo + " (no está en tu biblioteca)", 'ok');
+        setStatus("Codigo: " + codigo + " (no esta en tu biblioteca)", 'ok');
     }
     updateSteps();
 }
 
-// ── STEPS ──
+// STEPS
 function updateSteps() {
     var s1 = !!selectedMain && (selectedMain !== 'Ravioli' || !!selectedSub);
     var s2 = !!document.getElementById('nombreProducto').value.trim();
@@ -512,7 +479,7 @@ function setStep(n, done, prev) {
     if (n<3) document.getElementById('line'+n).classList.toggle('done',done);
 }
 
-// ── ELABORACION ──
+// ELABORACION
 function setMain(elem, val, hasSub) {
     selectedMain = val; selectedSub = "";
     document.querySelectorAll('.btn-recipe').forEach(function(b){ b.classList.remove('selected'); });
@@ -533,9 +500,9 @@ function onFieldInput(input) {
     updateSteps();
 }
 
-// ── FOTO ──
+// FOTO
 function takePhoto() {
-    if (!video.videoWidth) { alert("Activa la cámara primero."); return; }
+    if (!video.videoWidth) { alert("Activa la camara primero."); return; }
     photoBase64 = captureFrame().toDataURL('image/jpeg', 0.7);
     var preview = document.getElementById('preview');
     preview.style.display='none'; preview.src='';
@@ -543,31 +510,37 @@ function takePhoto() {
 }
 
 function fotoProducto() {
-    if (!cameraStream || !video.videoWidth) { alert("Activa la cámara en Registro Cocina primero."); return; }
+    if (!cameraStream || !video.videoWidth) { alert("Activa la camara en Registro Cocina primero."); return; }
     photoProductoBase64 = captureFrame().toDataURL('image/jpeg', 0.7);
     var preview = document.getElementById('previewProducto');
     preview.style.display='none'; preview.src='';
     requestAnimationFrame(function(){ preview.src=photoProductoBase64; preview.style.display='block'; });
 }
 
-// ── PRODUCTOS ──
+// PRODUCTOS
 function cargarProductos() {
+    var lista = document.getElementById('listaProductos');
+    if (lista) lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div>';
     fetch(URL_SCRIPT + "?accion=listarProductos")
         .then(function(r){ return r.json(); })
         .then(function(data) {
             productosLibreria = (data.productos || []).filter(function(p){ return p && p.nombre; });
             renderListaProductos();
         })
-        .catch(function(){ document.getElementById('listaProductos').innerHTML='<div style="color:var(--muted);text-align:center;padding:20px;">Sin conexión.</div>'; });
+        .catch(function(){
+            if (lista) lista.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Sin conexion.</div>';
+        });
 }
 
 function renderListaProductos() {
     var lista = document.getElementById('listaProductos');
+    if (!lista) return;
     if (!productosLibreria.length) {
-        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Aún no hay productos.</div>';
+        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Aun no hay productos.</div>';
         return;
     }
     lista.innerHTML = productosLibreria.map(function(p, i) {
+        var nombreSafe = (p.nombre||'').replace(/'/g, "");
         return '<div class="producto-item" id="pitem-'+i+'">' +
             '<div class="producto-item-top">' +
                 '<div style="font-size:1.4em">📦</div>' +
@@ -581,13 +554,56 @@ function renderListaProductos() {
             '<div class="edit-form" id="editform-'+i+'">' +
                 '<div class="edit-row">' +
                     '<input class="edit-input" id="en-'+i+'" value="'+(p.nombre||'')+'" placeholder="Nombre">' +
-                    '<input class="edit-input" id="ec-'+i+'" value="'+(p.codigo||'')+'" placeholder="Código">' +
+                    '<input class="edit-input" id="ec-'+i+'" value="'+(p.codigo||'')+'" placeholder="Codigo">' +
                 '</div>' +
                 '<div class="edit-row">' +
                     '<input class="edit-input" id="eu-'+i+'" value="'+(p.unidad||'')+'" placeholder="Unidad">' +
                     '<input class="edit-input" id="ep-'+i+'" value="'+(p.proveedor||'')+'" placeholder="Proveedor">' +
                 '</div>' +
-                '<button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+p.nombre+'\')">Guardar</button>' +
+                '<button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+nombreSafe+'\')">Guardar</button>' +
+                '<button class="btn-edit-cancel" onclick="toggleEdit('+i+')">Cancelar</button>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+// BUSCADOR
+function filtrarProductos(texto) {
+    var termino = (texto||'').toLowerCase().trim();
+    var lista = document.getElementById('listaProductos');
+    if (!termino) { renderListaProductos(); return; }
+    var filtrados = productosLibreria.filter(function(p){
+        return (p.nombre||'').toLowerCase().includes(termino) ||
+               (p.proveedor||'').toLowerCase().includes(termino) ||
+               (p.unidad||'').toLowerCase().includes(termino);
+    });
+    if (!filtrados.length) {
+        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">No se encontraron productos.</div>';
+        return;
+    }
+    lista.innerHTML = filtrados.map(function(p) {
+        var i = productosLibreria.indexOf(p);
+        var nombreSafe = (p.nombre||'').replace(/'/g, "");
+        return '<div class="producto-item">' +
+            '<div class="producto-item-top">' +
+                '<div style="font-size:1.4em">📦</div>' +
+                '<div class="producto-item-info">' +
+                    '<div class="producto-item-nombre">' + (p.nombre||'') + '</div>' +
+                    '<div class="producto-item-detalle">' + (p.unidad||'Sin unidad') + (p.proveedor ? ' · '+p.proveedor : '') + '</div>' +
+                    (p.codigo ? '<div class="producto-item-codigo">' + p.codigo + '</div>' : '') +
+                '</div>' +
+                '<button class="btn-edit-producto" onclick="toggleEdit('+i+')">✏️ Editar</button>' +
+            '</div>' +
+            '<div class="edit-form" id="editform-'+i+'">' +
+                '<div class="edit-row">' +
+                    '<input class="edit-input" id="en-'+i+'" value="'+(p.nombre||'')+'" placeholder="Nombre">' +
+                    '<input class="edit-input" id="ec-'+i+'" value="'+(p.codigo||'')+'" placeholder="Codigo">' +
+                '</div>' +
+                '<div class="edit-row">' +
+                    '<input class="edit-input" id="eu-'+i+'" value="'+(p.unidad||'')+'" placeholder="Unidad">' +
+                    '<input class="edit-input" id="ep-'+i+'" value="'+(p.proveedor||'')+'" placeholder="Proveedor">' +
+                '</div>' +
+                '<button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+nombreSafe+'\')">Guardar</button>' +
                 '<button class="btn-edit-cancel" onclick="toggleEdit('+i+')">Cancelar</button>' +
             '</div>' +
         '</div>';
@@ -596,17 +612,17 @@ function renderListaProductos() {
 
 function toggleEdit(i) {
     var form = document.getElementById('editform-'+i);
-    form.classList.toggle('open');
+    if (form) form.classList.toggle('open');
 }
 
 async function guardarEdicion(i, nombreOriginal) {
     var payload = {
         modo: 'editarProducto',
         nombreOriginal: nombreOriginal,
-        nombre:   document.getElementById('en-'+i).value.trim(),
-        codigo:   document.getElementById('ec-'+i).value.trim(),
-        unidad:   document.getElementById('eu-'+i).value.trim(),
-        proveedor: document.getElementById('ep-'+i).value.trim()
+        nombre:    document.getElementById('en-'+i) ? document.getElementById('en-'+i).value.trim() : '',
+        codigo:    document.getElementById('ec-'+i) ? document.getElementById('ec-'+i).value.trim() : '',
+        unidad:    document.getElementById('eu-'+i) ? document.getElementById('eu-'+i).value.trim() : '',
+        proveedor: document.getElementById('ep-'+i) ? document.getElementById('ep-'+i).value.trim() : ''
     };
     try {
         await fetch(URL_SCRIPT, {
@@ -614,6 +630,7 @@ async function guardarEdicion(i, nombreOriginal) {
             headers:{'Content-Type':'application/json'},
             body: JSON.stringify(payload)
         });
+        setTimeout(function(){ cargarProductos(); }, 1500);
         showSuccess("Producto Actualizado", "Cambios guardados en tu biblioteca", "✏️");
     } catch(err) { alert("Error de red."); }
 }
@@ -622,30 +639,52 @@ async function guardarProducto() {
     var nombre = document.getElementById('pNombre').value.trim();
     if (!nombre) return alert("El nombre es obligatorio.");
     var btn = document.querySelector('#screenProductos .btn-save');
-    btn.disabled=true; btn.innerHTML="Guardando...";
+    btn.disabled = true; btn.innerHTML = "Guardando...";
+
+    var payload = {
+        modo: 'inventario', producto: nombre,
+        codigo:    document.getElementById('pCodigo').value.trim(),
+        unidad:    document.getElementById('pUnidad').value.trim(),
+        proveedor: document.getElementById('pProveedor').value,
+        imagen:    photoProductoBase64 || ""
+    };
+
     try {
         await fetch(URL_SCRIPT, {
             method:'POST', mode:'no-cors', cache:'no-cache',
             headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({
-                modo:'inventario', producto:nombre,
-                codigo:   document.getElementById('pCodigo').value.trim(),
-                unidad:   document.getElementById('pUnidad').value.trim(),
-                proveedor: document.getElementById('pProveedor').value,
-                imagen:   photoProductoBase64||""
-            })
+            body: JSON.stringify(payload)
         });
-        showSuccess("Producto Guardado","Añadido a tu biblioteca","📚");
-    } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar en Biblioteca"; }
+
+        // Limpiar campos
+        document.getElementById('pNombre').value = '';
+        document.getElementById('pCodigo').value = '';
+        document.getElementById('pUnidad').value = '';
+        document.getElementById('pProveedor').value = '';
+        document.getElementById('previewProducto').style.display = 'none';
+        photoProductoBase64 = null;
+
+        // Recargar biblioteca despues de 2 segundos
+        btn.innerHTML = "Guardado ✔ Recargando...";
+        setTimeout(function(){
+            cargarProductos();
+            btn.disabled = false;
+            btn.innerHTML = "Guardar en Biblioteca";
+        }, 2000);
+
+    } catch(err) {
+        alert("Error de red.");
+        btn.disabled = false;
+        btn.innerHTML = "Guardar en Biblioteca";
+    }
 }
 
-// ── COMPRAS REGISTRAR ──
+// COMPRAS REGISTRAR
 function procesarTexto() {
     var texto = document.getElementById('cTexto').value.trim();
     if (!texto) return alert("Pega el texto del pedido primero.");
     var skipWords = ['hola','buenas','gracias','muchas','del','rest','charco','divina','italia','ok','perfecto'];
     var filas = [];
-
     texto.split('\n').forEach(function(linea) {
         linea = linea.trim();
         if (!linea) return;
@@ -659,17 +698,14 @@ function procesarTexto() {
             });
         }
     });
-
     if (!filas.length) return alert("No se encontraron productos.");
-
     var tbody = document.getElementById('tablaComprasBody');
-    tbody.innerHTML = filas.map(function(f,i){
-        return '<tr><td><input value="'+f.producto+'" oninput=""></td>' +
+    tbody.innerHTML = filas.map(function(f){
+        return '<tr><td><input value="'+f.producto+'"></td>' +
                '<td><input value="'+f.cantidad+'" style="width:50px"></td>' +
                '<td><input value="'+f.unidad+'"></td>' +
                '<td><button class="btn-del-row" onclick="eliminarFila(this)">✕</button></td></tr>';
     }).join('');
-
     document.getElementById('cardTablaCompras').classList.remove('hidden');
     document.getElementById('btnGuardarCompra').classList.remove('hidden');
 }
@@ -686,7 +722,7 @@ function buscarUnidadLibreria(nombreProducto) {
 
 function eliminarFila(btn) { btn.closest('tr').remove(); }
 
-function añadirFilaCompra() {
+function anadirFilaCompra() {
     var tbody = document.getElementById('tablaComprasBody');
     var tr = document.createElement('tr');
     tr.innerHTML = '<td><input placeholder="Producto"></td><td><input style="width:50px" placeholder="Cant."></td><td><input placeholder="Unidad"></td><td><button class="btn-del-row" onclick="eliminarFila(this)">✕</button></td>';
@@ -715,16 +751,18 @@ async function guardarCompras() {
     } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar en Compras del Mes"; }
 }
 
-// ── GENERAR PEDIDO ──
+// GENERAR PEDIDO
 function cargarProductosProveedor() {
     var proveedor = document.getElementById('gProveedor').value;
     if (!proveedor) return;
-    var filtrados = productosLibreria.filter(function(p){ return p && p.proveedor === proveedor; });
+    var filtrados = productosLibreria.filter(function(p){
+        if (!p || !p.proveedor) return false;
+        return p.proveedor.toLowerCase() === proveedor.toLowerCase();
+    });
     var card = document.getElementById('cardPedidoItems');
     var lista = document.getElementById('listaPedidoItems');
-
     if (!filtrados.length) {
-        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;padding:10px;">No tienes productos de este proveedor en tu biblioteca. Añádelos en Mis Productos.</div>';
+        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;padding:10px;">No tienes productos de este proveedor. Anadelos en Mis Productos.</div>';
     } else {
         lista.innerHTML = filtrados.map(function(p,i){
             return '<div class="pedido-item">' +
@@ -735,7 +773,6 @@ function cargarProductosProveedor() {
             '</div>';
         }).join('');
     }
-
     card.classList.remove('hidden');
     document.getElementById('actionGenerar').style.display = 'flex';
     window.productosProveedor = filtrados;
@@ -745,7 +782,6 @@ function generarMensajeWhatsApp() {
     var proveedor = document.getElementById('gProveedor').value;
     var filtrados = window.productosProveedor || [];
     var lineas = [];
-
     filtrados.forEach(function(p,i){
         var check = document.getElementById('pcheck-'+i);
         var cant  = document.getElementById('pcant-'+i);
@@ -753,9 +789,7 @@ function generarMensajeWhatsApp() {
             lineas.push(p.nombre + ' ' + cant.value + (p.unidad ? ' ' + p.unidad : ''));
         }
     });
-
     if (!lineas.length) return alert("Selecciona al menos un producto.");
-
     var mensaje = "Hola buenas, del rest. Divina Italia El Charco\n" + lineas.join('\n') + "\nMuchas gracias";
     var url = "https://wa.me/?text=" + encodeURIComponent(mensaje);
     window.open(url, '_blank');
@@ -766,7 +800,6 @@ async function guardarPedidoGenerado() {
     if (!proveedor) return alert("Selecciona un proveedor.");
     var filtrados = window.productosProveedor || [];
     var lineas = [];
-
     filtrados.forEach(function(p,i){
         var check = document.getElementById('pcheck-'+i);
         var cant  = document.getElementById('pcant-'+i);
@@ -774,7 +807,6 @@ async function guardarPedidoGenerado() {
             lineas.push({ producto:p.nombre, cantidad:cant.value, unidad:p.unidad||"" });
         }
     });
-
     if (!lineas.length) return alert("Selecciona productos.");
     try {
         await fetch(URL_SCRIPT, {
@@ -786,15 +818,15 @@ async function guardarPedidoGenerado() {
     } catch(err) { alert("Error de red."); }
 }
 
-// ── GUARDAR COCINA ──
+// GUARDAR COCINA
 async function guardarCocina() {
     var producto = document.getElementById('nombreProducto').value.trim();
     var lote     = document.getElementById('loteProducto').value.trim();
     var cantidad = document.getElementById('cantidadProducto').value.trim();
-    if (!selectedMain) return alert("Selecciona una elaboración.");
+    if (!selectedMain) return alert("Selecciona una elaboracion.");
     if (selectedMain==='Ravioli' && !selectedSub) return alert("Selecciona el tipo de Ravioli.");
     if (!producto) return alert("Escribe o escanea el nombre del producto.");
-    if (!photoBase64 && !confirm("No has tomado foto. ¿Continuar?")) return;
+    if (!photoBase64 && !confirm("No has tomado foto. Continuar?")) return;
     var btn = document.querySelector('#screenCocina .btn-save');
     btn.disabled=true; btn.innerHTML="Guardando...";
     try {
@@ -808,11 +840,11 @@ async function guardarCocina() {
                 codigoBarras:currentCode||"Sin escanear", imagen:photoBase64||""
             })
         });
-        showSuccess("¡Oído Cocina!","Guardado en Registros · Verifica en Sheets","🍝");
+        showSuccess("Oido Cocina!","Guardado en Registros","🍝");
     } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Confirmar y Guardar en Registros"; }
 }
 
-// ── SUCCESS ──
+// SUCCESS
 function showSuccess(titulo, sub, icon) {
     document.getElementById('successIcon').innerHTML  = icon||'✅';
     document.getElementById('successText').innerHTML  = titulo;
