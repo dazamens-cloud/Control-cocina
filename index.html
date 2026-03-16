@@ -33,109 +33,71 @@
         .btn-back { background:none; border:none; color:var(--gold); font-size:1.3em; cursor:pointer; padding:4px 8px; border-radius:6px; }
         .top-bar-title { font-family:'Playfair Display',serif; font-size:1.1em; color:var(--gold); font-style:italic; }
         .screen-content { padding:14px 14px 120px; flex:1; }
-        .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:12px; transition:border-color 0.3s; }
-        .card.completed { border-color:var(--green); }
+        .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:12px; }
         .card-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
         .card-icon { width:32px; height:32px; border-radius:8px; background:var(--surface2); display:flex; align-items:center; justify-content:center; border:1px solid var(--border); }
         .card-title { font-family:'Bebas Neue',sans-serif; font-size:1em; letter-spacing:1.5px; color:var(--gold); }
-        .card-check { margin-left:auto; color:var(--green); font-size:1.1em; opacity:0; transition:opacity 0.3s; }
-        .card.completed .card-check { opacity:1; }
-        .steps { display:flex; gap:6px; align-items:center; margin-bottom:16px; }
-        .step { display:flex; align-items:center; gap:5px; font-size:0.72em; color:var(--muted); font-weight:600; transition:color 0.3s; }
-        .step-num { width:22px; height:22px; border-radius:50%; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.85em; transition:all 0.3s; flex-shrink:0; }
-        .step.done { color:var(--green); }
-        .step.done .step-num { background:var(--green); border-color:var(--green); color:#fff; font-weight:700; }
-        .step.active { color:var(--cream); }
-        .step.active .step-num { border-color:var(--gold); color:var(--gold); }
-        .step-line { flex:1; height:1px; background:var(--border); transition:background 0.3s; }
-        .step-line.done { background:var(--green); }
-        .grid-recipes { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-        .btn-recipe { background:var(--surface2); color:var(--muted); border:1px solid var(--border); border-radius:10px; padding:14px 8px; font-size:13px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s; }
-        .btn-recipe:active { transform:scale(0.97); }
-        .btn-recipe.selected { background:rgba(74,140,92,0.15); border-color:var(--green); color:#6abf84; }
-        .grid-sub { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
-        .btn-sub { background:var(--surface2); color:var(--muted); border:1px solid var(--border); border-radius:8px; padding:10px 4px; font-size:11px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s; }
-        .btn-sub.selected { background:rgba(201,169,110,0.15); border-color:var(--gold); color:var(--gold); }
-        /* CAMARA */
-        .camera-wrapper { position:relative; border-radius:12px; overflow:hidden; background:#000; display:none; margin-bottom:10px; }
-        video { width:100%; display:block; min-height:220px; }
-        .scan-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
-        .scan-box { width:75%; max-width:260px; height:100px; border:2px solid rgba(201,169,110,0.6); border-radius:10px; box-shadow:0 0 0 9999px rgba(0,0,0,0.45); transition:border-color 0.3s; position:relative; }
-        .scan-box.detected { border-color:#4a8c5c; box-shadow:0 0 0 9999px rgba(0,0,0,0.45),0 0 20px rgba(74,140,92,0.5); }
-        .scan-line { position:absolute; left:4px; right:4px; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); animation:scanMove 2s ease-in-out infinite; top:50%; }
-        .scan-hint { position:absolute; bottom:-24px; left:0; right:0; text-align:center; font-size:0.7em; color:rgba(201,169,110,0.7); letter-spacing:1px; }
-        @keyframes scanMove { 0%,100%{top:15%} 50%{top:80%} }
-        /* CAMARA FOTO LOTE — overlay para foto */
-        .camera-wrapper-foto { position:relative; border-radius:12px; overflow:hidden; background:#000; display:none; margin-bottom:10px; }
-        .foto-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
-        .foto-frame { width:90%; height:80%; border:2px solid rgba(201,169,110,0.6); border-radius:10px; box-shadow:0 0 0 9999px rgba(0,0,0,0.3); }
-        .foto-hint { position:absolute; bottom:12px; left:0; right:0; text-align:center; font-size:0.75em; color:rgba(201,169,110,0.8); letter-spacing:1px; }
-        .btn-cam { width:100%; padding:14px; border-radius:10px; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; cursor:pointer; border:none; transition:all 0.2s; margin-bottom:8px; font-size:14px; }
-        .btn-cam:active { transform:scale(0.98); }
-        #btnCamera { background:linear-gradient(135deg,var(--surface2),#3a2a10); color:var(--gold); border:1px solid var(--border); }
-        #btnScan { background:linear-gradient(135deg,#2a4a3a,#1a3a2a); color:#6abf84; border:1px solid #2a5a3a; display:none; }
-        #btnAbrirFoto { background:linear-gradient(135deg,#4a1080,#6f42c1); color:white; margin-bottom:0; }
-        #btnCapturarFoto { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:white; display:none; margin-bottom:0; }
-        #camError { font-size:0.82em; margin-bottom:8px; display:none; line-height:1.5; color:var(--danger); }
-        #status { font-size:0.85em; font-weight:600; min-height:20px; color:var(--muted); margin:10px 0 6px; }
-        #status.ok { color:#6abf84; }
-        #status.err { color:var(--danger); }
+        .grid-elab { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .btn-elab { background:var(--surface2); color:var(--muted); border:1px solid var(--border); border-radius:10px; padding:14px 8px; font-size:13px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s; text-align:center; }
+        .btn-elab:active { transform:scale(0.97); }
+        .btn-elab.selected { background:rgba(74,140,92,0.15); border-color:var(--green); color:#6abf84; }
+        /* INGREDIENTES */
+        .ingrediente-row { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; }
+        .ingrediente-top { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+        .ingrediente-check { width:20px; height:20px; accent-color:var(--green); flex-shrink:0; cursor:pointer; }
+        .ingrediente-nombre { flex:1; font-weight:600; font-size:0.9em; color:var(--cream); }
+        .ingrediente-cantidad-default { font-size:0.75em; color:var(--gold-dim); }
+        .ingrediente-fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .ingrediente-input { width:100%; padding:8px 10px; background:var(--bg); border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; }
+        .ingrediente-input:focus { border-color:var(--gold-dim); }
+        .ingrediente-foto-btn { width:100%; padding:8px; background:var(--surface); border:1px dashed var(--border); border-radius:8px; color:var(--muted); font-size:12px; cursor:pointer; text-align:center; transition:all 0.2s; margin-top:8px; font-family:'DM Sans',sans-serif; }
+        .ingrediente-foto-btn.has-foto { border-color:var(--green); color:#6abf84; background:rgba(74,140,92,0.1); }
+        .ingrediente-foto-preview { width:100%; max-height:120px; object-fit:cover; border-radius:8px; margin-top:6px; display:none; border:1px solid var(--green); }
+        .add-ingrediente-btn { width:100%; padding:12px; background:transparent; border:1px dashed var(--border); border-radius:10px; color:var(--gold-dim); font-size:13px; cursor:pointer; text-align:center; margin-top:4px; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+        .add-ingrediente-btn:hover { border-color:var(--gold); color:var(--gold); }
+        /* CAMARA FOTO */
+        .camera-mini { position:relative; border-radius:10px; overflow:hidden; background:#000; display:none; margin:8px 0; }
+        .camera-mini video { width:100%; display:block; max-height:200px; }
+        .camera-mini-overlay { position:absolute; inset:0; border:2px solid rgba(201,169,110,0.5); border-radius:10px; pointer-events:none; }
+        .camera-mini-hint { position:absolute; bottom:8px; left:0; right:0; text-align:center; font-size:0.7em; color:rgba(201,169,110,0.8); }
+        /* SESION BADGE */
+        .sesion-badge { display:inline-block; background:rgba(201,169,110,0.15); border:1px solid var(--gold-dim); border-radius:8px; padding:6px 12px; font-family:'Bebas Neue',sans-serif; letter-spacing:1.5px; color:var(--gold); font-size:0.85em; margin-bottom:12px; }
+        /* INPUTS */
         .input-group { margin-top:10px; }
         .input-group label { font-size:0.72em; color:var(--gold-dim); display:block; margin-bottom:5px; font-weight:600; letter-spacing:1px; text-transform:uppercase; }
         .input-group input,.input-group select,.input-group textarea { width:100%; padding:13px 14px; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; font-size:15px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; transition:border-color 0.2s; }
         .input-group input::placeholder,.input-group textarea::placeholder { color:#5a4a2a; }
-        .input-group input:focus,.input-group select:focus,.input-group textarea:focus { border-color:var(--gold-dim); }
-        .input-group input.filled,.input-group select.filled { border-color:var(--green); }
+        .input-group input:focus,.input-group select:focus { border-color:var(--gold-dim); }
         .input-group select option { background:var(--surface2); }
         .input-group textarea { resize:vertical; min-height:80px; }
-        #preview { width:100%; border-radius:10px; display:none; margin-top:12px; border:2px solid var(--gold-dim); max-height:240px; object-fit:cover; }
-        #previewProducto { width:100%; border-radius:10px; display:none; margin-top:12px; border:2px solid var(--gold-dim); max-height:240px; object-fit:cover; }
         /* PRODUCTOS */
         .producto-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; }
         .producto-item-top { display:flex; align-items:center; gap:10px; }
-        .producto-item-foto { width:48px; height:48px; border-radius:8px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; }
         .producto-emoji-icon { width:48px; height:48px; border-radius:8px; border:1px solid var(--border); flex-shrink:0; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:1.6em; }
+        .producto-item-foto { width:48px; height:48px; border-radius:8px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; }
         .producto-item-info { flex:1; min-width:0; }
         .producto-item-nombre { font-weight:600; font-size:0.95em; color:var(--cream); }
         .producto-item-detalle { font-size:0.75em; color:var(--muted); margin-top:2px; }
         .producto-item-codigo { font-size:0.7em; color:var(--gold-dim); margin-top:2px; font-family:monospace; }
-        .btn-edit-producto { background:none; border:1px solid var(--border); border-radius:6px; color:var(--gold-dim); padding:6px 10px; font-size:0.75em; cursor:pointer; transition:all 0.2s; white-space:nowrap; flex-shrink:0; }
-        .btn-edit-producto:hover { border-color:var(--gold); color:var(--gold); }
+        .btn-edit-producto { background:none; border:1px solid var(--border); border-radius:6px; color:var(--gold-dim); padding:6px 10px; font-size:0.75em; cursor:pointer; white-space:nowrap; flex-shrink:0; }
         .edit-form { margin-top:10px; padding-top:10px; border-top:1px solid var(--border); display:none; }
         .edit-form.open { display:block; }
         .edit-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
         .edit-input { width:100%; padding:8px 10px; background:var(--bg); border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; }
-        .edit-input:focus { border-color:var(--gold-dim); }
         .edit-foto-preview { width:100%; max-height:160px; object-fit:cover; border-radius:8px; border:1px solid var(--border); display:none; margin-bottom:8px; }
-        .edit-foto-buttons { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
-        .btn-edit-foto { padding:8px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--gold-dim); font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; text-align:center; transition:all 0.2s; }
-        .btn-edit-foto:hover { border-color:var(--gold); color:var(--gold); }
+        .edit-foto-buttons { display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:8px; }
+        .btn-edit-foto { padding:8px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--gold-dim); font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; text-align:center; }
         .btn-edit-save { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-family:'Bebas Neue',sans-serif; letter-spacing:1px; cursor:pointer; }
         .btn-edit-cancel { background:var(--surface2); color:var(--muted); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; cursor:pointer; margin-left:6px; }
         /* COMPRAS */
-        .compras-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:0.85em; }
-        .compras-table th { background:var(--surface2); color:var(--gold-dim); padding:8px; text-align:left; font-weight:600; border-bottom:1px solid var(--border); }
-        .compras-table td { padding:8px; border-bottom:1px solid var(--border); color:var(--text); }
-        .compras-table input { background:transparent; border:none; color:var(--text); font-size:0.95em; width:100%; outline:none; font-family:'DM Sans',sans-serif; }
-        .compras-table input:focus { border-bottom:1px solid var(--gold); }
-        .btn-del-row { background:none; border:none; color:var(--danger); cursor:pointer; font-size:1em; padding:2px 6px; }
         .pedido-item { display:flex; align-items:center; gap:8px; padding:8px; background:var(--surface2); border-radius:8px; margin-bottom:6px; border:1px solid var(--border); }
         .pedido-item-nombre { flex:1; font-size:0.9em; color:var(--cream); }
         .pedido-item-cant { width:60px; padding:6px 8px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:13px; color:var(--text); text-align:center; font-family:'DM Sans',sans-serif; outline:none; }
         .pedido-item-unidad { font-size:0.75em; color:var(--muted); white-space:nowrap; }
         .pedido-item-check { width:20px; height:20px; cursor:pointer; accent-color:var(--green); }
-        /* ACTION BUTTONS */
-        .action-buttons { position:fixed; bottom:0; left:0; right:0; padding:10px 14px 20px; background:linear-gradient(transparent,var(--bg) 25%); display:flex; flex-direction:column; gap:8px; }
-        .btn-save { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; width:100%; padding:18px; font-family:'Bebas Neue',sans-serif; letter-spacing:2.5px; border:none; border-radius:12px; cursor:pointer; font-size:1em; transition:all 0.2s; box-shadow:0 4px 20px rgba(74,140,92,0.25); }
-        .btn-save:active { transform:scale(0.98); }
-        .btn-save:disabled { background:var(--surface2); color:var(--muted); box-shadow:none; cursor:not-allowed; }
-        .btn-whatsapp { background:linear-gradient(135deg,#1a5c2a,#25a244); color:#fff; width:100%; padding:18px; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; border:none; border-radius:12px; cursor:pointer; font-size:1em; transition:all 0.2s; box-shadow:0 4px 20px rgba(37,162,68,0.25); }
-        .btn-whatsapp:active { transform:scale(0.98); }
         /* STOCK */
         .semana-badge { display:inline-block; background:rgba(201,169,110,0.15); border:1px solid var(--gold-dim); border-radius:8px; padding:8px 14px; font-family:'Bebas Neue',sans-serif; letter-spacing:1.5px; color:var(--gold); font-size:0.9em; margin-bottom:14px; }
         .stock-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
-        .stock-item-elab { flex:1; font-weight:600; font-size:0.9em; color:var(--cream); }
-        .stock-item-fecha { font-size:0.72em; color:var(--muted); }
         /* VENTAS */
         .ventas-table { width:100%; border-collapse:collapse; font-size:0.82em; }
         .ventas-table th { background:var(--surface2); color:var(--gold-dim); padding:8px 6px; text-align:left; font-weight:600; border-bottom:1px solid var(--border); }
@@ -143,12 +105,16 @@
         .ventas-table td:last-child { text-align:right; color:var(--gold); font-weight:600; }
         .ventas-rank { display:inline-block; width:20px; height:20px; border-radius:50%; background:var(--surface2); text-align:center; line-height:20px; font-size:0.75em; color:var(--muted); margin-right:4px; }
         .ventas-rank.top { background:rgba(201,169,110,0.2); color:var(--gold); }
-        .upload-area { border:2px dashed var(--border); border-radius:12px; padding:30px 20px; text-align:center; cursor:pointer; transition:all 0.2s; margin-bottom:12px; }
-        .upload-area:hover { border-color:var(--gold-dim); }
+        .upload-area { border:2px dashed var(--border); border-radius:12px; padding:30px 20px; text-align:center; cursor:pointer; margin-bottom:12px; }
         .upload-area-icon { font-size:2.5em; margin-bottom:8px; }
         .upload-area-text { font-size:0.85em; color:var(--muted); }
         #ticketPreview { width:100%; border-radius:10px; display:none; margin-top:10px; border:1px solid var(--border); max-height:300px; object-fit:contain; }
-        /* SUCCESS */
+        /* BUTTONS */
+        .action-buttons { position:fixed; bottom:0; left:0; right:0; padding:10px 14px 20px; background:linear-gradient(transparent,var(--bg) 25%); display:flex; flex-direction:column; gap:8px; }
+        .btn-save { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; width:100%; padding:18px; font-family:'Bebas Neue',sans-serif; letter-spacing:2.5px; border:none; border-radius:12px; cursor:pointer; font-size:1em; transition:all 0.2s; box-shadow:0 4px 20px rgba(74,140,92,0.25); }
+        .btn-save:active { transform:scale(0.98); }
+        .btn-save:disabled { background:var(--surface2); color:var(--muted); box-shadow:none; cursor:not-allowed; }
+        .btn-whatsapp { background:linear-gradient(135deg,#1a5c2a,#25a244); color:#fff; width:100%; padding:18px; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; border:none; border-radius:12px; cursor:pointer; font-size:1em; transition:all 0.2s; }
         .success-overlay { position:fixed; inset:0; background:rgba(10,7,2,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:999; opacity:0; pointer-events:none; transition:opacity 0.3s; }
         .success-overlay.show { opacity:1; pointer-events:all; }
         .success-icon { font-size:4.5em; animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; margin-bottom:16px; }
@@ -181,7 +147,7 @@
     <div class="home-buttons">
         <button class="btn-home" onclick="irA('screenCocina')">
             <div class="btn-home-icon">🍳</div>
-            <div class="btn-home-text"><div class="btn-home-title">Registro Cocina</div><div class="btn-home-desc">Registra elaboraciones del dia con producto y lote</div></div>
+            <div class="btn-home-text"><div class="btn-home-title">Registro Cocina</div><div class="btn-home-desc">Registra sesiones de produccion con ingredientes</div></div>
         </button>
         <button class="btn-home" onclick="irA('screenProductos')">
             <div class="btn-home-icon">📚</div>
@@ -209,79 +175,42 @@
         <div class="top-bar-title">Registro Cocina</div>
     </div>
     <div class="screen-content">
-        <div class="steps">
-            <div class="step active" id="step1"><div class="step-num" id="stepNum1">1</div><span>Elaboracion</span></div>
-            <div class="step-line" id="line1"></div>
-            <div class="step" id="step2"><div class="step-num" id="stepNum2">2</div><span>Producto</span></div>
-            <div class="step-line" id="line2"></div>
-            <div class="step" id="step3"><div class="step-num" id="stepNum3">3</div><span>Foto</span></div>
-        </div>
-        <div class="card" id="card1">
-            <div class="card-header"><div class="card-icon">🍳</div><div class="card-title">Que estas preparando?</div><div class="card-check">✔</div></div>
-            <div class="grid-recipes">
-                <button type="button" class="btn-recipe" onclick="setMain(this,'Salsa',true,'sub-salsa')">Salsas ⬇️</button>
-                <button type="button" class="btn-recipe" onclick="setMain(this,'Bolonesa Lasana')">Bolonesa Lasana</button>
-                <button type="button" class="btn-recipe" onclick="setMain(this,'Bolonesa Pasta')">Bolonesa Pasta</button>
-                <button type="button" class="btn-recipe" onclick="setMain(this,'Lasana')">Lasana</button>
-                <button type="button" class="btn-recipe" onclick="setMain(this,'Berenjena')">Berenjena</button>
-                <button type="button" class="btn-recipe" onclick="setMain(this,'Caneloni')">Caneloni</button>
-                <button type="button" class="btn-recipe" onclick="setMain(this,'Ravioli',true,'sub-ravioli')">Ravioli ⬇️</button>
-            </div>
-            <div id="sub-salsa" class="hidden">
-                <div class="grid-sub">
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Bolognese')">Bolognese</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Tomate')">Tomate</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Porcini')">Porcini</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'SRQ')">S.R.Q</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Champi')">Champi</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Gorgonzola')">Gorgonzola</button>
-                </div>
-            </div>
-            <div id="sub-ravioli" class="hidden">
-                <div class="grid-sub">
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Masa')">Masa</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Ricotta')">Ricotta</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Carne')">Carne</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Queso')">Queso</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Porcini')">Porcini</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Pescado')">Pescado</button>
-                    <button type="button" class="btn-sub" onclick="setSub(this,'Setas')">Setas</button>
-                </div>
+
+        <!-- PASO 1: ELABORACION -->
+        <div class="card" id="cardElab">
+            <div class="card-header"><div class="card-icon">🍳</div><div class="card-title">Que estas preparando?</div></div>
+            <div class="grid-elab">
+                <button class="btn-elab" onclick="seleccionarElab('Salsa Bolognese')">Salsa Bolognese</button>
+                <button class="btn-elab" onclick="seleccionarElab('Salsa Tomate')">Salsa Tomate</button>
+                <button class="btn-elab" onclick="seleccionarElab('Salsa Porcini')">Salsa Porcini</button>
+                <button class="btn-elab" onclick="seleccionarElab('Salsa S.R.Q')">Salsa S.R.Q</button>
+                <button class="btn-elab" onclick="seleccionarElab('Salsa Champi')">Salsa Champi</button>
+                <button class="btn-elab" onclick="seleccionarElab('Salsa Gorgonzola')">Salsa Gorgonzola</button>
+                <button class="btn-elab" onclick="seleccionarElab('Bolonesa Lasana')">Bolonesa Lasana</button>
+                <button class="btn-elab" onclick="seleccionarElab('Lasana')">Lasana</button>
+                <button class="btn-elab" onclick="seleccionarElab('Berenjena')">Berenjena</button>
+                <button class="btn-elab" onclick="seleccionarElab('Caneloni')">Caneloni</button>
+                <button class="btn-elab" onclick="seleccionarElab('Masa Estandar')">Masa Estandar</button>
+                <button class="btn-elab" onclick="seleccionarElab('Masa Ricotta')">Masa Ricotta</button>
+                <button class="btn-elab" onclick="seleccionarElab('Relleno Carne')">Relleno Carne</button>
+                <button class="btn-elab" onclick="seleccionarElab('Relleno Ricotta')">Relleno Ricotta</button>
+                <button class="btn-elab" onclick="seleccionarElab('Relleno Queso')">Relleno Queso</button>
+                <button class="btn-elab" onclick="seleccionarElab('Relleno Porcini')">Relleno Porcini</button>
+                <button class="btn-elab" onclick="seleccionarElab('Relleno Pescado')">Relleno Pescado</button>
             </div>
         </div>
 
-        <!-- ESCANER -->
-        <div class="card" id="card2">
-            <div class="card-header"><div class="card-icon">📷</div><div class="card-title">Escanear Producto</div><div class="card-check">✔</div></div>
-            <div class="camera-wrapper" id="cameraWrapper">
-                <video id="webcam" autoplay playsinline muted></video>
-                <div class="scan-overlay"><div class="scan-box" id="scanBox"><div class="scan-line"></div><div class="scan-hint">CENTRA EL CODIGO</div></div></div>
-            </div>
-            <div id="camError"></div>
-            <button type="button" class="btn-cam" id="btnCamera" onclick="startCamera()">🎥 ACTIVAR CAMARA</button>
-            <button type="button" class="btn-cam" id="btnScan" onclick="scanCode()">📷 ESCANEAR CODIGO</button>
-            <div id="status">Activa la camara o escribe el producto</div>
-            <div class="input-group"><label>Nombre del producto *</label><input type="text" id="nombreProducto" placeholder="Ej: Ricotta fresca, Harina 00..." oninput="onFieldInput(this)"></div>
-            <div class="input-group"><label>Numero de lote</label><input type="text" id="loteProducto" placeholder="Se rellenara al leer la etiqueta" oninput="onFieldInput(this)"></div>
-            <div class="input-group"><label>Cantidad</label><input type="text" id="cantidadProducto" placeholder="Ej: 5 kg, 3 unidades..." oninput="onFieldInput(this)"></div>
+        <!-- PASO 2: INGREDIENTES -->
+        <div class="card hidden" id="cardIngredientes">
+            <div class="card-header"><div class="card-icon">📋</div><div class="card-title" id="tituloIngredientes">Ingredientes</div></div>
+            <div class="sesion-badge" id="sesionBadge"></div>
+            <div id="listaIngredientes"></div>
+            <button class="add-ingrediente-btn" onclick="anadirIngredienteExtra()">+ Añadir ingrediente extra</button>
         </div>
 
-        <!-- FOTO LOTE -->
-        <div class="card" id="card3">
-            <div class="card-header"><div class="card-icon">📸</div><div class="card-title">Foto del Lote</div><div class="card-check">✔</div></div>
-            <p style="font-size:0.8em;color:var(--muted);margin-bottom:10px;">Abre la camara, encuadra el lote y confirma la foto.</p>
-            <div class="camera-wrapper-foto" id="cameraWrapperFoto">
-                <video id="webcamFoto" autoplay playsinline muted></video>
-                <div class="foto-overlay"><div class="foto-frame"></div></div>
-                <div class="foto-hint">ENCUADRA EL LOTE Y PULSA CONFIRMAR</div>
-            </div>
-            <button type="button" class="btn-cam" id="btnAbrirFoto" onclick="abrirCamaraFoto()">📸 ABRIR CAMARA PARA FOTO</button>
-            <button type="button" class="btn-cam" id="btnCapturarFoto" onclick="capturarFoto()">✅ CONFIRMAR FOTO</button>
-            <img id="preview" alt="Vista previa">
-        </div>
     </div>
     <div class="action-buttons">
-        <button class="btn-save" onclick="guardarCocina()">Confirmar y Guardar en Registros</button>
+        <button class="btn-save hidden" id="btnGuardarSesion" onclick="guardarSesion()">Confirmar y Guardar Sesion</button>
     </div>
 </div>
 
@@ -294,9 +223,9 @@
     <div class="screen-content">
         <div class="card">
             <div class="card-header"><div class="card-icon">➕</div><div class="card-title">Anadir Producto</div></div>
-            <div class="input-group"><label>Nombre del producto *</label><input type="text" id="pNombre" placeholder="Ej: Harina napoletana" oninput="onFieldInput(this)"></div>
-            <div class="input-group"><label>Codigo de barras</label><input type="text" id="pCodigo" placeholder="Escanea o escribe el codigo"></div>
-            <div class="input-group"><label>Unidad por defecto</label><input type="text" id="pUnidad" placeholder="Ej: saco 25kg, ud, caja, bolsa..."></div>
+            <div class="input-group"><label>Nombre *</label><input type="text" id="pNombre" placeholder="Ej: Harina napoletana"></div>
+            <div class="input-group"><label>Codigo de barras</label><input type="text" id="pCodigo" placeholder="Escanea o escribe"></div>
+            <div class="input-group"><label>Unidad por defecto</label><input type="text" id="pUnidad" placeholder="Ej: saco 25kg, ud, caja..."></div>
             <div class="input-group">
                 <label>Proveedor</label>
                 <select id="pProveedor">
@@ -307,9 +236,9 @@
                 </select>
             </div>
             <div class="input-group" style="margin-top:12px;">
-                <button type="button" class="btn-cam" style="background:linear-gradient(135deg,#2a4a3a,#1a3a2a);color:#6abf84;border:1px solid #2a5a3a;" onclick="document.getElementById('inputFotoProducto').click()">📸 SUBIR FOTO DEL PRODUCTO</button>
+                <button type="button" style="width:100%;padding:12px;background:linear-gradient(135deg,#2a4a3a,#1a3a2a);color:#6abf84;border:1px solid #2a5a3a;border-radius:10px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;cursor:pointer;font-size:13px;" onclick="document.getElementById('inputFotoProducto').click()">📸 SUBIR FOTO</button>
                 <input type="file" id="inputFotoProducto" accept="image/*" style="display:none" onchange="onFotoProductoSelected(event)">
-                <img id="previewProducto" alt="Foto producto">
+                <img id="previewProducto" style="width:100%;border-radius:10px;display:none;margin-top:10px;border:2px solid var(--gold-dim);max-height:200px;object-fit:cover;" alt="Foto">
             </div>
         </div>
         <div class="card">
@@ -353,7 +282,7 @@
     </div>
 </div>
 
-<!-- STOCK SEMANAL -->
+<!-- STOCK -->
 <div id="screenStock" class="screen">
     <div class="top-bar">
         <button class="btn-back" onclick="irA('screenHome')">←</button>
@@ -362,9 +291,9 @@
     <div class="screen-content">
         <div class="card">
             <div class="card-header"><div class="card-icon">📦</div><div class="card-title">Registrar Stock</div></div>
-            <div class="semana-badge" id="semanaActual">Cargando semana...</div>
+            <div class="semana-badge" id="semanaActual"></div>
             <div class="input-group">
-                <label>Fecha (opcional, dejar vacio para hoy)</label>
+                <label>Fecha (vacio = hoy)</label>
                 <input type="date" id="sFecha">
             </div>
             <div class="input-group">
@@ -372,55 +301,31 @@
                 <select id="sElaboracion" onchange="onStockElabChange()">
                     <option value="">Seleccionar...</option>
                     <optgroup label="Salsas">
-                        <option>Salsa Bolognese</option>
-                        <option>Salsa Tomate</option>
-                        <option>Salsa Porcini</option>
-                        <option>Salsa S.R.Q</option>
-                        <option>Salsa Champi</option>
-                        <option>Salsa Gorgonzola</option>
+                        <option>Salsa Bolognese</option><option>Salsa Tomate</option><option>Salsa Porcini</option>
+                        <option>Salsa S.R.Q</option><option>Salsa Champi</option><option>Salsa Gorgonzola</option>
                     </optgroup>
                     <optgroup label="Pastas">
-                        <option>Pasta Lasana</option>
-                        <option>Lasana</option>
-                        <option>Canelloni</option>
-                        <option>Berenjena</option>
+                        <option>Pasta Lasana</option><option>Lasana</option><option>Canelloni</option><option>Berenjena</option>
                     </optgroup>
                     <optgroup label="Ravioli">
-                        <option>Ravioli Carne</option>
-                        <option>Ravioli Pescado</option>
-                        <option>Ravioli Ricotta</option>
-                        <option>Ravioli Queso</option>
-                        <option>Ravioli Setas</option>
+                        <option>Ravioli Carne</option><option>Ravioli Pescado</option><option>Ravioli Ricotta</option>
+                        <option>Ravioli Queso</option><option>Ravioli Porcini</option>
                     </optgroup>
                     <optgroup label="Otros">
-                        <option>Fritas</option>
-                        <option>Almejas</option>
-                        <option>Mejillones</option>
-                        <option>Salmon</option>
-                        <option>Lubina</option>
-                        <option>Nata</option>
-                        <option>Datiles</option>
-                        <option>Ossobuco</option>
+                        <option>Fritas</option><option>Almejas</option><option>Mejillones</option>
+                        <option>Salmon</option><option>Lubina</option><option>Nata</option>
+                        <option>Datiles</option><option>Ossobuco</option>
                         <option value="__otro__">+ Otro (escribir)</option>
                     </optgroup>
                 </select>
             </div>
             <div id="stockOtroInput" class="input-group hidden">
-                <label>Nombre del producto</label>
-                <input type="text" id="sElaboracionOtro" placeholder="Escribe el nombre del producto...">
+                <label>Nombre</label>
+                <input type="text" id="sElaboracionOtro" placeholder="Escribe el nombre...">
             </div>
-            <div class="input-group">
-                <label>Cantidad *</label>
-                <input type="text" id="sCantidad" placeholder="Ej: 15 kg, 200 unidades, 3 bandejas...">
-            </div>
-            <div class="input-group">
-                <label>Unidad</label>
-                <input type="text" id="sUnidad" placeholder="Ej: kg, unidades, bandejas...">
-            </div>
-            <div class="input-group">
-                <label>Notas</label>
-                <textarea id="sNotas" placeholder="Ej: Recien hecho, congelado, para el fin de semana..."></textarea>
-            </div>
+            <div class="input-group"><label>Cantidad *</label><input type="text" id="sCantidad" placeholder="Ej: 15 kg, 200 unidades..."></div>
+            <div class="input-group"><label>Unidad</label><input type="text" id="sUnidad" placeholder="Ej: kg, unidades, bandejas..."></div>
+            <div class="input-group"><label>Notas</label><textarea id="sNotas" placeholder="Recien hecho, congelado..."></textarea></div>
         </div>
         <div class="card">
             <div class="card-header"><div class="card-icon">📋</div><div class="card-title">Stock Esta Semana</div></div>
@@ -446,7 +351,6 @@
         <div id="tabSubirTicket" class="tab-content active">
             <div class="card">
                 <div class="card-header"><div class="card-icon">🧾</div><div class="card-title">Subir Ticket TPV</div></div>
-                <p style="font-size:0.82em;color:var(--muted);margin-bottom:12px;">Selecciona una foto del ranking de articulos del TPV.</p>
                 <div class="upload-area" onclick="document.getElementById('inputTicket').click()">
                     <div class="upload-area-icon">📄</div>
                     <div class="upload-area-text">Pulsa para seleccionar foto del ticket</div>
@@ -470,13 +374,12 @@
         <div id="tabVerVentas" class="tab-content">
             <div class="card">
                 <div class="card-header"><div class="card-icon">📊</div><div class="card-title">Ranking del Mes</div></div>
-                <div id="listaVentas"><div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando ventas...</div></div>
+                <div id="listaVentas"><div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- SUCCESS -->
 <div class="success-overlay" id="successOverlay">
     <div class="success-icon" id="successIcon">✅</div>
     <div class="success-text" id="successText">Oido Cocina!</div>
@@ -484,60 +387,182 @@
 </div>
 
 <input type="file" id="inputGaleria" accept="image/*" style="display:none" onchange="onGaleriaSelected(event)">
+<input type="file" id="inputIngredienteFoto" accept="image/*" style="display:none" onchange="onIngredienteFotoSelected(event)">
 
 <script>
 var URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxFwybPB0TY67DyJWYwN7Z5FpbtYa36R1UPVt7lsPwJTrC0gdpt3scbJRNNk2wvhRflXg/exec";
-var selectedMain="", selectedSub="", currentCode="", photoBase64=null, photoProductoBase64=null;
-var cameraStream=null, cameraStreamFoto=null, isScanning=false;
-var productosLibreria=[];
-var editFotoIndex=-1, editFotoBase64=null;
-var ventasData=[];
+var productosLibreria = [];
+var editFotoIndex = -1, editFotoBase64 = null;
+var ventasData = [];
+var currentElabSelected = "";
+var ingredientesFotoTarget = -1;
+var ingredientesFotos = {};
 
-// EMOJIS por categoria de producto
+// RECETAS — ingredientes por elaboracion
+var RECETAS = {
+    "Salsa Bolognese": [
+        {nombre:"Carne molida vacuno", cantidad:"5kg"},
+        {nombre:"Carne molida cerdo", cantidad:"5kg"},
+        {nombre:"Chorizo criollo blanco", cantidad:"2kg"},
+        {nombre:"Cebolla blanca", cantidad:"2kg"},
+        {nombre:"Puerro", cantidad:"4 ud"},
+        {nombre:"Zanahoria", cantidad:"6-8 ud"},
+        {nombre:"Vino tinto", cantidad:"2lt"},
+        {nombre:"Tomate triturado", cantidad:"1 lata"}
+    ],
+    "Salsa Tomate": [
+        {nombre:"Cebolla blanca", cantidad:"9 ud"},
+        {nombre:"Zanahoria", cantidad:"10 ud"},
+        {nombre:"Tomate para salsa", cantidad:"3kg"},
+        {nombre:"Tomate triturado", cantidad:"4 latas"}
+    ],
+    "Salsa Porcini": [
+        {nombre:"Porcini seco", cantidad:"1 bolsa 200gr"},
+        {nombre:"Mantequilla", cantidad:"200gr"},
+        {nombre:"Cebolla blanca", cantidad:"1 ud"},
+        {nombre:"Nata de cocinar", cantidad:"3lt"}
+    ],
+    "Salsa S.R.Q": [
+        {nombre:"Champiñones", cantidad:"1 caja"},
+        {nombre:"Bacon", cantidad:"1/2 pieza"},
+        {nombre:"Mantequilla", cantidad:"200gr"},
+        {nombre:"Nata de cocinar", cantidad:"4lt"},
+        {nombre:"Parmesano rallado", cantidad:"250gr"},
+        {nombre:"Rabo de buey", cantidad:"1 cucharada"}
+    ],
+    "Salsa Champi": [
+        {nombre:"Champiñones", cantidad:"2 cajas"},
+        {nombre:"Mantequilla", cantidad:"400gr"},
+        {nombre:"Nata de cocinar", cantidad:"6lt"}
+    ],
+    "Salsa Gorgonzola": [
+        {nombre:"Gorgonzola", cantidad:"2 piezas 2kg"},
+        {nombre:"Parmesano rallado", cantidad:"450gr"},
+        {nombre:"Nata de cocinar", cantidad:"6lt"}
+    ],
+    "Bolonesa Lasana": [
+        {nombre:"Carne de vacuno molida", cantidad:"6kg"},
+        {nombre:"Carne de cerdo molida", cantidad:"6kg"},
+        {nombre:"Cebolla blanca", cantidad:"2kg"},
+        {nombre:"Puerro", cantidad:"4 ud"},
+        {nombre:"Zanahoria", cantidad:"6-8 ud"},
+        {nombre:"Vino tinto", cantidad:"2lt"},
+        {nombre:"Tomate triturado", cantidad:"1 lata"}
+    ],
+    "Lasana": [
+        {nombre:"Bolonesa lasana", cantidad:"preparada"},
+        {nombre:"Pasta para lasana", cantidad:"2 cajas"},
+        {nombre:"Bechamel", cantidad:"15lt"},
+        {nombre:"Parmesano rallado", cantidad:"2kg"},
+        {nombre:"Mozzarella filante pizza", cantidad:"al gusto"}
+    ],
+    "Berenjena": [
+        {nombre:"Berenjenas", cantidad:"al gusto"},
+        {nombre:"Salsa tomate", cantidad:"preparada"},
+        {nombre:"Parmesano rallado", cantidad:"2kg"},
+        {nombre:"Mozzarella filante pizza", cantidad:"al gusto"}
+    ],
+    "Caneloni": [
+        {nombre:"Espinacas", cantidad:"1 caja 10kg"},
+        {nombre:"Nata para cocinar", cantidad:"2lt"},
+        {nombre:"Mantequilla", cantidad:"300gr"},
+        {nombre:"Ricotta", cantidad:"8 ud 250gr"},
+        {nombre:"Parmesano rallado", cantidad:"1kg"},
+        {nombre:"Pasta caneloni", cantidad:"al gusto"}
+    ],
+    "Masa Estandar": [
+        {nombre:"Huevos", cantidad:"1056gr"},
+        {nombre:"Harina napoletana", cantidad:"1kg"},
+        {nombre:"Semola", cantidad:"1kg"}
+    ],
+    "Masa Ricotta": [
+        {nombre:"Huevos", cantidad:"856gr"},
+        {nombre:"Harina napoletana", cantidad:"1kg"},
+        {nombre:"Semola", cantidad:"1kg"},
+        {nombre:"Espinacas", cantidad:"200gr"}
+    ],
+    "Relleno Carne": [
+        {nombre:"Carne de vacuno molida", cantidad:"7kg"},
+        {nombre:"Chorizo criollo blanco", cantidad:"4kg"},
+        {nombre:"Mortadela", cantidad:"2kg"},
+        {nombre:"Ricotta", cantidad:"4 ud 250gr"},
+        {nombre:"Cebolla blanca", cantidad:"1kg / 4 ud"},
+        {nombre:"Parmesano rallado", cantidad:"1.6kg"},
+        {nombre:"Huevos", cantidad:"14 ud"}
+    ],
+    "Relleno Ricotta": [
+        {nombre:"Espinacas", cantidad:"1 caja 10kg"},
+        {nombre:"Ricotta", cantidad:"20 ud 250gr"},
+        {nombre:"Parmesano rallado", cantidad:"2kg"},
+        {nombre:"Huevos", cantidad:"6 ud"}
+    ],
+    "Relleno Queso": [
+        {nombre:"Gorgonzola", cantidad:"2 ud 2kg"},
+        {nombre:"Mozzarella filante pizza", cantidad:"1.4kg"},
+        {nombre:"Ricotta", cantidad:"20 ud 250gr"},
+        {nombre:"Parmesano rallado", cantidad:"2kg"}
+    ],
+    "Relleno Porcini": [
+        {nombre:"Champiñones", cantidad:"1 caja"},
+        {nombre:"Porcini seco", cantidad:"1 bolsa 200gr"},
+        {nombre:"Rabo de buey", cantidad:"30gr"},
+        {nombre:"Mantequilla", cantidad:"200gr"},
+        {nombre:"Ricotta", cantidad:"3 ud 250gr"}
+    ],
+    "Relleno Pescado": [
+        {nombre:"Fogonero", cantidad:"1 caja"},
+        {nombre:"Zanahoria", cantidad:"6 ud"},
+        {nombre:"Cebolla", cantidad:"4 ud"},
+        {nombre:"Tomate", cantidad:"6 ud"},
+        {nombre:"Papas folio", cantidad:"6 ud"},
+        {nombre:"Ajos", cantidad:"al gusto"}
+    ]
+};
+
 var EMOJI_MAP = {
-    "ajo":"\uD83E\uDDC4","cebolla":"\uD83E\uDDC5","tomate":"🍅","pimiento":"🫑","pepino":"🥒","calabacin":"🥒",
-    "zanahoria":"🥕","patata":"🥔","papa":"🥔","espinaca":"🥬","berenjena":"🍆","champiñon":"🍄","champi":"🍄",
-    "limon":"🍋","naranja":"🍊","manzana":"🍎","pera":"🍐","lima":"🍋","aguacate":"🥑","fresa":"🍓",
-    "harina":"🌾","arroz":"🍚","pasta":"🍝","spaghetti":"🍝","penne":"🍝","lasana":"🍝","caneloni":"🍝",
+    "ajo":"🧄","cebolla":"🧅","tomate":"🍅","pimiento":"🫑","pepino":"🥒","calabacin":"🥒",
+    "zanahoria":"🥕","patata":"🥔","papa":"🥔","espinaca":"🥬","berenjena":"🍆","champi":"🍄","champiñon":"🍄",
+    "limon":"🍋","naranja":"🍊","manzana":"🍎","pera":"🍐","lima":"🍋","aguacate":"🥑",
+    "harina":"🌾","arroz":"🍚","pasta":"🍝","spaghetti":"🍝","penne":"🍝","lasana":"🍝","semola":"🌾",
     "queso":"🧀","parmesano":"🧀","grana":"🧀","mozzarella":"🧀","ricotta":"🧀","gorgonzola":"🧀","mascarpone":"🧀",
-    "carne":"🥩","pollo":"🍗","salmon":"🐟","pescado":"🐟","lubina":"🐟","atun":"🐟","langostino":"🦐","almeja":"🦪","mejillon":"🦪","ossobuco":"🥩",
-    "jamon":"🥓","salami":"🥓","mortadela":"🥓","bresaola":"🥓","chorizo":"🌶️",
+    "carne":"🥩","pollo":"🍗","salmon":"🐟","pescado":"🐟","lubina":"🐟","fogonero":"🐟","atun":"🐟","langostino":"🦐","almeja":"🦪","mejillon":"🦪","ossobuco":"🥩",
+    "jamon":"🥓","salami":"🥓","mortadela":"🥓","bresaola":"🥓","chorizo":"🌶️","bacon":"🥓",
     "aceite":"🫙","vinagre":"🫙","sal":"🧂","pimienta":"🌶️","oregano":"🌿","albahaca":"🌿","romero":"🌿","salvia":"🌿","menta":"🌿","tomillo":"🌿","perejil":"🌿",
-    "huevo":"🥚","mantequilla":"🧈","nata":"🥛","leche":"🥛",
-    "vino":"🍷","lambrusco":"🍷",
-    "tomate triturado":"🍅","tomate entero":"🍅",
-    "porcini":"🍄","seta":"🍄","trufa":"🍄",
-    "langosta":"🦞","bogavante":"🦞","chipiron":"🦑","calamar":"🦑",
-    "nuez":"🥜","almendra":"🥜","piñon":"🌰","dátil":"🫘","higo":"🫐",
-    "maiz":"🌽","alcachofa":"🥦","escarola":"🥬","radicchio":"🥬","apio":"🥬","puerro":"🥬",
+    "huevo":"🥚","mantequilla":"🧈","nata":"🥛","leche":"🥛","bechamel":"🥛",
+    "vino":"🍷","porcini":"🍄","seta":"🍄","rabo":"🦴",
     "salsa":"🍝","bolonesa":"🍝","default":"📦"
 };
 
 function getEmoji(nombre) {
     if (!nombre) return "📦";
     var n = nombre.toLowerCase();
-    for (var key in EMOJI_MAP) {
-        if (n.includes(key)) return EMOJI_MAP[key];
-    }
+    for (var key in EMOJI_MAP) { if (n.includes(key)) return EMOJI_MAP[key]; }
     return "📦";
 }
 
 function getSemanaActual() {
-    var now=new Date();
-    var startOfYear=new Date(now.getFullYear(),0,1);
-    var weekNum=Math.ceil(((now-startOfYear)/86400000+startOfYear.getDay()+1)/7);
-    return "Semana "+weekNum+" - "+now.getFullYear();
+    var now = new Date();
+    var startOfYear = new Date(now.getFullYear(), 0, 1);
+    var weekNum = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+    return "Semana " + weekNum + " - " + now.getFullYear();
+}
+
+function generarCodigoSesion(elab) {
+    var codigo = elab.substring(0, 6).replace(/ /g,'').toUpperCase();
+    var now = new Date();
+    var dia = String(now.getDate()).padStart(2,'0');
+    var mes = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'][now.getMonth()];
+    return codigo + '-' + dia + mes;
 }
 
 // NAVEGACION
 function irA(screenId) {
     document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-    var screen=document.getElementById(screenId);
+    var screen = document.getElementById(screenId);
     if (screen) screen.classList.add('active');
-    if (screenId==='screenProductos') cargarProductos();
-    if (screenId==='screenStock') iniciarStock();
-    if (screenId==='screenVentas') cargarVentas();
-    if (screenId==='screenHome') { pararCamara(); pararCamaraFoto(); }
+    if (screenId === 'screenProductos') cargarProductos();
+    if (screenId === 'screenStock') iniciarStock();
+    if (screenId === 'screenVentas') cargarVentas();
     window.scrollTo(0,0);
 }
 
@@ -546,252 +571,183 @@ function switchTabVentas(tabId) {
     document.querySelectorAll('#screenVentas .tab-btn').forEach(function(b){ b.classList.remove('active'); });
     document.getElementById(tabId).classList.add('active');
     event.target.classList.add('active');
-    if (tabId==='tabVerVentas') cargarVentas();
+    if (tabId === 'tabVerVentas') cargarVentas();
 }
 
-// CAMARA ESCANER
-var video=document.getElementById('webcam');
+// COCINA — SELECCION ELABORACION
+function seleccionarElab(nombre) {
+    currentElabSelected = nombre;
+    ingredientesFotos = {};
 
-async function startCamera() {
-    var btnCamera=document.getElementById('btnCamera');
-    var btnScan=document.getElementById('btnScan');
-    var camError=document.getElementById('camError');
-    var wrapper=document.getElementById('cameraWrapper');
-    btnCamera.innerHTML="Iniciando..."; btnCamera.disabled=true;
-    camError.style.display='none';
-    var modos=[
-        {video:{facingMode:{exact:"environment"}}},
-        {video:{facingMode:"environment"}},
-        {video:true}
-    ];
-    var stream=null,lastErr=null;
-    for (var i=0;i<modos.length;i++) {
-        try { stream=await navigator.mediaDevices.getUserMedia(modos[i]); break; }
-        catch(e) { lastErr=e; }
-    }
-    if (stream) {
-        cameraStream=stream; video.srcObject=stream;
-        wrapper.style.display='block';
-        try { await video.play(); } catch(e) {}
-        btnCamera.style.display='none'; btnScan.style.display='block';
-        setStatus("Camara activa.",'ok');
-    } else {
-        btnCamera.innerHTML="🎥 ACTIVAR CAMARA"; btnCamera.disabled=false;
-        camError.style.display='block';
-        camError.innerHTML="No se pudo acceder a la camara: "+(lastErr?lastErr.name:"error");
-    }
+    document.querySelectorAll('.btn-elab').forEach(function(b){ b.classList.remove('selected'); });
+    event.target.classList.add('selected');
+
+    var ingredientes = RECETAS[nombre] || [];
+    document.getElementById('tituloIngredientes').textContent = nombre;
+    document.getElementById('sesionBadge').textContent = generarCodigoSesion(nombre);
+
+    var html = ingredientes.map(function(ing, i) {
+        return renderIngredienteRow(ing.nombre, ing.cantidad, i);
+    }).join('');
+
+    document.getElementById('listaIngredientes').innerHTML = html;
+    document.getElementById('cardIngredientes').classList.remove('hidden');
+    document.getElementById('btnGuardarSesion').classList.remove('hidden');
+    document.getElementById('cardIngredientes').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-function pararCamara() {
-    if (cameraStream) { cameraStream.getTracks().forEach(function(t){ t.stop(); }); cameraStream=null; }
+function renderIngredienteRow(nombre, cantidadDefault, i) {
+    return '<div class="ingrediente-row" id="ing-row-'+i+'">' +
+        '<div class="ingrediente-top">' +
+            '<input type="checkbox" class="ingrediente-check" id="ing-check-'+i+'" checked>' +
+            '<span style="font-size:1.3em">'+getEmoji(nombre)+'</span>' +
+            '<span class="ingrediente-nombre">'+nombre+'</span>' +
+            '<span class="ingrediente-cantidad-default">'+cantidadDefault+'</span>' +
+        '</div>' +
+        '<div class="ingrediente-fields">' +
+            '<input class="ingrediente-input" id="ing-lote-'+i+'" placeholder="Nº Lote">' +
+            '<input class="ingrediente-input" id="ing-cant-'+i+'" placeholder="Cant." value="'+cantidadDefault+'">' +
+        '</div>' +
+        '<button class="ingrediente-foto-btn" id="ing-foto-btn-'+i+'" onclick="abrirFotoIngrediente('+i+')">' +
+            '📸 Foto del producto' +
+        '</button>' +
+        '<img class="ingrediente-foto-preview" id="ing-foto-preview-'+i+'" alt="foto">' +
+    '</div>';
 }
 
-// CAMARA FOTO LOTE — separada
-var videoFoto=document.getElementById('webcamFoto');
-
-async function abrirCamaraFoto() {
-    var wrapper=document.getElementById('cameraWrapperFoto');
-    var btnAbrir=document.getElementById('btnAbrirFoto');
-    var btnCapturar=document.getElementById('btnCapturarFoto');
-    btnAbrir.innerHTML="Iniciando camara..."; btnAbrir.disabled=true;
-
-    // Parar si ya hay stream
-    if (cameraStreamFoto) { cameraStreamFoto.getTracks().forEach(function(t){ t.stop(); }); cameraStreamFoto=null; }
-
-    var modos=[
-        {video:{facingMode:{exact:"environment"}}},
-        {video:{facingMode:"environment"}},
-        {video:true}
-    ];
-    var stream=null,lastErr=null;
-    for (var i=0;i<modos.length;i++) {
-        try { stream=await navigator.mediaDevices.getUserMedia(modos[i]); break; }
-        catch(e) { lastErr=e; }
-    }
-    if (stream) {
-        cameraStreamFoto=stream; videoFoto.srcObject=stream;
-        wrapper.style.display='block';
-        try { await videoFoto.play(); } catch(e) {}
-        btnAbrir.style.display='none';
-        btnCapturar.style.display='block';
-        // Scroll para ver la camara
-        wrapper.scrollIntoView({behavior:'smooth', block:'center'});
-    } else {
-        btnAbrir.innerHTML="📸 ABRIR CAMARA PARA FOTO"; btnAbrir.disabled=false;
-        alert("No se pudo abrir la camara: "+(lastErr?lastErr.name:"error"));
-    }
+var contadorIngredientesExtra = 100;
+function anadirIngredienteExtra() {
+    var i = contadorIngredientesExtra++;
+    var html = '<div class="ingrediente-row" id="ing-row-'+i+'">' +
+        '<div class="ingrediente-top">' +
+            '<input type="checkbox" class="ingrediente-check" id="ing-check-'+i+'" checked>' +
+            '<span style="font-size:1.3em">📦</span>' +
+            '<input class="ingrediente-input" id="ing-nombre-'+i+'" placeholder="Nombre del ingrediente" style="flex:1">' +
+        '</div>' +
+        '<div class="ingrediente-fields">' +
+            '<input class="ingrediente-input" id="ing-lote-'+i+'" placeholder="Nº Lote">' +
+            '<input class="ingrediente-input" id="ing-cant-'+i+'" placeholder="Cantidad">' +
+        '</div>' +
+        '<button class="ingrediente-foto-btn" id="ing-foto-btn-'+i+'" onclick="abrirFotoIngrediente('+i+')">' +
+            '📸 Foto del producto' +
+        '</button>' +
+        '<img class="ingrediente-foto-preview" id="ing-foto-preview-'+i+'" alt="foto">' +
+    '</div>';
+    document.getElementById('listaIngredientes').insertAdjacentHTML('beforeend', html);
 }
 
-function capturarFoto() {
-    if (!videoFoto.videoWidth) { alert("La camara no esta lista."); return; }
-    var c=document.createElement('canvas');
-    c.width=videoFoto.videoWidth; c.height=videoFoto.videoHeight;
-    c.getContext('2d').drawImage(videoFoto,0,0);
-    photoBase64=c.toDataURL('image/jpeg',0.7);
-
-    // Intentar leer lote con OCR via Quagga (codigos) o mostrar directamente
-    var preview=document.getElementById('preview');
-    preview.style.display='none'; preview.src='';
-    requestAnimationFrame(function(){
-        preview.src=photoBase64; preview.style.display='block';
-        updateSteps();
-    });
-
-    // Parar camara de foto
-    pararCamaraFoto();
-    document.getElementById('cameraWrapperFoto').style.display='none';
-    document.getElementById('btnAbrirFoto').style.display='block';
-    document.getElementById('btnAbrirFoto').innerHTML="📸 TOMAR OTRA FOTO";
-    document.getElementById('btnAbrirFoto').disabled=false;
-    document.getElementById('btnCapturarFoto').style.display='none';
-    setStatus("Foto del lote capturada.",'ok');
+function abrirFotoIngrediente(i) {
+    ingredientesFotoTarget = i;
+    document.getElementById('inputIngredienteFoto').click();
 }
 
-function pararCamaraFoto() {
-    if (cameraStreamFoto) { cameraStreamFoto.getTracks().forEach(function(t){ t.stop(); }); cameraStreamFoto=null; }
-}
-
-window.addEventListener('beforeunload', function(){ pararCamara(); pararCamaraFoto(); });
-
-function captureFrame() {
-    var c=document.createElement('canvas');
-    c.width=video.videoWidth; c.height=video.videoHeight;
-    c.getContext('2d').drawImage(video,0,0);
-    return c;
-}
-
-function scanCode() {
-    if (isScanning) return;
-    if (!video.videoWidth) { setStatus("Camara no lista.",'err'); isScanning=false; return; }
-    if (typeof Quagga==='undefined') { setStatus("Libreria no disponible.",'err'); isScanning=false; return; }
-    isScanning=true;
-    setStatus('<span class="scanning-indicator">Escaneando...</span>','');
-    var canvas=captureFrame();
-    if (!canvas.width||!canvas.height) { setStatus("Error captura.",'err'); isScanning=false; return; }
-    Quagga.decodeSingle({
-        src:canvas.toDataURL('image/png'), numOfWorkers:0, locate:true,
-        decoder:{readers:["ean_reader","ean_8_reader","code_128_reader","upc_reader"]}
-    }, function(result) {
-        isScanning=false;
-        if (result&&result.codeResult) {
-            currentCode=result.codeResult.code;
-            document.getElementById('scanBox').classList.add('detected');
-            setTimeout(function(){ document.getElementById('scanBox').classList.remove('detected'); },1000);
-            buscarEnLibreria(currentCode);
-            if (navigator.vibrate) navigator.vibrate([100,50,100]);
-        } else { setStatus("No detectado. Ajusta la luz.",'err'); }
-    });
-}
-
-function buscarEnLibreria(codigo) {
-    var encontrado=productosLibreria.find(function(p){ return p&&p.codigo&&p.codigo===codigo; });
-    if (encontrado) {
-        document.getElementById('nombreProducto').value=encontrado.nombre;
-        document.getElementById('nombreProducto').classList.add('filled');
-        if (encontrado.unidad) document.getElementById('cantidadProducto').placeholder="Unidad: "+encontrado.unidad;
-        setStatus("Encontrado: "+encontrado.nombre,'ok');
-    } else {
-        document.getElementById('nombreProducto').value=codigo;
-        setStatus("Codigo: "+codigo,'ok');
-    }
-    updateSteps();
-}
-
-function updateSteps() {
-    var s1=!!selectedMain&&((selectedMain!=='Ravioli'&&selectedMain!=='Salsa')||!!selectedSub);
-    var s2=!!document.getElementById('nombreProducto').value.trim();
-    var s3=!!photoBase64;
-    setStep(1,s1,true); setStep(2,s2,s1); setStep(3,s3,s2);
-    document.getElementById('card1').classList.toggle('completed',s1);
-    document.getElementById('card2').classList.toggle('completed',s2);
-    document.getElementById('card3').classList.toggle('completed',s3);
-}
-
-function setStep(n, done, prev) {
-    var step=document.getElementById('step'+n);
-    var num=document.getElementById('stepNum'+n);
-    step.classList.remove('done','active');
-    if (done) { step.classList.add('done'); num.innerHTML='✔'; }
-    else if (prev) { step.classList.add('active'); num.innerHTML=n; }
-    else { num.innerHTML=n; }
-    if (n<3) document.getElementById('line'+n).classList.toggle('done',done);
-}
-
-function setMain(elem, val, hasSub, subId) {
-    selectedMain=val; selectedSub="";
-    document.querySelectorAll('.btn-recipe').forEach(function(b){ b.classList.remove('selected'); });
-    document.querySelectorAll('.btn-sub').forEach(function(b){ b.classList.remove('selected'); });
-    elem.classList.add('selected');
-    document.getElementById('sub-salsa').classList.add('hidden');
-    document.getElementById('sub-ravioli').classList.add('hidden');
-    if (hasSub&&subId) document.getElementById(subId).classList.remove('hidden');
-    updateSteps();
-}
-
-function setSub(elem, val) {
-    selectedSub=val;
-    document.querySelectorAll('.btn-sub').forEach(function(b){ b.classList.remove('selected'); });
-    elem.classList.add('selected');
-    updateSteps();
-}
-
-function onFieldInput(input) {
-    input.classList.toggle('filled', input.value.trim().length>0);
-    updateSteps();
-}
-
-// FOTO PRODUCTO desde galeria
-function onFotoProductoSelected(event) {
-    var file=event.target.files[0]; if (!file) return;
-    var reader=new FileReader();
-    reader.onload=function(e) {
-        photoProductoBase64=e.target.result;
-        var preview=document.getElementById('previewProducto');
-        preview.src=photoProductoBase64; preview.style.display='block';
+function onIngredienteFotoSelected(event) {
+    var file = event.target.files[0]; if (!file) return;
+    var i = ingredientesFotoTarget;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        ingredientesFotos[i] = e.target.result;
+        var preview = document.getElementById('ing-foto-preview-'+i);
+        if (preview) { preview.src = e.target.result; preview.style.display = 'block'; }
+        var btn = document.getElementById('ing-foto-btn-'+i);
+        if (btn) { btn.textContent = '✅ Foto tomada'; btn.classList.add('has-foto'); }
     };
     reader.readAsDataURL(file);
-    event.target.value='';
+    event.target.value = '';
 }
 
-// GALERIA EDICION
+async function guardarSesion() {
+    if (!currentElabSelected) return alert("Selecciona una elaboracion.");
+    var btn = document.getElementById('btnGuardarSesion');
+    btn.disabled = true; btn.innerHTML = "Guardando...";
+
+    var sesion = generarCodigoSesion(currentElabSelected);
+    var rows = document.getElementById('listaIngredientes').querySelectorAll('.ingrediente-row');
+    var ingredientes = [];
+
+    rows.forEach(function(row) {
+        var id = row.id.replace('ing-row-','');
+        var check = document.getElementById('ing-check-'+id);
+        if (!check || !check.checked) return;
+
+        var nombreEl = document.getElementById('ing-nombre-'+id);
+        var nombre = nombreEl ? nombreEl.value.trim() : row.querySelector('.ingrediente-nombre') ? row.querySelector('.ingrediente-nombre').textContent : '';
+        if (!nombre) return;
+
+        var lote = document.getElementById('ing-lote-'+id) ? document.getElementById('ing-lote-'+id).value.trim() : '';
+        var cant = document.getElementById('ing-cant-'+id) ? document.getElementById('ing-cant-'+id).value.trim() : '';
+        var foto = ingredientesFotos[id] || '';
+
+        ingredientes.push({ nombre:nombre, lote:lote||'Sin lote', cantidad:cant, imagen:foto });
+    });
+
+    if (!ingredientes.length) return alert("Selecciona al menos un ingrediente.");
+
+    try {
+        await fetch(URL_SCRIPT, {
+            method:'POST', mode:'no-cors', cache:'no-cache',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({
+                modo: 'sesion',
+                elaboracion: currentElabSelected,
+                sesion: sesion,
+                ingredientes: ingredientes
+            })
+        });
+        showSuccess("Oido Cocina!", sesion + " — " + ingredientes.length + " ingredientes guardados", "🍝");
+    } catch(err) {
+        alert("Error de red.");
+        btn.disabled = false; btn.innerHTML = "Confirmar y Guardar Sesion";
+    }
+}
+
+// PRODUCTOS
+function onFotoProductoSelected(event) {
+    var file = event.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        window.photoProductoBase64 = e.target.result;
+        var preview = document.getElementById('previewProducto');
+        preview.src = e.target.result; preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+}
+
 function abrirGaleriaParaEditar(i) {
-    editFotoIndex=i; editFotoBase64=null;
+    editFotoIndex = i; editFotoBase64 = null;
     document.getElementById('inputGaleria').click();
 }
 
 function onGaleriaSelected(event) {
-    var file=event.target.files[0]; if (!file) return;
-    var reader=new FileReader();
-    reader.onload=function(e) {
-        editFotoBase64=e.target.result;
-        var preview=document.getElementById('editFotoPreview-'+editFotoIndex);
-        if (preview) { preview.src=editFotoBase64; preview.style.display='block'; }
+    var file = event.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        editFotoBase64 = e.target.result;
+        var preview = document.getElementById('editFotoPreview-'+editFotoIndex);
+        if (preview) { preview.src = editFotoBase64; preview.style.display = 'block'; }
     };
     reader.readAsDataURL(file);
-    event.target.value='';
+    event.target.value = '';
 }
 
-// PRODUCTOS
 function cargarProductos() {
-    var lista=document.getElementById('listaProductos');
-    if (lista) lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div>';
-    fetch(URL_SCRIPT+"?accion=listarProductos")
+    var lista = document.getElementById('listaProductos');
+    if (lista) lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div>';
+    fetch(URL_SCRIPT + "?accion=listarProductos")
         .then(function(r){ return r.json(); })
         .then(function(data) {
-            productosLibreria=(data.productos||[]).filter(function(p){ return p&&p.nombre; });
+            productosLibreria = (data.productos || []).filter(function(p){ return p && p.nombre; });
             renderListaProductos();
         })
-        .catch(function(){ if (lista) lista.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px;">Sin conexion.</div>'; });
+        .catch(function(){ if (lista) lista.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Sin conexion.</div>'; });
 }
 
 function itemHTML(p, i) {
-    var nombreSafe=(p.nombre||'').replace(/'/g,"").replace(/"/g,"");
-    var iconHtml;
-    if (p.foto) {
-        iconHtml='<img class="producto-item-foto" src="'+p.foto+'" onerror="this.outerHTML=\'<div class=producto-emoji-icon>'+getEmoji(p.nombre)+'</div>\'">';
-    } else {
-        iconHtml='<div class="producto-emoji-icon">'+getEmoji(p.nombre)+'</div>';
-    }
+    var nombreSafe = (p.nombre||'').replace(/'/g,"").replace(/"/g,"");
+    var iconHtml = p.foto
+        ? '<img class="producto-item-foto" src="'+p.foto+'" onerror="this.outerHTML=\'<div class=producto-emoji-icon>'+getEmoji(p.nombre)+'</div>\'">'
+        : '<div class="producto-emoji-icon">'+getEmoji(p.nombre)+'</div>';
     return '<div class="producto-item" id="pitem-'+i+'">' +
         '<div class="producto-item-top">'+iconHtml+
             '<div class="producto-item-info">' +
@@ -799,7 +755,7 @@ function itemHTML(p, i) {
                 '<div class="producto-item-detalle">'+(p.unidad||'Sin unidad')+(p.proveedor?' · '+p.proveedor:'')+'</div>' +
                 (p.codigo?'<div class="producto-item-codigo">'+p.codigo+'</div>':'') +
             '</div>' +
-            '<button class="btn-edit-producto" onclick="toggleEdit('+i+')">✏️ Editar</button>' +
+            '<button class="btn-edit-producto" onclick="toggleEdit('+i+')">✏️</button>' +
         '</div>' +
         '<div class="edit-form" id="editform-'+i+'">' +
             '<div class="edit-row">' +
@@ -810,10 +766,9 @@ function itemHTML(p, i) {
                 '<input class="edit-input" id="eu-'+i+'" value="'+(p.unidad||'')+'" placeholder="Unidad">' +
                 '<input class="edit-input" id="ep-'+i+'" value="'+(p.proveedor||'')+'" placeholder="Proveedor">' +
             '</div>' +
-            '<img class="edit-foto-preview" id="editFotoPreview-'+i+'" src="" alt="Foto nueva">' +
+            '<img class="edit-foto-preview" id="editFotoPreview-'+i+'" src="" alt="Foto">' +
             '<div class="edit-foto-buttons">' +
                 '<button class="btn-edit-foto" onclick="abrirGaleriaParaEditar('+i+')">🖼 Subir foto propia</button>' +
-                '<button class="btn-edit-foto" style="opacity:0.5;cursor:default;">'+getEmoji(p.nombre)+' Auto</button>' +
             '</div>' +
             '<button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+nombreSafe+'\')">Guardar</button>' +
             '<button class="btn-edit-cancel" onclick="toggleEdit('+i+')">Cancelar</button>' +
@@ -822,33 +777,33 @@ function itemHTML(p, i) {
 }
 
 function renderListaProductos() {
-    var lista=document.getElementById('listaProductos'); if (!lista) return;
-    if (!productosLibreria.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Aun no hay productos.</div>'; return; }
-    lista.innerHTML=productosLibreria.map(function(p,i){ return itemHTML(p,i); }).join('');
+    var lista = document.getElementById('listaProductos'); if (!lista) return;
+    if (!productosLibreria.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Aun no hay productos.</div>'; return; }
+    lista.innerHTML = productosLibreria.map(function(p,i){ return itemHTML(p,i); }).join('');
 }
 
 function filtrarProductos(texto) {
-    var termino=(texto||'').toLowerCase().trim();
-    var lista=document.getElementById('listaProductos');
+    var termino = (texto||'').toLowerCase().trim();
+    var lista = document.getElementById('listaProductos');
     if (!termino) { renderListaProductos(); return; }
-    var filtrados=productosLibreria.filter(function(p){
+    var filtrados = productosLibreria.filter(function(p){
         return (p.nombre||'').toLowerCase().includes(termino)||(p.proveedor||'').toLowerCase().includes(termino)||(p.unidad||'').toLowerCase().includes(termino);
     });
-    if (!filtrados.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">No encontrado.</div>'; return; }
-    lista.innerHTML=filtrados.map(function(p){ return itemHTML(p,productosLibreria.indexOf(p)); }).join('');
+    if (!filtrados.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">No encontrado.</div>'; return; }
+    lista.innerHTML = filtrados.map(function(p){ return itemHTML(p, productosLibreria.indexOf(p)); }).join('');
 }
 
-function toggleEdit(i) { var form=document.getElementById('editform-'+i); if (form) form.classList.toggle('open'); }
+function toggleEdit(i) { var form = document.getElementById('editform-'+i); if (form) form.classList.toggle('open'); }
 
 async function guardarEdicion(i, nombreOriginal) {
-    var fotoParaEnviar=(editFotoIndex===i&&editFotoBase64)?editFotoBase64:"";
-    var payload={
+    var fotoParaEnviar = (editFotoIndex === i && editFotoBase64) ? editFotoBase64 : "";
+    var payload = {
         modo:'editarProducto', nombreOriginal:nombreOriginal,
-        nombre:document.getElementById('en-'+i)?document.getElementById('en-'+i).value.trim():'',
-        codigo:document.getElementById('ec-'+i)?document.getElementById('ec-'+i).value.trim():'',
-        unidad:document.getElementById('eu-'+i)?document.getElementById('eu-'+i).value.trim():'',
-        proveedor:document.getElementById('ep-'+i)?document.getElementById('ep-'+i).value.trim():'',
-        imagen:fotoParaEnviar
+        nombre: document.getElementById('en-'+i)?document.getElementById('en-'+i).value.trim():'',
+        codigo: document.getElementById('ec-'+i)?document.getElementById('ec-'+i).value.trim():'',
+        unidad: document.getElementById('eu-'+i)?document.getElementById('eu-'+i).value.trim():'',
+        proveedor: document.getElementById('ep-'+i)?document.getElementById('ep-'+i).value.trim():'',
+        imagen: fotoParaEnviar
     };
     try {
         await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
@@ -859,9 +814,9 @@ async function guardarEdicion(i, nombreOriginal) {
 }
 
 async function guardarProducto() {
-    var nombre=document.getElementById('pNombre').value.trim();
+    var nombre = document.getElementById('pNombre').value.trim();
     if (!nombre) return alert("El nombre es obligatorio.");
-    var btn=document.querySelector('#screenProductos .btn-save');
+    var btn = document.querySelector('#screenProductos .btn-save');
     btn.disabled=true; btn.innerHTML="Guardando...";
     try {
         await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},
@@ -869,27 +824,27 @@ async function guardarProducto() {
                 codigo:document.getElementById('pCodigo').value.trim(),
                 unidad:document.getElementById('pUnidad').value.trim(),
                 proveedor:document.getElementById('pProveedor').value,
-                imagen:photoProductoBase64||""})});
+                imagen:window.photoProductoBase64||""})});
         document.getElementById('pNombre').value=''; document.getElementById('pCodigo').value='';
         document.getElementById('pUnidad').value=''; document.getElementById('pProveedor').value='';
-        document.getElementById('previewProducto').style.display='none'; photoProductoBase64=null;
+        document.getElementById('previewProducto').style.display='none'; window.photoProductoBase64=null;
         btn.innerHTML="Guardado ✔ Recargando...";
         setTimeout(function(){ cargarProductos(); btn.disabled=false; btn.innerHTML="Guardar en Biblioteca"; },2000);
     } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar en Biblioteca"; }
 }
 
-// COMPRAS — solo generar pedido
+// COMPRAS
 function cargarProductosProveedor() {
-    var proveedor=document.getElementById('gProveedor').value; if (!proveedor) return;
-    var filtrados=productosLibreria.filter(function(p){
+    var proveedor = document.getElementById('gProveedor').value; if (!proveedor) return;
+    var filtrados = productosLibreria.filter(function(p){
         if (!p||!p.proveedor) return false;
-        return p.proveedor.toLowerCase().trim()===proveedor.toLowerCase().trim();
+        return p.proveedor.toLowerCase().trim() === proveedor.toLowerCase().trim();
     });
-    var lista=document.getElementById('listaPedidoItems');
+    var lista = document.getElementById('listaPedidoItems');
     if (!filtrados.length) {
-        lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;padding:10px;">No tienes productos de este proveedor. Añadelos en Mis Productos o en el Sheets.</div>';
+        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;padding:10px;">No tienes productos de este proveedor. Añadelos en Mis Productos o en el Sheets.</div>';
     } else {
-        lista.innerHTML=filtrados.map(function(p,i){
+        lista.innerHTML = filtrados.map(function(p,i){
             return '<div class="pedido-item">' +
                 '<input type="checkbox" class="pedido-item-check" id="pcheck-'+i+'" checked>' +
                 '<div class="pedido-item-nombre">'+p.nombre+'</div>' +
@@ -899,49 +854,42 @@ function cargarProductosProveedor() {
         }).join('');
     }
     document.getElementById('cardPedidoItems').classList.remove('hidden');
-    document.getElementById('btnEnviarPedido').style.display='block';
-    window.productosProveedor=filtrados;
+    document.getElementById('btnEnviarPedido').style.display = 'block';
+    window.productosProveedor = filtrados;
 }
 
 async function enviarYGuardarPedido() {
-    var proveedor=document.getElementById('gProveedor').value;
-    var filtrados=window.productosProveedor||[];
-    var lineas=[];
+    var proveedor = document.getElementById('gProveedor').value;
+    var filtrados = window.productosProveedor || [];
+    var lineas = [];
     filtrados.forEach(function(p,i){
-        var check=document.getElementById('pcheck-'+i);
-        var cant=document.getElementById('pcant-'+i);
+        var check = document.getElementById('pcheck-'+i);
+        var cant = document.getElementById('pcant-'+i);
         if (check&&check.checked&&cant&&parseFloat(cant.value)>0)
             lineas.push({producto:p.nombre,cantidad:cant.value,unidad:p.unidad||""});
     });
     if (!lineas.length) return alert("Pon cantidad a al menos un producto.");
-    var mensaje="Hola buenas, del rest. Divina Italia El Charco\n"+
+    var mensaje = "Hola buenas, del rest. Divina Italia El Charco\n"+
         lineas.map(function(l){ return l.producto+' '+l.cantidad+(l.unidad?' '+l.unidad:''); }).join('\n')+"\nMuchas gracias";
     window.open("https://wa.me/?text="+encodeURIComponent(mensaje),'_blank');
     try {
         await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},
             body:JSON.stringify({modo:'compra',proveedor:proveedor,lineas:lineas})});
-        showSuccess("Pedido Enviado y Guardado",lineas.length+" productos en Compras del mes","📱");
+        showSuccess("Pedido Enviado y Guardado",lineas.length+" productos","📱");
     } catch(err) { alert("WhatsApp abierto pero error al guardar."); }
 }
 
-// STOCK SEMANAL
+// STOCK
 function onStockElabChange() {
-    var val=document.getElementById('sElaboracion').value;
-    var otroDiv=document.getElementById('stockOtroInput');
-    if (val==='__otro__') {
-        otroDiv.classList.remove('hidden');
-        document.getElementById('sElaboracionOtro').focus();
-    } else {
-        otroDiv.classList.add('hidden');
-    }
+    var val = document.getElementById('sElaboracion').value;
+    document.getElementById('stockOtroInput').classList.toggle('hidden', val !== '__otro__');
+    if (val === '__otro__') document.getElementById('sElaboracionOtro').focus();
 }
 
 function iniciarStock() {
-    var semana=getSemanaActual();
-    document.getElementById('semanaActual').textContent=semana;
-    // Fecha por defecto hoy
-    var hoy=new Date();
-    document.getElementById('sFecha').value=hoy.toISOString().split('T')[0];
+    var semana = getSemanaActual();
+    document.getElementById('semanaActual').textContent = semana;
+    document.getElementById('sFecha').value = new Date().toISOString().split('T')[0];
     cargarStockSemana(semana);
 }
 
@@ -949,18 +897,18 @@ function cargarStockSemana(semana) {
     fetch(URL_SCRIPT+"?accion=listarStock&semana="+encodeURIComponent(semana))
         .then(function(r){ return r.json(); })
         .then(function(data) {
-            var lista=document.getElementById('listaStock');
-            var items=data.stock||[];
+            var lista = document.getElementById('listaStock');
+            var items = data.stock || [];
             if (!items.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin registros esta semana.</div>'; return; }
-            lista.innerHTML=items.map(function(s){
+            lista.innerHTML = items.map(function(s){
                 return '<div class="stock-item">' +
                     '<div style="font-size:1.3em">'+getEmoji(s.elaboracion||'')+'</div>' +
                     '<div style="flex:1">' +
-                        '<div class="stock-item-elab">'+(s.elaboracion||'')+'</div>' +
+                        '<div style="font-weight:600;font-size:0.9em;color:var(--cream)">'+(s.elaboracion||'')+'</div>' +
                         '<div style="font-size:0.82em;color:var(--gold-dim)">'+(s.cantidad||'')+' '+(s.unidad||'')+'</div>' +
                         (s.notas?'<div style="font-size:0.75em;color:var(--muted);margin-top:2px;">'+s.notas+'</div>':'') +
                     '</div>' +
-                    '<div class="stock-item-fecha">'+(s.fecha||'')+'</div>' +
+                    '<div style="font-size:0.72em;color:var(--muted)">'+(s.fecha||'')+'</div>' +
                 '</div>';
             }).join('');
         })
@@ -968,17 +916,17 @@ function cargarStockSemana(semana) {
 }
 
 async function guardarStock() {
-    var selectVal=document.getElementById('sElaboracion').value;
-    var elaboracion=selectVal==='__otro__'?document.getElementById('sElaboracionOtro').value.trim():selectVal;
-    var cantidad=document.getElementById('sCantidad').value.trim();
-    var unidad=document.getElementById('sUnidad').value.trim();
-    var notas=document.getElementById('sNotas').value.trim();
-    var fechaInput=document.getElementById('sFecha').value;
+    var selectVal = document.getElementById('sElaboracion').value;
+    var elaboracion = selectVal==='__otro__' ? document.getElementById('sElaboracionOtro').value.trim() : selectVal;
+    var cantidad = document.getElementById('sCantidad').value.trim();
+    var unidad = document.getElementById('sUnidad').value.trim();
+    var notas = document.getElementById('sNotas').value.trim();
+    var fechaInput = document.getElementById('sFecha').value;
     if (!elaboracion) return alert("Selecciona o escribe una elaboracion.");
     if (!cantidad) return alert("Introduce la cantidad.");
-    var btn=document.querySelector('#screenStock .btn-save');
+    var btn = document.querySelector('#screenStock .btn-save');
     btn.disabled=true; btn.innerHTML="Guardando...";
-    var semana=getSemanaActual();
+    var semana = getSemanaActual();
     try {
         await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},
             body:JSON.stringify({modo:'stock',elaboracion:elaboracion,cantidad:cantidad,unidad:unidad,notas:notas,semana:semana,fechaManual:fechaInput})});
@@ -995,67 +943,58 @@ async function guardarStock() {
 
 // VENTAS
 function onTicketSelected(event) {
-    var file=event.target.files[0]; if (!file) return;
-    var reader=new FileReader();
-    reader.onload=function(e) {
-        var base64=e.target.result;
-        var preview=document.getElementById('ticketPreview');
-        preview.src=base64; preview.style.display='block';
-        document.getElementById('ventasStatus').textContent="Analizando ticket con IA...";
+    var file = event.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var base64 = e.target.result;
+        document.getElementById('ticketPreview').src = base64;
+        document.getElementById('ticketPreview').style.display = 'block';
+        document.getElementById('ventasStatus').textContent = "Analizando ticket con IA...";
         analizarTicketConIA(base64);
     };
     reader.readAsDataURL(file);
-    event.target.value='';
+    event.target.value = '';
 }
 
 async function analizarTicketConIA(base64) {
     try {
-        var response=await fetch("https://api.anthropic.com/v1/messages",{
+        var response = await fetch("https://api.anthropic.com/v1/messages",{
             method:"POST",
             headers:{"Content-Type":"application/json"},
             body:JSON.stringify({
-                model:"claude-sonnet-4-20250514",
-                max_tokens:1000,
-                messages:[{
-                    role:"user",
-                    content:[
-                        {type:"image",source:{type:"base64",media_type:"image/jpeg",data:base64.split(',')[1]}},
-                        {type:"text",text:"Extrae la lista de platos vendidos de este ticket de TPV. Devuelve SOLO un JSON valido sin texto adicional: {\"platos\":[{\"descripcion\":\"nombre\",\"unidades\":123,\"importe\":456.78}]}. Si no hay datos claros devuelve {\"platos\":[]}"}
-                    ]
-                }]
+                model:"claude-sonnet-4-20250514", max_tokens:1000,
+                messages:[{role:"user",content:[
+                    {type:"image",source:{type:"base64",media_type:"image/jpeg",data:base64.split(',')[1]}},
+                    {type:"text",text:"Extrae la lista de platos vendidos de este ticket TPV. Devuelve SOLO JSON sin texto adicional: {\"platos\":[{\"descripcion\":\"nombre\",\"unidades\":123,\"importe\":456.78}]}. Si no hay datos devuelve {\"platos\":[]}"}
+                ]}]
             })
         });
-        var data=await response.json();
-        var texto=data.content[0].text;
-        var clean=texto.replace(/```json|```/g,'').trim();
-        var parsed=JSON.parse(clean);
-        ventasData=parsed.platos||[];
+        var data = await response.json();
+        var clean = data.content[0].text.replace(/```json|```/g,'').trim();
+        ventasData = JSON.parse(clean).platos || [];
         renderVentasPreview();
     } catch(err) {
-        document.getElementById('ventasStatus').textContent="Error al analizar. Revisa la imagen.";
-        ventasData=[];
+        document.getElementById('ventasStatus').textContent = "Error al analizar. Revisa la imagen.";
     }
 }
 
 function renderVentasPreview() {
-    var tbody=document.getElementById('tablaVentasBody');
-    var card=document.getElementById('cardVentasPreview');
-    var status=document.getElementById('ventasStatus');
-    if (!ventasData.length) { status.textContent="No se detectaron datos."; return; }
-    status.textContent=ventasData.length+" platos detectados.";
-    tbody.innerHTML=ventasData.map(function(v,i){
+    var tbody = document.getElementById('tablaVentasBody');
+    if (!ventasData.length) { document.getElementById('ventasStatus').textContent="No se detectaron datos."; return; }
+    document.getElementById('ventasStatus').textContent = ventasData.length+" platos detectados.";
+    tbody.innerHTML = ventasData.map(function(v,i){
         return '<tr><td><span class="ventas-rank'+(i<3?' top':'')+'">'+(i+1)+'</span></td>' +
             '<td>'+v.descripcion+'</td><td>'+v.unidades+'</td><td>'+v.importe+'</td></tr>';
     }).join('');
-    card.classList.remove('hidden');
-    document.getElementById('actionVentas').style.display='flex';
+    document.getElementById('cardVentasPreview').classList.remove('hidden');
+    document.getElementById('actionVentas').style.display = 'flex';
 }
 
 async function guardarVentas() {
-    if (!ventasData.length) return alert("No hay datos de ventas.");
-    var btn=document.querySelector('#screenVentas .btn-save');
+    if (!ventasData.length) return alert("No hay datos.");
+    var btn = document.querySelector('#screenVentas .btn-save');
     btn.disabled=true; btn.innerHTML="Guardando...";
-    var mes=new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+    var mes = new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'});
     try {
         await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},
             body:JSON.stringify({modo:'ventas',mes:mes,platos:ventasData})});
@@ -1064,54 +1003,29 @@ async function guardarVentas() {
 }
 
 function cargarVentas() {
-    var lista=document.getElementById('listaVentas');
-    var mes=new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+    var lista = document.getElementById('listaVentas');
+    var mes = new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'});
     fetch(URL_SCRIPT+"?accion=listarVentas&mes="+encodeURIComponent(mes))
         .then(function(r){ return r.json(); })
         .then(function(data) {
-            var items=data.ventas||[];
+            var items = data.ventas || [];
             if (!items.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin ventas registradas este mes.</div>'; return; }
-            lista.innerHTML='<table class="ventas-table"><thead><tr><th>#</th><th>Plato</th><th>Uds</th><th>Importe</th></tr></thead><tbody>'+
+            lista.innerHTML = '<table class="ventas-table"><thead><tr><th>#</th><th>Plato</th><th>Uds</th><th>Importe</th></tr></thead><tbody>'+
                 items.map(function(v,i){ return '<tr><td><span class="ventas-rank'+(i<3?' top':'')+'">'+(i+1)+'</span></td><td>'+v.descripcion+'</td><td>'+v.unidades+'</td><td>'+v.importe+'</td></tr>'; }).join('')+
                 '</tbody></table>';
         })
         .catch(function(){ lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>'; });
 }
 
-// GUARDAR COCINA
-async function guardarCocina() {
-    var producto=document.getElementById('nombreProducto').value.trim();
-    var lote=document.getElementById('loteProducto').value.trim();
-    var cantidad=document.getElementById('cantidadProducto').value.trim();
-    if (!selectedMain) return alert("Selecciona una elaboracion.");
-    if ((selectedMain==='Ravioli'||selectedMain==='Salsa')&&!selectedSub) return alert("Selecciona el subtipo.");
-    if (!producto) return alert("Escribe o escanea el nombre del producto.");
-    if (!photoBase64&&!confirm("No has tomado foto del lote. Continuar?")) return;
-    var btn=document.querySelector('#screenCocina .btn-save');
-    btn.disabled=true; btn.innerHTML="Guardando...";
-    try {
-        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({modo:'cocina',producto:producto,lote:lote||"Sin lote",cantidad:cantidad||"Sin especificar",
-                preparacion:selectedMain,subTipo:selectedSub||"N/A",codigoBarras:currentCode||"Sin escanear",imagen:photoBase64||""})});
-        showSuccess("Oido Cocina!","Guardado en Registros","🍝");
-    } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Confirmar y Guardar en Registros"; }
-}
-
 function showSuccess(titulo, sub, icon) {
-    document.getElementById('successIcon').innerHTML=icon||'✅';
-    document.getElementById('successText').innerHTML=titulo;
-    document.getElementById('successSub').textContent=sub;
+    document.getElementById('successIcon').innerHTML = icon||'✅';
+    document.getElementById('successText').innerHTML = titulo;
+    document.getElementById('successSub').textContent = sub;
     document.getElementById('successOverlay').classList.add('show');
     if (navigator.vibrate) navigator.vibrate([100,80,200]);
-    setTimeout(function(){ document.getElementById('successOverlay').classList.remove('show'); pararCamara(); pararCamaraFoto(); location.reload(); },2800);
+    setTimeout(function(){ document.getElementById('successOverlay').classList.remove('show'); location.reload(); },2800);
 }
 
-function setStatus(html, cls) {
-    var el=document.getElementById('status');
-    el.innerHTML=html; el.className=cls||'';
-}
-
-updateSteps();
 cargarProductos();
 </script>
 </body>
