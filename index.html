@@ -875,14 +875,35 @@ async function enviarYGuardarPedido() {
             lineas.push({producto:p.nombre,cantidad:cant.value,unidad:p.unidad||""});
     });
     if (!lineas.length) return alert("Pon cantidad a al menos un producto.");
-    var mensaje = "Hola buenas, del rest. Divina Italia El Charco\n"+
-        lineas.map(function(l){ return l.producto+' '+l.cantidad+(l.unidad?' '+l.unidad:''); }).join('\n')+"\nMuchas gracias";
-    window.open("https://wa.me/?text="+encodeURIComponent(mensaje),'_blank');
+
+    var btn = document.getElementById('btnEnviarPedido');
+    btn.disabled = true; btn.innerHTML = "Guardando...";
+
     try {
-        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({modo:'compra',proveedor:proveedor,lineas:lineas})});
-        showSuccess("Pedido Enviado y Guardado",lineas.length+" productos","📱");
-    } catch(err) { alert("WhatsApp abierto pero error al guardar."); }
+        await fetch(URL_SCRIPT, {
+            method:'POST', mode:'no-cors', cache:'no-cache',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({modo:'compra', proveedor:proveedor, lineas:lineas})
+        });
+
+        // Primero confirmar guardado, luego WhatsApp
+        var mensaje = "Hola buenas, del rest. Divina Italia El Charco\n"+
+            lineas.map(function(l){ return l.producto+' '+l.cantidad+(l.unidad?' '+l.unidad:''); }).join('\n')+
+            "\nMuchas gracias";
+
+        btn.innerHTML = "✅ Guardado — Abriendo WhatsApp...";
+
+        setTimeout(function(){
+            window.open("https://wa.me/?text="+encodeURIComponent(mensaje),'_blank');
+            btn.disabled = false;
+            btn.innerHTML = "📱 ENVIAR POR WHATSAPP Y GUARDAR";
+        }, 1500);
+
+    } catch(err) {
+        alert("Error de red. No se guardó.");
+        btn.disabled = false;
+        btn.innerHTML = "📱 ENVIAR POR WHATSAPP Y GUARDAR";
+    }
 }
 
 // STOCK
