@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Divina Italia El Charco</title>
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#c9a96e">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Divina Italia">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+    <meta name="theme-color" content="#c9a96e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Divina Italia">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
@@ -47,7 +47,6 @@
         .btn-elab { background:var(--surface2); color:var(--muted); border:1px solid var(--border); border-radius:10px; padding:14px 8px; font-size:13px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s; text-align:center; }
         .btn-elab:active { transform:scale(0.97); }
         .btn-elab.selected { background:rgba(74,140,92,0.15); border-color:var(--green); color:#6abf84; }
-        /* INGREDIENTES */
         .ingrediente-row { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; }
         .ingrediente-top { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
         .ingrediente-check { width:20px; height:20px; accent-color:var(--green); flex-shrink:0; cursor:pointer; }
@@ -61,14 +60,7 @@
         .ingrediente-foto-preview { width:100%; max-height:120px; object-fit:cover; border-radius:8px; margin-top:6px; display:none; border:1px solid var(--green); }
         .add-ingrediente-btn { width:100%; padding:12px; background:transparent; border:1px dashed var(--border); border-radius:10px; color:var(--gold-dim); font-size:13px; cursor:pointer; text-align:center; margin-top:4px; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
         .add-ingrediente-btn:hover { border-color:var(--gold); color:var(--gold); }
-        /* CAMARA FOTO */
-        .camera-mini { position:relative; border-radius:10px; overflow:hidden; background:#000; display:none; margin:8px 0; }
-        .camera-mini video { width:100%; display:block; max-height:200px; }
-        .camera-mini-overlay { position:absolute; inset:0; border:2px solid rgba(201,169,110,0.5); border-radius:10px; pointer-events:none; }
-        .camera-mini-hint { position:absolute; bottom:8px; left:0; right:0; text-align:center; font-size:0.7em; color:rgba(201,169,110,0.8); }
-        /* SESION BADGE */
         .sesion-badge { display:inline-block; background:rgba(201,169,110,0.15); border:1px solid var(--gold-dim); border-radius:8px; padding:6px 12px; font-family:'Bebas Neue',sans-serif; letter-spacing:1.5px; color:var(--gold); font-size:0.85em; margin-bottom:12px; }
-        /* INPUTS */
         .input-group { margin-top:10px; }
         .input-group label { font-size:0.72em; color:var(--gold-dim); display:block; margin-bottom:5px; font-weight:600; letter-spacing:1px; text-transform:uppercase; }
         .input-group input,.input-group select,.input-group textarea { width:100%; padding:13px 14px; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; font-size:15px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; transition:border-color 0.2s; }
@@ -76,7 +68,6 @@
         .input-group input:focus,.input-group select:focus { border-color:var(--gold-dim); }
         .input-group select option { background:var(--surface2); }
         .input-group textarea { resize:vertical; min-height:80px; }
-        /* PRODUCTOS */
         .producto-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; }
         .producto-item-top { display:flex; align-items:center; gap:10px; }
         .producto-emoji-icon { width:48px; height:48px; border-radius:8px; border:1px solid var(--border); flex-shrink:0; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:1.6em; }
@@ -90,20 +81,33 @@
         .edit-form.open { display:block; }
         .edit-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
         .edit-input { width:100%; padding:8px 10px; background:var(--bg); border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; }
+        .edit-input:focus { border-color:var(--gold-dim); }
         .edit-foto-preview { width:100%; max-height:160px; object-fit:cover; border-radius:8px; border:1px solid var(--border); display:none; margin-bottom:8px; }
-        .edit-foto-buttons { display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:8px; }
-        .btn-edit-foto { padding:8px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--gold-dim); font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; text-align:center; }
+        .btn-edit-foto { padding:8px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--gold-dim); font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; text-align:center; width:100%; margin-bottom:8px; }
         .btn-edit-save { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-family:'Bebas Neue',sans-serif; letter-spacing:1px; cursor:pointer; }
         .btn-edit-cancel { background:var(--surface2); color:var(--muted); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; cursor:pointer; margin-left:6px; }
-        /* COMPRAS */
+        /* PEDIDO */
         .pedido-item { display:flex; align-items:center; gap:8px; padding:8px; background:var(--surface2); border-radius:8px; margin-bottom:6px; border:1px solid var(--border); }
         .pedido-item-nombre { flex:1; font-size:0.9em; color:var(--cream); }
         .pedido-item-cant { width:60px; padding:6px 8px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:13px; color:var(--text); text-align:center; font-family:'DM Sans',sans-serif; outline:none; }
         .pedido-item-unidad { font-size:0.75em; color:var(--muted); white-space:nowrap; }
         .pedido-item-check { width:20px; height:20px; cursor:pointer; accent-color:var(--green); }
+        /* RESUMEN DIA */
+        .resumen-dia { background:var(--surface); border:1px solid var(--gold-dim); border-radius:14px; padding:16px; margin-bottom:12px; }
+        .resumen-dia-titulo { font-family:'Bebas Neue',sans-serif; color:var(--gold); letter-spacing:2px; font-size:0.9em; margin-bottom:10px; }
+        .resumen-dia-item { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:0.85em; }
+        .resumen-dia-item:last-child { border-bottom:none; }
+        .resumen-dia-proveedor { font-size:0.7em; color:var(--gold-dim); margin-top:2px; }
+        .resumen-dia-cant { color:var(--gold); font-weight:600; font-size:0.8em; }
+        /* NUEVO PRODUCTO EN COMPRAS */
+        .nuevo-producto-form { background:var(--surface2); border:1px dashed var(--gold-dim); border-radius:10px; padding:14px; margin-top:12px; }
+        .nuevo-producto-titulo { font-family:'Bebas Neue',sans-serif; color:var(--gold-dim); letter-spacing:1.5px; font-size:0.85em; margin-bottom:10px; }
+        .nuevo-producto-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+        .nuevo-producto-input { width:100%; padding:10px 12px; background:var(--bg); border:1px solid var(--border); border-radius:8px; font-size:14px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; }
+        .nuevo-producto-input:focus { border-color:var(--gold-dim); }
+        .btn-anadir-producto { width:100%; padding:10px; background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; border:none; border-radius:8px; font-family:'Bebas Neue',sans-serif; letter-spacing:1.5px; font-size:0.85em; cursor:pointer; margin-top:4px; }
         /* STOCK */
         .semana-badge { display:inline-block; background:rgba(201,169,110,0.15); border:1px solid var(--gold-dim); border-radius:8px; padding:8px 14px; font-family:'Bebas Neue',sans-serif; letter-spacing:1.5px; color:var(--gold); font-size:0.9em; margin-bottom:14px; }
-        .stock-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
         /* VENTAS */
         .ventas-table { width:100%; border-collapse:collapse; font-size:0.82em; }
         .ventas-table th { background:var(--surface2); color:var(--gold-dim); padding:8px 6px; text-align:left; font-weight:600; border-bottom:1px solid var(--border); }
@@ -115,12 +119,12 @@
         .upload-area-icon { font-size:2.5em; margin-bottom:8px; }
         .upload-area-text { font-size:0.85em; color:var(--muted); }
         #ticketPreview { width:100%; border-radius:10px; display:none; margin-top:10px; border:1px solid var(--border); max-height:300px; object-fit:contain; }
-        /* BUTTONS */
         .action-buttons { position:fixed; bottom:0; left:0; right:0; padding:10px 14px 20px; background:linear-gradient(transparent,var(--bg) 25%); display:flex; flex-direction:column; gap:8px; }
         .btn-save { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; width:100%; padding:18px; font-family:'Bebas Neue',sans-serif; letter-spacing:2.5px; border:none; border-radius:12px; cursor:pointer; font-size:1em; transition:all 0.2s; box-shadow:0 4px 20px rgba(74,140,92,0.25); }
         .btn-save:active { transform:scale(0.98); }
         .btn-save:disabled { background:var(--surface2); color:var(--muted); box-shadow:none; cursor:not-allowed; }
         .btn-whatsapp { background:linear-gradient(135deg,#1a5c2a,#25a244); color:#fff; width:100%; padding:18px; font-family:'Bebas Neue',sans-serif; letter-spacing:2px; border:none; border-radius:12px; cursor:pointer; font-size:1em; transition:all 0.2s; }
+        .btn-whatsapp:active { transform:scale(0.98); }
         .success-overlay { position:fixed; inset:0; background:rgba(10,7,2,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:999; opacity:0; pointer-events:none; transition:opacity 0.3s; }
         .success-overlay.show { opacity:1; pointer-events:all; }
         .success-icon { font-size:4.5em; animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; margin-bottom:16px; }
@@ -181,8 +185,6 @@
         <div class="top-bar-title">Registro Cocina</div>
     </div>
     <div class="screen-content">
-
-        <!-- PASO 1: ELABORACION -->
         <div class="card" id="cardElab">
             <div class="card-header"><div class="card-icon">🍳</div><div class="card-title">Que estas preparando?</div></div>
             <div class="grid-elab">
@@ -205,15 +207,12 @@
                 <button class="btn-elab" onclick="seleccionarElab('Relleno Pescado')">Relleno Pescado</button>
             </div>
         </div>
-
-        <!-- PASO 2: INGREDIENTES -->
         <div class="card hidden" id="cardIngredientes">
             <div class="card-header"><div class="card-icon">📋</div><div class="card-title" id="tituloIngredientes">Ingredientes</div></div>
             <div class="sesion-badge" id="sesionBadge"></div>
             <div id="listaIngredientes"></div>
             <button class="add-ingrediente-btn" onclick="anadirIngredienteExtra()">+ Añadir ingrediente extra</button>
         </div>
-
     </div>
     <div class="action-buttons">
         <button class="btn-save hidden" id="btnGuardarSesion" onclick="guardarSesion()">Confirmar y Guardar Sesion</button>
@@ -265,6 +264,10 @@
         <div class="top-bar-title">Compras del Mes</div>
     </div>
     <div class="screen-content">
+
+        <!-- RESUMEN DEL DIA -->
+        <div id="resumenDiaContainer"></div>
+
         <div class="card">
             <div class="card-header"><div class="card-icon">📤</div><div class="card-title">Generar Pedido</div></div>
             <div class="input-group">
@@ -277,10 +280,28 @@
                 </select>
             </div>
         </div>
+
         <div class="card hidden" id="cardPedidoItems">
             <div class="card-header"><div class="card-icon">🛒</div><div class="card-title">Selecciona y pon cantidad</div></div>
             <div id="listaPedidoItems"></div>
+
+            <!-- FORMULARIO NUEVO PRODUCTO -->
+            <div class="nuevo-producto-form" id="formNuevoProducto" style="display:none">
+                <div class="nuevo-producto-titulo">➕ AÑADIR PRODUCTO NUEVO</div>
+                <div class="nuevo-producto-row">
+                    <input class="nuevo-producto-input" id="npNombre" placeholder="Nombre del producto *">
+                    <input class="nuevo-producto-input" id="npUnidad" placeholder="Unidad (ej: kg, ud)">
+                </div>
+                <div class="nuevo-producto-row">
+                    <input class="nuevo-producto-input" id="npCantidad" type="number" placeholder="Cantidad" min="0" value="1">
+                    <input class="nuevo-producto-input" id="npProveedor" placeholder="Proveedor" readonly style="opacity:0.7">
+                </div>
+                <button class="btn-anadir-producto" onclick="anadirProductoNuevo()">AÑADIR AL PEDIDO Y GUARDAR EN BIBLIOTECA</button>
+            </div>
+
+            <button type="button" style="margin-top:10px;width:100%;padding:10px;background:transparent;border:1px dashed var(--gold-dim);border-radius:8px;color:var(--gold-dim);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;" onclick="toggleFormNuevoProducto()">+ Añadir producto que no está en la lista</button>
         </div>
+
         <div style="height:120px"></div>
         <div class="action-buttons">
             <button class="btn-whatsapp" id="btnEnviarPedido" onclick="enviarYGuardarPedido()" style="display:none">📱 ENVIAR POR WHATSAPP Y GUARDAR</button>
@@ -298,10 +319,7 @@
         <div class="card">
             <div class="card-header"><div class="card-icon">📦</div><div class="card-title">Registrar Stock</div></div>
             <div class="semana-badge" id="semanaActual"></div>
-            <div class="input-group">
-                <label>Fecha (vacio = hoy)</label>
-                <input type="date" id="sFecha">
-            </div>
+            <div class="input-group"><label>Fecha (vacio = hoy)</label><input type="date" id="sFecha"></div>
             <div class="input-group">
                 <label>Elaboracion *</label>
                 <select id="sElaboracion" onchange="onStockElabChange()">
@@ -326,8 +344,7 @@
                 </select>
             </div>
             <div id="stockOtroInput" class="input-group hidden">
-                <label>Nombre</label>
-                <input type="text" id="sElaboracionOtro" placeholder="Escribe el nombre...">
+                <label>Nombre</label><input type="text" id="sElaboracionOtro" placeholder="Escribe el nombre...">
             </div>
             <div class="input-group"><label>Cantidad *</label><input type="text" id="sCantidad" placeholder="Ej: 15 kg, 200 unidades..."></div>
             <div class="input-group"><label>Unidad</label><input type="text" id="sUnidad" placeholder="Ej: kg, unidades, bandejas..."></div>
@@ -380,7 +397,7 @@
         <div id="tabVerVentas" class="tab-content">
             <div class="card">
                 <div class="card-header"><div class="card-icon">📊</div><div class="card-title">Ranking del Mes</div></div>
-                <div id="listaVentas"><div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div></div>
+                <div id="listaVentas"><div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando ventas...</div></div>
             </div>
         </div>
     </div>
@@ -403,140 +420,30 @@ var ventasData = [];
 var currentElabSelected = "";
 var ingredientesFotoTarget = -1;
 var ingredientesFotos = {};
+var pedidoDelDia = []; // acumulador del dia
 
-// RECETAS — ingredientes por elaboracion
 var RECETAS = {
-    "Salsa Bolognese": [
-        {nombre:"Carne molida vacuno", cantidad:"5kg"},
-        {nombre:"Carne molida cerdo", cantidad:"5kg"},
-        {nombre:"Chorizo criollo blanco", cantidad:"2kg"},
-        {nombre:"Cebolla blanca", cantidad:"2kg"},
-        {nombre:"Puerro", cantidad:"4 ud"},
-        {nombre:"Zanahoria", cantidad:"6-8 ud"},
-        {nombre:"Vino tinto", cantidad:"2lt"},
-        {nombre:"Tomate triturado", cantidad:"1 lata"}
-    ],
-    "Salsa Tomate": [
-        {nombre:"Cebolla blanca", cantidad:"9 ud"},
-        {nombre:"Zanahoria", cantidad:"10 ud"},
-        {nombre:"Tomate para salsa", cantidad:"3kg"},
-        {nombre:"Tomate triturado", cantidad:"4 latas"}
-    ],
-    "Salsa Porcini": [
-        {nombre:"Porcini seco", cantidad:"1 bolsa 200gr"},
-        {nombre:"Mantequilla", cantidad:"200gr"},
-        {nombre:"Cebolla blanca", cantidad:"1 ud"},
-        {nombre:"Nata de cocinar", cantidad:"3lt"}
-    ],
-    "Salsa S.R.Q": [
-        {nombre:"Champiñones", cantidad:"1 caja"},
-        {nombre:"Bacon", cantidad:"1/2 pieza"},
-        {nombre:"Mantequilla", cantidad:"200gr"},
-        {nombre:"Nata de cocinar", cantidad:"4lt"},
-        {nombre:"Parmesano rallado", cantidad:"250gr"},
-        {nombre:"Rabo de buey", cantidad:"1 cucharada"}
-    ],
-    "Salsa Champi": [
-        {nombre:"Champiñones", cantidad:"2 cajas"},
-        {nombre:"Mantequilla", cantidad:"400gr"},
-        {nombre:"Nata de cocinar", cantidad:"6lt"}
-    ],
-    "Salsa Gorgonzola": [
-        {nombre:"Gorgonzola", cantidad:"2 piezas 2kg"},
-        {nombre:"Parmesano rallado", cantidad:"450gr"},
-        {nombre:"Nata de cocinar", cantidad:"6lt"}
-    ],
-    "Bolonesa Lasana": [
-        {nombre:"Carne de vacuno molida", cantidad:"6kg"},
-        {nombre:"Carne de cerdo molida", cantidad:"6kg"},
-        {nombre:"Cebolla blanca", cantidad:"2kg"},
-        {nombre:"Puerro", cantidad:"4 ud"},
-        {nombre:"Zanahoria", cantidad:"6-8 ud"},
-        {nombre:"Vino tinto", cantidad:"2lt"},
-        {nombre:"Tomate triturado", cantidad:"1 lata"}
-    ],
-    "Lasana": [
-        {nombre:"Bolonesa lasana", cantidad:"preparada"},
-        {nombre:"Pasta para lasana", cantidad:"2 cajas"},
-        {nombre:"Bechamel", cantidad:"15lt"},
-        {nombre:"Parmesano rallado", cantidad:"2kg"},
-        {nombre:"Mozzarella filante pizza", cantidad:"al gusto"}
-    ],
-    "Berenjena": [
-        {nombre:"Berenjenas", cantidad:"al gusto"},
-        {nombre:"Salsa tomate", cantidad:"preparada"},
-        {nombre:"Parmesano rallado", cantidad:"2kg"},
-        {nombre:"Mozzarella filante pizza", cantidad:"al gusto"}
-    ],
-    "Caneloni": [
-        {nombre:"Espinacas", cantidad:"1 caja 10kg"},
-        {nombre:"Nata para cocinar", cantidad:"2lt"},
-        {nombre:"Mantequilla", cantidad:"300gr"},
-        {nombre:"Ricotta", cantidad:"8 ud 250gr"},
-        {nombre:"Parmesano rallado", cantidad:"1kg"},
-        {nombre:"Pasta caneloni", cantidad:"al gusto"}
-    ],
-    "Masa Estandar": [
-        {nombre:"Huevos", cantidad:"1056gr"},
-        {nombre:"Harina napoletana", cantidad:"1kg"},
-        {nombre:"Semola", cantidad:"1kg"}
-    ],
-    "Masa Ricotta": [
-        {nombre:"Huevos", cantidad:"856gr"},
-        {nombre:"Harina napoletana", cantidad:"1kg"},
-        {nombre:"Semola", cantidad:"1kg"},
-        {nombre:"Espinacas", cantidad:"200gr"}
-    ],
-    "Relleno Carne": [
-        {nombre:"Carne de vacuno molida", cantidad:"7kg"},
-        {nombre:"Chorizo criollo blanco", cantidad:"4kg"},
-        {nombre:"Mortadela", cantidad:"2kg"},
-        {nombre:"Ricotta", cantidad:"4 ud 250gr"},
-        {nombre:"Cebolla blanca", cantidad:"1kg / 4 ud"},
-        {nombre:"Parmesano rallado", cantidad:"1.6kg"},
-        {nombre:"Huevos", cantidad:"14 ud"}
-    ],
-    "Relleno Ricotta": [
-        {nombre:"Espinacas", cantidad:"1 caja 10kg"},
-        {nombre:"Ricotta", cantidad:"20 ud 250gr"},
-        {nombre:"Parmesano rallado", cantidad:"2kg"},
-        {nombre:"Huevos", cantidad:"6 ud"}
-    ],
-    "Relleno Queso": [
-        {nombre:"Gorgonzola", cantidad:"2 ud 2kg"},
-        {nombre:"Mozzarella filante pizza", cantidad:"1.4kg"},
-        {nombre:"Ricotta", cantidad:"20 ud 250gr"},
-        {nombre:"Parmesano rallado", cantidad:"2kg"}
-    ],
-    "Relleno Porcini": [
-        {nombre:"Champiñones", cantidad:"1 caja"},
-        {nombre:"Porcini seco", cantidad:"1 bolsa 200gr"},
-        {nombre:"Rabo de buey", cantidad:"30gr"},
-        {nombre:"Mantequilla", cantidad:"200gr"},
-        {nombre:"Ricotta", cantidad:"3 ud 250gr"}
-    ],
-    "Relleno Pescado": [
-        {nombre:"Fogonero", cantidad:"1 caja"},
-        {nombre:"Zanahoria", cantidad:"6 ud"},
-        {nombre:"Cebolla", cantidad:"4 ud"},
-        {nombre:"Tomate", cantidad:"6 ud"},
-        {nombre:"Papas folio", cantidad:"6 ud"},
-        {nombre:"Ajos", cantidad:"al gusto"}
-    ]
+    "Salsa Bolognese": [{nombre:"Carne molida vacuno",cantidad:"5kg"},{nombre:"Carne molida cerdo",cantidad:"5kg"},{nombre:"Chorizo criollo blanco",cantidad:"2kg"},{nombre:"Cebolla blanca",cantidad:"2kg"},{nombre:"Puerro",cantidad:"4 ud"},{nombre:"Zanahoria",cantidad:"6-8 ud"},{nombre:"Vino tinto",cantidad:"2lt"},{nombre:"Tomate triturado",cantidad:"1 lata"}],
+    "Salsa Tomate": [{nombre:"Cebolla blanca",cantidad:"9 ud"},{nombre:"Zanahoria",cantidad:"10 ud"},{nombre:"Tomate para salsa",cantidad:"3kg"},{nombre:"Tomate triturado",cantidad:"4 latas"}],
+    "Salsa Porcini": [{nombre:"Porcini seco",cantidad:"1 bolsa 200gr"},{nombre:"Mantequilla",cantidad:"200gr"},{nombre:"Cebolla blanca",cantidad:"1 ud"},{nombre:"Nata de cocinar",cantidad:"3lt"}],
+    "Salsa S.R.Q": [{nombre:"Champiñones",cantidad:"1 caja"},{nombre:"Bacon",cantidad:"1/2 pieza"},{nombre:"Mantequilla",cantidad:"200gr"},{nombre:"Nata de cocinar",cantidad:"4lt"},{nombre:"Parmesano rallado",cantidad:"250gr"},{nombre:"Rabo de buey",cantidad:"1 cucharada"}],
+    "Salsa Champi": [{nombre:"Champiñones",cantidad:"2 cajas"},{nombre:"Mantequilla",cantidad:"400gr"},{nombre:"Nata de cocinar",cantidad:"6lt"}],
+    "Salsa Gorgonzola": [{nombre:"Gorgonzola",cantidad:"2 piezas 2kg"},{nombre:"Parmesano rallado",cantidad:"450gr"},{nombre:"Nata de cocinar",cantidad:"6lt"}],
+    "Bolonesa Lasana": [{nombre:"Carne de vacuno molida",cantidad:"6kg"},{nombre:"Carne de cerdo molida",cantidad:"6kg"},{nombre:"Cebolla blanca",cantidad:"2kg"},{nombre:"Puerro",cantidad:"4 ud"},{nombre:"Zanahoria",cantidad:"6-8 ud"},{nombre:"Vino tinto",cantidad:"2lt"},{nombre:"Tomate triturado",cantidad:"1 lata"}],
+    "Lasana": [{nombre:"Bolonesa lasana",cantidad:"preparada"},{nombre:"Pasta para lasana",cantidad:"2 cajas"},{nombre:"Bechamel",cantidad:"15lt"},{nombre:"Parmesano rallado",cantidad:"2kg"},{nombre:"Mozzarella filante pizza",cantidad:"al gusto"}],
+    "Berenjena": [{nombre:"Berenjenas",cantidad:"al gusto"},{nombre:"Salsa tomate",cantidad:"preparada"},{nombre:"Parmesano rallado",cantidad:"2kg"},{nombre:"Mozzarella filante pizza",cantidad:"al gusto"}],
+    "Caneloni": [{nombre:"Espinacas",cantidad:"1 caja 10kg"},{nombre:"Nata para cocinar",cantidad:"2lt"},{nombre:"Mantequilla",cantidad:"300gr"},{nombre:"Ricotta",cantidad:"8 ud 250gr"},{nombre:"Parmesano rallado",cantidad:"1kg"},{nombre:"Pasta caneloni",cantidad:"al gusto"}],
+    "Masa Estandar": [{nombre:"Huevos",cantidad:"1056gr"},{nombre:"Harina napoletana",cantidad:"1kg"},{nombre:"Semola",cantidad:"1kg"}],
+    "Masa Ricotta": [{nombre:"Huevos",cantidad:"856gr"},{nombre:"Harina napoletana",cantidad:"1kg"},{nombre:"Semola",cantidad:"1kg"},{nombre:"Espinacas",cantidad:"200gr"}],
+    "Relleno Carne": [{nombre:"Carne de vacuno molida",cantidad:"7kg"},{nombre:"Chorizo criollo blanco",cantidad:"4kg"},{nombre:"Mortadela",cantidad:"2kg"},{nombre:"Ricotta",cantidad:"4 ud 250gr"},{nombre:"Cebolla blanca",cantidad:"1kg / 4 ud"},{nombre:"Parmesano rallado",cantidad:"1.6kg"},{nombre:"Huevos",cantidad:"14 ud"}],
+    "Relleno Ricotta": [{nombre:"Espinacas",cantidad:"1 caja 10kg"},{nombre:"Ricotta",cantidad:"20 ud 250gr"},{nombre:"Parmesano rallado",cantidad:"2kg"},{nombre:"Huevos",cantidad:"6 ud"}],
+    "Relleno Queso": [{nombre:"Gorgonzola",cantidad:"2 ud 2kg"},{nombre:"Mozzarella filante pizza",cantidad:"1.4kg"},{nombre:"Ricotta",cantidad:"20 ud 250gr"},{nombre:"Parmesano rallado",cantidad:"2kg"}],
+    "Relleno Porcini": [{nombre:"Champiñones",cantidad:"1 caja"},{nombre:"Porcini seco",cantidad:"1 bolsa 200gr"},{nombre:"Rabo de buey",cantidad:"30gr"},{nombre:"Mantequilla",cantidad:"200gr"},{nombre:"Ricotta",cantidad:"3 ud 250gr"}],
+    "Relleno Pescado": [{nombre:"Fogonero",cantidad:"1 caja"},{nombre:"Zanahoria",cantidad:"6 ud"},{nombre:"Cebolla",cantidad:"4 ud"},{nombre:"Tomate",cantidad:"6 ud"},{nombre:"Papas folio",cantidad:"6 ud"},{nombre:"Ajos",cantidad:"al gusto"}]
 };
 
 var EMOJI_MAP = {
-    "ajo":"🧄","cebolla":"🧅","tomate":"🍅","pimiento":"🫑","pepino":"🥒","calabacin":"🥒",
-    "zanahoria":"🥕","patata":"🥔","papa":"🥔","espinaca":"🥬","berenjena":"🍆","champi":"🍄","champiñon":"🍄",
-    "limon":"🍋","naranja":"🍊","manzana":"🍎","pera":"🍐","lima":"🍋","aguacate":"🥑",
-    "harina":"🌾","arroz":"🍚","pasta":"🍝","spaghetti":"🍝","penne":"🍝","lasana":"🍝","semola":"🌾",
-    "queso":"🧀","parmesano":"🧀","grana":"🧀","mozzarella":"🧀","ricotta":"🧀","gorgonzola":"🧀","mascarpone":"🧀",
-    "carne":"🥩","pollo":"🍗","salmon":"🐟","pescado":"🐟","lubina":"🐟","fogonero":"🐟","atun":"🐟","langostino":"🦐","almeja":"🦪","mejillon":"🦪","ossobuco":"🥩",
-    "jamon":"🥓","salami":"🥓","mortadela":"🥓","bresaola":"🥓","chorizo":"🌶️","bacon":"🥓",
-    "aceite":"🫙","vinagre":"🫙","sal":"🧂","pimienta":"🌶️","oregano":"🌿","albahaca":"🌿","romero":"🌿","salvia":"🌿","menta":"🌿","tomillo":"🌿","perejil":"🌿",
-    "huevo":"🥚","mantequilla":"🧈","nata":"🥛","leche":"🥛","bechamel":"🥛",
-    "vino":"🍷","porcini":"🍄","seta":"🍄","rabo":"🦴",
-    "salsa":"🍝","bolonesa":"🍝","default":"📦"
+    "ajo":"🧄","cebolla":"🧅","tomate":"🍅","pimiento":"🫑","pepino":"🥒","calabacin":"🥒","zanahoria":"🥕","patata":"🥔","papa":"🥔","espinaca":"🥬","berenjena":"🍆","champi":"🍄","champiñon":"🍄","limon":"🍋","naranja":"🍊","manzana":"🍎","pera":"🍐","lima":"🍋","aguacate":"🥑","harina":"🌾","arroz":"🍚","pasta":"🍝","spaghetti":"🍝","penne":"🍝","lasana":"🍝","semola":"🌾","queso":"🧀","parmesano":"🧀","grana":"🧀","mozzarella":"🧀","ricotta":"🧀","gorgonzola":"🧀","mascarpone":"🧀","carne":"🥩","pollo":"🍗","salmon":"🐟","pescado":"🐟","lubina":"🐟","fogonero":"🐟","atun":"🐟","langostino":"🦐","almeja":"🦪","mejillon":"🦪","ossobuco":"🥩","jamon":"🥓","salami":"🥓","mortadela":"🥓","bresaola":"🥓","chorizo":"🌶️","bacon":"🥓","aceite":"🫙","vinagre":"🫙","sal":"🧂","pimienta":"🌶️","oregano":"🌿","albahaca":"🌿","romero":"🌿","salvia":"🌿","menta":"🌿","tomillo":"🌿","perejil":"🌿","huevo":"🥚","mantequilla":"🧈","nata":"🥛","leche":"🥛","bechamel":"🥛","vino":"🍷","porcini":"🍄","seta":"🍄","rabo":"🦴","salsa":"🍝","bolonesa":"🍝","default":"📦"
 };
 
 function getEmoji(nombre) {
@@ -561,6 +468,11 @@ function generarCodigoSesion(elab) {
     return codigo + '-' + dia + mes;
 }
 
+function getFechaHoy() {
+    var now = new Date();
+    return now.toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit', year:'numeric'});
+}
+
 // NAVEGACION
 function irA(screenId) {
     document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
@@ -569,6 +481,7 @@ function irA(screenId) {
     if (screenId === 'screenProductos') cargarProductos();
     if (screenId === 'screenStock') iniciarStock();
     if (screenId === 'screenVentas') cargarVentas();
+    if (screenId === 'screenCompras') { cargarResumenDia(); }
     window.scrollTo(0,0);
 }
 
@@ -580,23 +493,47 @@ function switchTabVentas(tabId) {
     if (tabId === 'tabVerVentas') cargarVentas();
 }
 
-// COCINA — SELECCION ELABORACION
+// RESUMEN DEL DIA
+function cargarResumenDia() {
+    var container = document.getElementById('resumenDiaContainer');
+    container.innerHTML = '<div style="color:var(--muted);font-size:0.8em;text-align:center;padding:10px;">Cargando pedidos de hoy...</div>';
+
+    fetch(URL_SCRIPT + "?accion=pedidosHoy")
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+            var items = data.pedidos || [];
+            if (!items.length) {
+                container.innerHTML = '';
+                return;
+            }
+            var html = '<div class="resumen-dia">' +
+                '<div class="resumen-dia-titulo">📋 PEDIDO DE HOY — ' + getFechaHoy() + '</div>';
+            items.forEach(function(item) {
+                html += '<div class="resumen-dia-item">' +
+                    '<div>' +
+                        '<div>' + getEmoji(item.producto) + ' ' + item.producto + '</div>' +
+                        '<div class="resumen-dia-proveedor">' + (item.proveedor||'') + '</div>' +
+                    '</div>' +
+                    '<div class="resumen-dia-cant">' + item.cantidad + ' ' + (item.unidad||'') + '</div>' +
+                '</div>';
+            });
+            html += '<div style="font-size:0.75em;color:var(--muted);margin-top:10px;text-align:right;">Total: '+items.length+' productos</div>';
+            html += '</div>';
+            container.innerHTML = html;
+        })
+        .catch(function() { container.innerHTML = ''; });
+}
+
+// COCINA
 function seleccionarElab(nombre) {
     currentElabSelected = nombre;
     ingredientesFotos = {};
-
     document.querySelectorAll('.btn-elab').forEach(function(b){ b.classList.remove('selected'); });
     event.target.classList.add('selected');
-
     var ingredientes = RECETAS[nombre] || [];
     document.getElementById('tituloIngredientes').textContent = nombre;
     document.getElementById('sesionBadge').textContent = generarCodigoSesion(nombre);
-
-    var html = ingredientes.map(function(ing, i) {
-        return renderIngredienteRow(ing.nombre, ing.cantidad, i);
-    }).join('');
-
-    document.getElementById('listaIngredientes').innerHTML = html;
+    document.getElementById('listaIngredientes').innerHTML = ingredientes.map(function(ing, i){ return renderIngredienteRow(ing.nombre, ing.cantidad, i); }).join('');
     document.getElementById('cardIngredientes').classList.remove('hidden');
     document.getElementById('btnGuardarSesion').classList.remove('hidden');
     document.getElementById('cardIngredientes').scrollIntoView({behavior:'smooth', block:'start'});
@@ -614,9 +551,7 @@ function renderIngredienteRow(nombre, cantidadDefault, i) {
             '<input class="ingrediente-input" id="ing-lote-'+i+'" placeholder="Nº Lote">' +
             '<input class="ingrediente-input" id="ing-cant-'+i+'" placeholder="Cant." value="'+cantidadDefault+'">' +
         '</div>' +
-        '<button class="ingrediente-foto-btn" id="ing-foto-btn-'+i+'" onclick="abrirFotoIngrediente('+i+')">' +
-            '📸 Foto del producto' +
-        '</button>' +
+        '<button class="ingrediente-foto-btn" id="ing-foto-btn-'+i+'" onclick="abrirFotoIngrediente('+i+')">📸 Foto del producto</button>' +
         '<img class="ingrediente-foto-preview" id="ing-foto-preview-'+i+'" alt="foto">' +
     '</div>';
 }
@@ -634,9 +569,7 @@ function anadirIngredienteExtra() {
             '<input class="ingrediente-input" id="ing-lote-'+i+'" placeholder="Nº Lote">' +
             '<input class="ingrediente-input" id="ing-cant-'+i+'" placeholder="Cantidad">' +
         '</div>' +
-        '<button class="ingrediente-foto-btn" id="ing-foto-btn-'+i+'" onclick="abrirFotoIngrediente('+i+')">' +
-            '📸 Foto del producto' +
-        '</button>' +
+        '<button class="ingrediente-foto-btn" id="ing-foto-btn-'+i+'" onclick="abrirFotoIngrediente('+i+')">📸 Foto del producto</button>' +
         '<img class="ingrediente-foto-preview" id="ing-foto-preview-'+i+'" alt="foto">' +
     '</div>';
     document.getElementById('listaIngredientes').insertAdjacentHTML('beforeend', html);
@@ -666,45 +599,26 @@ async function guardarSesion() {
     if (!currentElabSelected) return alert("Selecciona una elaboracion.");
     var btn = document.getElementById('btnGuardarSesion');
     btn.disabled = true; btn.innerHTML = "Guardando...";
-
     var sesion = generarCodigoSesion(currentElabSelected);
     var rows = document.getElementById('listaIngredientes').querySelectorAll('.ingrediente-row');
     var ingredientes = [];
-
     rows.forEach(function(row) {
         var id = row.id.replace('ing-row-','');
         var check = document.getElementById('ing-check-'+id);
         if (!check || !check.checked) return;
-
         var nombreEl = document.getElementById('ing-nombre-'+id);
-        var nombre = nombreEl ? nombreEl.value.trim() : row.querySelector('.ingrediente-nombre') ? row.querySelector('.ingrediente-nombre').textContent : '';
+        var nombre = nombreEl ? nombreEl.value.trim() : (row.querySelector('.ingrediente-nombre') ? row.querySelector('.ingrediente-nombre').textContent : '');
         if (!nombre) return;
-
         var lote = document.getElementById('ing-lote-'+id) ? document.getElementById('ing-lote-'+id).value.trim() : '';
         var cant = document.getElementById('ing-cant-'+id) ? document.getElementById('ing-cant-'+id).value.trim() : '';
         var foto = ingredientesFotos[id] || '';
-
         ingredientes.push({ nombre:nombre, lote:lote||'Sin lote', cantidad:cant, imagen:foto });
     });
-
     if (!ingredientes.length) return alert("Selecciona al menos un ingrediente.");
-
     try {
-        await fetch(URL_SCRIPT, {
-            method:'POST', mode:'no-cors', cache:'no-cache',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({
-                modo: 'sesion',
-                elaboracion: currentElabSelected,
-                sesion: sesion,
-                ingredientes: ingredientes
-            })
-        });
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ modo:'sesion', elaboracion:currentElabSelected, sesion:sesion, ingredientes:ingredientes }) });
         showSuccess("Oido Cocina!", sesion + " — " + ingredientes.length + " ingredientes guardados", "🍝");
-    } catch(err) {
-        alert("Error de red.");
-        btn.disabled = false; btn.innerHTML = "Confirmar y Guardar Sesion";
-    }
+    } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Confirmar y Guardar Sesion"; }
 }
 
 // PRODUCTOS
@@ -773,9 +687,7 @@ function itemHTML(p, i) {
                 '<input class="edit-input" id="ep-'+i+'" value="'+(p.proveedor||'')+'" placeholder="Proveedor">' +
             '</div>' +
             '<img class="edit-foto-preview" id="editFotoPreview-'+i+'" src="" alt="Foto">' +
-            '<div class="edit-foto-buttons">' +
-                '<button class="btn-edit-foto" onclick="abrirGaleriaParaEditar('+i+')">🖼 Subir foto propia</button>' +
-            '</div>' +
+            '<button class="btn-edit-foto" onclick="abrirGaleriaParaEditar('+i+')">🖼 Subir foto propia</button>' +
             '<button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+nombreSafe+'\')">Guardar</button>' +
             '<button class="btn-edit-cancel" onclick="toggleEdit('+i+')">Cancelar</button>' +
         '</div>' +
@@ -803,14 +715,7 @@ function toggleEdit(i) { var form = document.getElementById('editform-'+i); if (
 
 async function guardarEdicion(i, nombreOriginal) {
     var fotoParaEnviar = (editFotoIndex === i && editFotoBase64) ? editFotoBase64 : "";
-    var payload = {
-        modo:'editarProducto', nombreOriginal:nombreOriginal,
-        nombre: document.getElementById('en-'+i)?document.getElementById('en-'+i).value.trim():'',
-        codigo: document.getElementById('ec-'+i)?document.getElementById('ec-'+i).value.trim():'',
-        unidad: document.getElementById('eu-'+i)?document.getElementById('eu-'+i).value.trim():'',
-        proveedor: document.getElementById('ep-'+i)?document.getElementById('ep-'+i).value.trim():'',
-        imagen: fotoParaEnviar
-    };
+    var payload = { modo:'editarProducto', nombreOriginal:nombreOriginal, nombre:document.getElementById('en-'+i)?document.getElementById('en-'+i).value.trim():'', codigo:document.getElementById('ec-'+i)?document.getElementById('ec-'+i).value.trim():'', unidad:document.getElementById('eu-'+i)?document.getElementById('eu-'+i).value.trim():'', proveedor:document.getElementById('ep-'+i)?document.getElementById('ep-'+i).value.trim():'', imagen:fotoParaEnviar };
     try {
         await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
         editFotoIndex=-1; editFotoBase64=null;
@@ -825,15 +730,8 @@ async function guardarProducto() {
     var btn = document.querySelector('#screenProductos .btn-save');
     btn.disabled=true; btn.innerHTML="Guardando...";
     try {
-        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({modo:'inventario',producto:nombre,
-                codigo:document.getElementById('pCodigo').value.trim(),
-                unidad:document.getElementById('pUnidad').value.trim(),
-                proveedor:document.getElementById('pProveedor').value,
-                imagen:window.photoProductoBase64||""})});
-        document.getElementById('pNombre').value=''; document.getElementById('pCodigo').value='';
-        document.getElementById('pUnidad').value=''; document.getElementById('pProveedor').value='';
-        document.getElementById('previewProducto').style.display='none'; window.photoProductoBase64=null;
+        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({modo:'inventario',producto:nombre,codigo:document.getElementById('pCodigo').value.trim(),unidad:document.getElementById('pUnidad').value.trim(),proveedor:document.getElementById('pProveedor').value,imagen:window.photoProductoBase64||""})});
+        document.getElementById('pNombre').value=''; document.getElementById('pCodigo').value=''; document.getElementById('pUnidad').value=''; document.getElementById('pProveedor').value=''; document.getElementById('previewProducto').style.display='none'; window.photoProductoBase64=null;
         btn.innerHTML="Guardado ✔ Recargando...";
         setTimeout(function(){ cargarProductos(); btn.disabled=false; btn.innerHTML="Guardar en Biblioteca"; },2000);
     } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar en Biblioteca"; }
@@ -847,13 +745,18 @@ function cargarProductosProveedor() {
         return p.proveedor.toLowerCase().trim() === proveedor.toLowerCase().trim();
     });
     var lista = document.getElementById('listaPedidoItems');
+
+    // Rellenar proveedor en form nuevo producto
+    var npProv = document.getElementById('npProveedor');
+    if (npProv) npProv.value = proveedor;
+
     if (!filtrados.length) {
-        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;padding:10px;">No tienes productos de este proveedor. Añadelos en Mis Productos o en el Sheets.</div>';
+        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;padding:10px;">No tienes productos de este proveedor todavia.</div>';
     } else {
         lista.innerHTML = filtrados.map(function(p,i){
             return '<div class="pedido-item">' +
                 '<input type="checkbox" class="pedido-item-check" id="pcheck-'+i+'" checked>' +
-                '<div class="pedido-item-nombre">'+p.nombre+'</div>' +
+                '<div class="pedido-item-nombre">'+getEmoji(p.nombre)+' '+p.nombre+'</div>' +
                 '<input type="number" class="pedido-item-cant" id="pcant-'+i+'" value="0" min="0">' +
                 '<div class="pedido-item-unidad">'+(p.unidad||'')+'</div>' +
             '</div>';
@@ -861,42 +764,98 @@ function cargarProductosProveedor() {
     }
     document.getElementById('cardPedidoItems').classList.remove('hidden');
     document.getElementById('btnEnviarPedido').style.display = 'block';
+    document.getElementById('formNuevoProducto').style.display = 'none';
     window.productosProveedor = filtrados;
+}
+
+function toggleFormNuevoProducto() {
+    var form = document.getElementById('formNuevoProducto');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    if (form.style.display === 'block') {
+        document.getElementById('npNombre').focus();
+    }
+}
+
+async function anadirProductoNuevo() {
+    var nombre = document.getElementById('npNombre').value.trim();
+    var unidad = document.getElementById('npUnidad').value.trim();
+    var cantidad = document.getElementById('npCantidad').value.trim();
+    var proveedor = document.getElementById('gProveedor').value;
+
+    if (!nombre) return alert("El nombre del producto es obligatorio.");
+    if (!cantidad || parseFloat(cantidad) <= 0) return alert("Pon una cantidad mayor que 0.");
+
+    // Añadir a la lista visual del pedido
+    var lista = document.getElementById('listaPedidoItems');
+    var i = 'nuevo_' + Date.now();
+    var nuevoItem = '<div class="pedido-item" id="pi-'+i+'">' +
+        '<input type="checkbox" class="pedido-item-check" id="pcheck-'+i+'" checked>' +
+        '<div class="pedido-item-nombre">'+getEmoji(nombre)+' '+nombre+' <span style="font-size:0.7em;color:var(--gold-dim)">(nuevo)</span></div>' +
+        '<input type="number" class="pedido-item-cant" id="pcant-'+i+'" value="'+cantidad+'" min="0">' +
+        '<div class="pedido-item-unidad">'+(unidad||'')+'</div>' +
+    '</div>';
+    lista.insertAdjacentHTML('beforeend', nuevoItem);
+
+    // Guardarlo en biblioteca
+    try {
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ modo:'inventario', producto:nombre, unidad:unidad, proveedor:proveedor, codigo:'', imagen:'' }) });
+    } catch(err) {}
+
+    // Añadirlo a productosProveedor para que se incluya en el pedido
+    if (!window.productosProveedor) window.productosProveedor = [];
+    window.productosProveedor.push({ nombre:nombre, unidad:unidad, proveedor:proveedor, _id:i, _cantidad:cantidad });
+
+    // Limpiar form
+    document.getElementById('npNombre').value = '';
+    document.getElementById('npUnidad').value = '';
+    document.getElementById('npCantidad').value = '1';
+    document.getElementById('formNuevoProducto').style.display = 'none';
+
+    // Recargar biblioteca en segundo plano
+    setTimeout(cargarProductos, 2000);
 }
 
 async function enviarYGuardarPedido() {
     var proveedor = document.getElementById('gProveedor').value;
     var filtrados = window.productosProveedor || [];
     var lineas = [];
+
     filtrados.forEach(function(p,i){
-        var check = document.getElementById('pcheck-'+i);
-        var cant = document.getElementById('pcant-'+i);
-        if (check&&check.checked&&cant&&parseFloat(cant.value)>0)
-            lineas.push({producto:p.nombre,cantidad:cant.value,unidad:p.unidad||""});
+        var id = p._id || i;
+        var check = document.getElementById('pcheck-'+id);
+        var cant = document.getElementById('pcant-'+id);
+        // Para productos normales
+        if (!p._id) {
+            check = document.getElementById('pcheck-'+i);
+            cant = document.getElementById('pcant-'+i);
+        }
+        if (check && check.checked && cant && parseFloat(cant.value) > 0)
+            lineas.push({ producto:p.nombre, cantidad:cant.value, unidad:p.unidad||"" });
     });
+
     if (!lineas.length) return alert("Pon cantidad a al menos un producto.");
 
     var btn = document.getElementById('btnEnviarPedido');
-    btn.disabled = true; btn.innerHTML = "Guardando...";
+    btn.disabled = true; btn.innerHTML = "⌛ Guardando...";
 
     try {
-        await fetch(URL_SCRIPT, {
-            method:'POST', mode:'no-cors', cache:'no-cache',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({modo:'compra', proveedor:proveedor, lineas:lineas})
-        });
+        // 1. PRIMERO guardar
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ modo:'compra', proveedor:proveedor, lineas:lineas }) });
 
-        // Primero confirmar guardado, luego WhatsApp
-        var mensaje = "Hola buenas, del rest. Divina Italia El Charco\n"+
-            lineas.map(function(l){ return l.producto+' '+l.cantidad+(l.unidad?' '+l.unidad:''); }).join('\n')+
-            "\nMuchas gracias";
-
+        // 2. Confirmar guardado
         btn.innerHTML = "✅ Guardado — Abriendo WhatsApp...";
 
+        // 3. LUEGO abrir WhatsApp
+        var mensaje = "Hola buenas, del rest. Divina Italia El Charco\n" +
+            lineas.map(function(l){ return l.producto+' '+l.cantidad+(l.unidad?' '+l.unidad:''); }).join('\n') +
+            "\nMuchas gracias";
+
         setTimeout(function(){
-            window.open("https://wa.me/?text="+encodeURIComponent(mensaje),'_blank');
+            window.open("https://wa.me/?text="+encodeURIComponent(mensaje), '_blank');
             btn.disabled = false;
             btn.innerHTML = "📱 ENVIAR POR WHATSAPP Y GUARDAR";
+            // Actualizar resumen del dia
+            cargarResumenDia();
         }, 1500);
 
     } catch(err) {
@@ -921,30 +880,26 @@ function iniciarStock() {
 }
 
 function cargarStockSemana(semana) {
-    fetch(URL_SCRIPT+"?accion=listarStock&semana="+encodeURIComponent(semana))
+    fetch(URL_SCRIPT + "?accion=listarStock&semana=" + encodeURIComponent(semana))
         .then(function(r){ return r.json(); })
         .then(function(data) {
             var lista = document.getElementById('listaStock');
             var items = data.stock || [];
-            if (!items.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin registros esta semana.</div>'; return; }
+            if (!items.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin registros esta semana.</div>'; return; }
             lista.innerHTML = items.map(function(s){
-                return '<div class="stock-item">' +
+                return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">' +
                     '<div style="font-size:1.3em">'+getEmoji(s.elaboracion||'')+'</div>' +
-                    '<div style="flex:1">' +
-                        '<div style="font-weight:600;font-size:0.9em;color:var(--cream)">'+(s.elaboracion||'')+'</div>' +
-                        '<div style="font-size:0.82em;color:var(--gold-dim)">'+(s.cantidad||'')+' '+(s.unidad||'')+'</div>' +
-                        (s.notas?'<div style="font-size:0.75em;color:var(--muted);margin-top:2px;">'+s.notas+'</div>':'') +
-                    '</div>' +
+                    '<div style="flex:1"><div style="font-weight:600;font-size:0.9em;color:var(--cream)">'+(s.elaboracion||'')+'</div><div style="font-size:0.82em;color:var(--gold-dim)">'+(s.cantidad||'')+' '+(s.unidad||'')+'</div>'+(s.notas?'<div style="font-size:0.75em;color:var(--muted);margin-top:2px;">'+s.notas+'</div>':'')+'</div>' +
                     '<div style="font-size:0.72em;color:var(--muted)">'+(s.fecha||'')+'</div>' +
                 '</div>';
             }).join('');
         })
-        .catch(function(){ document.getElementById('listaStock').innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>'; });
+        .catch(function(){ document.getElementById('listaStock').innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>'; });
 }
 
 async function guardarStock() {
     var selectVal = document.getElementById('sElaboracion').value;
-    var elaboracion = selectVal==='__otro__' ? document.getElementById('sElaboracionOtro').value.trim() : selectVal;
+    var elaboracion = selectVal === '__otro__' ? document.getElementById('sElaboracionOtro').value.trim() : selectVal;
     var cantidad = document.getElementById('sCantidad').value.trim();
     var unidad = document.getElementById('sUnidad').value.trim();
     var notas = document.getElementById('sNotas').value.trim();
@@ -955,14 +910,8 @@ async function guardarStock() {
     btn.disabled=true; btn.innerHTML="Guardando...";
     var semana = getSemanaActual();
     try {
-        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({modo:'stock',elaboracion:elaboracion,cantidad:cantidad,unidad:unidad,notas:notas,semana:semana,fechaManual:fechaInput})});
-        document.getElementById('sElaboracion').value='';
-        document.getElementById('sElaboracionOtro').value='';
-        document.getElementById('stockOtroInput').classList.add('hidden');
-        document.getElementById('sCantidad').value='';
-        document.getElementById('sUnidad').value='';
-        document.getElementById('sNotas').value='';
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ modo:'stock', elaboracion:elaboracion, cantidad:cantidad, unidad:unidad, notas:notas, semana:semana, fechaManual:fechaInput }) });
+        document.getElementById('sElaboracion').value=''; document.getElementById('sElaboracionOtro').value=''; document.getElementById('stockOtroInput').classList.add('hidden'); document.getElementById('sCantidad').value=''; document.getElementById('sUnidad').value=''; document.getElementById('sNotas').value='';
         btn.innerHTML="Guardado ✔";
         setTimeout(function(){ btn.disabled=false; btn.innerHTML="Guardar Stock"; cargarStockSemana(semana); },1500);
     } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar Stock"; }
@@ -974,8 +923,7 @@ function onTicketSelected(event) {
     var reader = new FileReader();
     reader.onload = function(e) {
         var base64 = e.target.result;
-        document.getElementById('ticketPreview').src = base64;
-        document.getElementById('ticketPreview').style.display = 'block';
+        document.getElementById('ticketPreview').src = base64; document.getElementById('ticketPreview').style.display = 'block';
         document.getElementById('ventasStatus').textContent = "Analizando ticket con IA...";
         analizarTicketConIA(base64);
     };
@@ -985,34 +933,19 @@ function onTicketSelected(event) {
 
 async function analizarTicketConIA(base64) {
     try {
-        var response = await fetch("https://api.anthropic.com/v1/messages",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({
-                model:"claude-sonnet-4-20250514", max_tokens:1000,
-                messages:[{role:"user",content:[
-                    {type:"image",source:{type:"base64",media_type:"image/jpeg",data:base64.split(',')[1]}},
-                    {type:"text",text:"Extrae la lista de platos vendidos de este ticket TPV. Devuelve SOLO JSON sin texto adicional: {\"platos\":[{\"descripcion\":\"nombre\",\"unidades\":123,\"importe\":456.78}]}. Si no hay datos devuelve {\"platos\":[]}"}
-                ]}]
-            })
-        });
+        var response = await fetch("https://api.anthropic.com/v1/messages", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:base64.split(',')[1]}},{type:"text",text:"Extrae la lista de platos vendidos de este ticket TPV. Devuelve SOLO JSON sin texto adicional: {\"platos\":[{\"descripcion\":\"nombre\",\"unidades\":123,\"importe\":456.78}]}. Si no hay datos devuelve {\"platos\":[]}"}]}] }) });
         var data = await response.json();
         var clean = data.content[0].text.replace(/```json|```/g,'').trim();
         ventasData = JSON.parse(clean).platos || [];
         renderVentasPreview();
-    } catch(err) {
-        document.getElementById('ventasStatus').textContent = "Error al analizar. Revisa la imagen.";
-    }
+    } catch(err) { document.getElementById('ventasStatus').textContent = "Error al analizar. La API de ventas requiere configuracion adicional."; }
 }
 
 function renderVentasPreview() {
     var tbody = document.getElementById('tablaVentasBody');
     if (!ventasData.length) { document.getElementById('ventasStatus').textContent="No se detectaron datos."; return; }
     document.getElementById('ventasStatus').textContent = ventasData.length+" platos detectados.";
-    tbody.innerHTML = ventasData.map(function(v,i){
-        return '<tr><td><span class="ventas-rank'+(i<3?' top':'')+'">'+(i+1)+'</span></td>' +
-            '<td>'+v.descripcion+'</td><td>'+v.unidades+'</td><td>'+v.importe+'</td></tr>';
-    }).join('');
+    tbody.innerHTML = ventasData.map(function(v,i){ return '<tr><td><span class="ventas-rank'+(i<3?' top':'')+'">'+(i+1)+'</span></td><td>'+v.descripcion+'</td><td>'+v.unidades+'</td><td>'+v.importe+'</td></tr>'; }).join('');
     document.getElementById('cardVentasPreview').classList.remove('hidden');
     document.getElementById('actionVentas').style.display = 'flex';
 }
@@ -1023,8 +956,7 @@ async function guardarVentas() {
     btn.disabled=true; btn.innerHTML="Guardando...";
     var mes = new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'});
     try {
-        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({modo:'ventas',mes:mes,platos:ventasData})});
+        await fetch(URL_SCRIPT, { method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ modo:'ventas', mes:mes, platos:ventasData }) });
         showSuccess("Ventas Guardadas","Ranking del mes registrado","💰");
     } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar Ventas en Sheets"; }
 }
@@ -1032,14 +964,12 @@ async function guardarVentas() {
 function cargarVentas() {
     var lista = document.getElementById('listaVentas');
     var mes = new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'});
-    fetch(URL_SCRIPT+"?accion=listarVentas&mes="+encodeURIComponent(mes))
+    fetch(URL_SCRIPT + "?accion=listarVentas&mes=" + encodeURIComponent(mes))
         .then(function(r){ return r.json(); })
         .then(function(data) {
             var items = data.ventas || [];
             if (!items.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin ventas registradas este mes.</div>'; return; }
-            lista.innerHTML = '<table class="ventas-table"><thead><tr><th>#</th><th>Plato</th><th>Uds</th><th>Importe</th></tr></thead><tbody>'+
-                items.map(function(v,i){ return '<tr><td><span class="ventas-rank'+(i<3?' top':'')+'">'+(i+1)+'</span></td><td>'+v.descripcion+'</td><td>'+v.unidades+'</td><td>'+v.importe+'</td></tr>'; }).join('')+
-                '</tbody></table>';
+            lista.innerHTML = '<table class="ventas-table"><thead><tr><th>#</th><th>Plato</th><th>Uds</th><th>Importe</th></tr></thead><tbody>'+items.map(function(v,i){ return '<tr><td><span class="ventas-rank'+(i<3?' top':'')+'">'+(i+1)+'</span></td><td>'+v.descripcion+'</td><td>'+v.unidades+'</td><td>'+v.importe+'</td></tr>'; }).join('')+'</tbody></table>';
         })
         .catch(function(){ lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>'; });
 }
@@ -1054,6 +984,14 @@ function showSuccess(titulo, sub, icon) {
 }
 
 cargarProductos();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/Control-cocina/sw.js')
+        .then(function(reg) { console.log('SW registrado'); })
+        .catch(function(err) { console.log('SW error:', err); });
+}
 </script>
 </body>
 </html>
