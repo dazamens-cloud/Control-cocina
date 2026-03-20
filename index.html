@@ -194,10 +194,7 @@
             <div class="btn-home-icon">📈</div>
             <div class="btn-home-text"><div class="btn-home-title">Resumen</div><div class="btn-home-desc">Produccion, compras y stock de la semana</div></div>
         </button>
-        <button class="btn-home-ventas" onclick="irA('screenVentas')">
-            <span style="font-size:1.2em">💰</span>
-            <span class="btn-home-ventas-text">Ventas del mes</span>
-        </button>
+
     </div>
 </div>
 
@@ -332,6 +329,13 @@
             </div>
             <button type="button" style="margin-top:10px;width:100%;padding:10px;background:transparent;border:1px dashed var(--gold-dim);border-radius:8px;color:var(--gold-dim);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;" onclick="toggleFormNuevoProducto()">+ Añadir producto que no está en la lista</button>
         </div>
+        <!-- ACCESO VENTAS DISCRETO -->
+        <div style="text-align:center;margin-top:8px;padding-bottom:8px;">
+            <button onclick="irA('screenVentas')" style="background:none;border:none;color:var(--muted);font-size:0.78em;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:8px;">
+                💰 Ver / registrar ventas del mes
+            </button>
+        </div>
+
         <div style="height:120px"></div>
         <div class="action-buttons">
             <button class="btn-whatsapp" id="btnEnviarPedido" onclick="enviarYGuardarPedido()" style="display:none">📱 ENVIAR POR WHATSAPP Y GUARDAR</button>
