@@ -1,4 +1,4 @@
-const CACHE_NAME = 'divina-italia-v1';
+const CACHE_NAME = 'divina-italia-v3';
 const ASSETS = [
   '/Control-cocina/',
   '/Control-cocina/index.html',
