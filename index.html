@@ -32,9 +32,6 @@
         .btn-home-icon { font-size:1.8em; flex-shrink:0; }
         .btn-home-title { font-family:'Bebas Neue',sans-serif; font-size:1.1em; letter-spacing:2px; color:var(--gold); }
         .btn-home-desc { font-size:0.78em; color:var(--muted); margin-top:2px; }
-        .btn-home-ventas { display:flex; align-items:center; gap:10px; background:transparent; border:1px dashed var(--border); border-radius:10px; padding:12px 16px; cursor:pointer; transition:all 0.2s; text-align:left; margin-top:4px; }
-        .btn-home-ventas:hover { border-color:var(--gold-dim); }
-        .btn-home-ventas-text { font-family:'Bebas Neue',sans-serif; font-size:0.85em; letter-spacing:1.5px; color:var(--muted); }
         .screen { display:none; flex-direction:column; min-height:100vh; }
         .screen.active { display:flex; }
         .top-bar { display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:10; }
@@ -65,7 +62,7 @@
         .ingrediente-foto-preview { width:100%; max-height:120px; object-fit:cover; border-radius:8px; margin-top:6px; display:none; border:1px solid var(--green); }
         .add-ingrediente-btn { width:100%; padding:12px; background:transparent; border:1px dashed var(--border); border-radius:10px; color:var(--gold-dim); font-size:13px; cursor:pointer; text-align:center; margin-top:4px; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
         .sesion-badge { display:inline-block; background:rgba(201,169,110,0.15); border:1px solid var(--gold-dim); border-radius:8px; padding:6px 12px; font-family:'Bebas Neue',sans-serif; letter-spacing:1.5px; color:var(--gold); font-size:0.85em; margin-bottom:12px; }
-        /* RESUMEN SEMANAL PRODUCCION */
+        /* RESUMEN SEMANAL */
         .sesion-resumen { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; }
         .sesion-resumen-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
         .sesion-resumen-nombre { font-family:'Bebas Neue',sans-serif; color:var(--gold); letter-spacing:1px; font-size:0.95em; }
@@ -136,10 +133,6 @@
         .ventas-table td:last-child { text-align:right; color:var(--gold); font-weight:600; }
         .ventas-rank { display:inline-block; width:20px; height:20px; border-radius:50%; background:var(--surface2); text-align:center; line-height:20px; font-size:0.75em; color:var(--muted); margin-right:4px; }
         .ventas-rank.top { background:rgba(201,169,110,0.2); color:var(--gold); }
-        .upload-area { border:2px dashed var(--border); border-radius:12px; padding:30px 20px; text-align:center; cursor:pointer; margin-bottom:12px; }
-        .upload-area-icon { font-size:2.5em; margin-bottom:8px; }
-        .upload-area-text { font-size:0.85em; color:var(--muted); }
-        #ticketPreview { width:100%; border-radius:10px; display:none; margin-top:10px; border:1px solid var(--border); max-height:300px; object-fit:contain; }
         /* BUTTONS */
         .action-buttons { position:fixed; bottom:0; left:0; right:0; padding:10px 14px 20px; background:linear-gradient(transparent,var(--bg) 25%); display:flex; flex-direction:column; gap:8px; }
         .btn-save { background:linear-gradient(135deg,#3a6a4a,#4a8c5c); color:#fff; width:100%; padding:18px; font-family:'Bebas Neue',sans-serif; letter-spacing:2.5px; border:none; border-radius:12px; cursor:pointer; font-size:1em; transition:all 0.2s; box-shadow:0 4px 20px rgba(74,140,92,0.25); }
@@ -194,7 +187,6 @@
             <div class="btn-home-icon">📈</div>
             <div class="btn-home-text"><div class="btn-home-title">Resumen</div><div class="btn-home-desc">Produccion, compras y stock de la semana</div></div>
         </button>
-
     </div>
 </div>
 
@@ -206,31 +198,31 @@
     </div>
     <div class="screen-content">
         <div class="tab-buttons">
-            <button class="tab-btn active" onclick="switchTabCocina('tabRegistrar')">🍳 Registrar</button>
-            <button class="tab-btn" onclick="switchTabCocina('tabSemana')">📋 Esta Semana</button>
+            <button class="tab-btn active" id="tabBtnRegistrar" onclick="switchTabCocina('tabRegistrar', event)">🍳 Registrar</button>
+            <button class="tab-btn" id="tabBtnSemana" onclick="switchTabCocina('tabSemana', event)">📋 Esta Semana</button>
         </div>
 
         <div id="tabRegistrar" class="tab-content active">
             <div class="card" id="cardElab">
                 <div class="card-header"><div class="card-icon">🍳</div><div class="card-title">Que estas preparando?</div></div>
                 <div class="grid-elab">
-                    <button class="btn-elab" onclick="seleccionarElab('Salsa Bolognese')">Salsa Bolognese</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Salsa Tomate')">Salsa Tomate</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Salsa Porcini')">Salsa Porcini</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Salsa S.R.Q')">Salsa S.R.Q</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Salsa Champi')">Salsa Champi</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Salsa Gorgonzola')">Salsa Gorgonzola</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Bolonesa Lasana')">Bolonesa Lasana</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Lasana')">Lasana</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Berenjena')">Berenjena</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Caneloni')">Caneloni</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Masa Estandar')">Masa Estandar</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Masa Ricotta')">Masa Ricotta</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Relleno Carne')">Relleno Carne</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Relleno Ricotta')">Relleno Ricotta</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Relleno Queso')">Relleno Queso</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Relleno Porcini')">Relleno Porcini</button>
-                    <button class="btn-elab" onclick="seleccionarElab('Relleno Pescado')">Relleno Pescado</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Salsa Bolognese', this)">Salsa Bolognese</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Salsa Tomate', this)">Salsa Tomate</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Salsa Porcini', this)">Salsa Porcini</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Salsa S.R.Q', this)">Salsa S.R.Q</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Salsa Champi', this)">Salsa Champi</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Salsa Gorgonzola', this)">Salsa Gorgonzola</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Bolonesa Lasana', this)">Bolonesa Lasana</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Lasana', this)">Lasana</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Berenjena', this)">Berenjena</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Caneloni', this)">Caneloni</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Masa Estandar', this)">Masa Estandar</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Masa Ricotta', this)">Masa Ricotta</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Relleno Carne', this)">Relleno Carne</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Relleno Ricotta', this)">Relleno Ricotta</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Relleno Queso', this)">Relleno Queso</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Relleno Porcini', this)">Relleno Porcini</button>
+                    <button class="btn-elab" onclick="seleccionarElab('Relleno Pescado', this)">Relleno Pescado</button>
                 </div>
             </div>
             <div class="card hidden" id="cardIngredientes">
@@ -270,7 +262,7 @@
                 <label>Proveedor</label>
                 <select id="pProveedor">
                     <option value="">Seleccionar...</option>
-                    <option>Matteo Comit</option><option>T&#237;as Fruit</option><option>Chacon</option>
+                    <option>Matteo Comit</option><option>Tías Fruit</option><option>Chacon</option>
                     <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
                     <option>Roper</option><option>Ortidal</option><option>Otro</option>
                 </select>
@@ -306,7 +298,7 @@
                 <label>Proveedor</label>
                 <select id="gProveedor" onchange="cargarProductosProveedor()">
                     <option value="">Seleccionar proveedor...</option>
-                    <option>Matteo Comit</option><option>T&#237;as Fruit</option><option>Chacon</option>
+                    <option>Matteo Comit</option><option>Tías Fruit</option><option>Chacon</option>
                     <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
                     <option>Roper</option><option>Ortidal</option><option>Otro</option>
                 </select>
@@ -329,13 +321,11 @@
             </div>
             <button type="button" style="margin-top:10px;width:100%;padding:10px;background:transparent;border:1px dashed var(--gold-dim);border-radius:8px;color:var(--gold-dim);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;" onclick="toggleFormNuevoProducto()">+ Añadir producto que no está en la lista</button>
         </div>
-        <!-- ACCESO VENTAS DISCRETO -->
         <div style="text-align:center;margin-top:8px;padding-bottom:8px;">
             <button onclick="irA('screenVentas')" style="background:none;border:none;color:var(--muted);font-size:0.78em;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:8px;">
                 💰 Ver / registrar ventas del mes
             </button>
         </div>
-
         <div style="height:120px"></div>
         <div class="action-buttons">
             <button class="btn-whatsapp" id="btnEnviarPedido" onclick="enviarYGuardarPedido()" style="display:none">📱 ENVIAR POR WHATSAPP Y GUARDAR</button>
@@ -417,8 +407,8 @@
     </div>
     <div class="screen-content">
         <div class="tab-buttons">
-            <button class="tab-btn active" onclick="switchTabVentas('tabSubirTicket')">📝 Introducir Datos</button>
-            <button class="tab-btn" onclick="switchTabVentas('tabVerVentas')">📊 Ver Ventas</button>
+            <button class="tab-btn active" id="tabBtnSubir" onclick="switchTabVentas('tabSubirTicket', event)">📝 Introducir Datos</button>
+            <button class="tab-btn" id="tabBtnVerVentas" onclick="switchTabVentas('tabVerVentas', event)">📊 Ver Ventas</button>
         </div>
         <div id="tabSubirTicket" class="tab-content active">
             <div class="card">
@@ -466,14 +456,22 @@
 <input type="file" id="inputIngredienteFotoCam" accept="image/*" capture="environment" style="display:none" onchange="onIngredienteFotoCamaraSelected(event)">
 
 <script>
+// ─── CONFIGURACIÓN ────────────────────────────────────────────────────────────
 var URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxFwybPB0TY67DyJWYwN7Z5FpbtYa36R1UPVt7lsPwJTrC0gdpt3scbJRNNk2wvhRflXg/exec";
+
+// ─── ESTADO GLOBAL ────────────────────────────────────────────────────────────
 var productosLibreria = [];
-var editFotoIndex = -1, editFotoBase64 = null;
+var editFotoIndex = -1;
+var editFotoBase64 = null;
 var ventasData = [];
 var currentElabSelected = "";
 var ingredientesFotoTarget = -1;
 var ingredientesFotos = {};
+var contadorIngredientesExtra = 100;
+// Almacén de productos en pedido: { id, nombre, unidad, proveedor }
+var productosEnPedido = [];
 
+// ─── RECETAS ──────────────────────────────────────────────────────────────────
 var RECETAS = {
     "Salsa Bolognese":[{nombre:"Carne molida vacuno",cantidad:"5kg"},{nombre:"Carne molida cerdo",cantidad:"5kg"},{nombre:"Chorizo criollo blanco",cantidad:"2kg"},{nombre:"Cebolla blanca",cantidad:"2kg"},{nombre:"Puerro",cantidad:"4 ud"},{nombre:"Zanahoria",cantidad:"6-8 ud"},{nombre:"Vino tinto",cantidad:"2lt"},{nombre:"Tomate triturado",cantidad:"1 lata"}],
     "Salsa Tomate":[{nombre:"Cebolla blanca",cantidad:"9 ud"},{nombre:"Zanahoria",cantidad:"10 ud"},{nombre:"Tomate para salsa",cantidad:"3kg"},{nombre:"Tomate triturado",cantidad:"4 latas"}],
@@ -494,497 +492,678 @@ var RECETAS = {
     "Relleno Pescado":[{nombre:"Fogonero",cantidad:"1 caja"},{nombre:"Zanahoria",cantidad:"6 ud"},{nombre:"Cebolla",cantidad:"4 ud"},{nombre:"Tomate",cantidad:"6 ud"},{nombre:"Papas folio",cantidad:"6 ud"},{nombre:"Ajos",cantidad:"al gusto"}]
 };
 
+// ─── EMOJI MAP ────────────────────────────────────────────────────────────────
 var EMOJI_MAP = {"ajo":"🧄","cebolla":"🧅","tomate":"🍅","pimiento":"🫑","pepino":"🥒","calabacin":"🥒","zanahoria":"🥕","patata":"🥔","papa":"🥔","espinaca":"🥬","berenjena":"🍆","champi":"🍄","champiñon":"🍄","limon":"🍋","naranja":"🍊","manzana":"🍎","pera":"🍐","lima":"🍋","aguacate":"🥑","harina":"🌾","arroz":"🍚","pasta":"🍝","spaghetti":"🍝","penne":"🍝","lasana":"🍝","semola":"🌾","queso":"🧀","parmesano":"🧀","grana":"🧀","mozzarella":"🧀","ricotta":"🧀","gorgonzola":"🧀","mascarpone":"🧀","carne":"🥩","pollo":"🍗","salmon":"🐟","pescado":"🐟","lubina":"🐟","fogonero":"🐟","atun":"🐟","langostino":"🦐","almeja":"🦪","mejillon":"🦪","ossobuco":"🥩","jamon":"🥓","salami":"🥓","mortadela":"🥓","bresaola":"🥓","chorizo":"🌶️","bacon":"🥓","aceite":"🫙","vinagre":"🫙","sal":"🧂","pimienta":"🌶️","oregano":"🌿","albahaca":"🌿","romero":"🌿","salvia":"🌿","menta":"🌿","tomillo":"🌿","perejil":"🌿","huevo":"🥚","mantequilla":"🧈","nata":"🥛","leche":"🥛","bechamel":"🥛","vino":"🍷","porcini":"🍄","seta":"🍄","rabo":"🦴","salsa":"🍝","bolonesa":"🍝","default":"📦"};
 
-function getEmoji(n) { if (!n) return "📦"; var s=n.toLowerCase(); for (var k in EMOJI_MAP){ if(s.includes(k)) return EMOJI_MAP[k]; } return "📦"; }
+function getEmoji(n) {
+    if (!n) return "📦";
+    var s = n.toLowerCase();
+    for (var k in EMOJI_MAP) { if (s.includes(k)) return EMOJI_MAP[k]; }
+    return "📦";
+}
 
-function getSemanaActual() {
-    var now=new Date(); var s=new Date(now.getFullYear(),0,1);
-    return "Semana "+Math.ceil(((now-s)/86400000+s.getDay()+1)/7)+" - "+now.getFullYear();
+// ─── UTILIDADES DE FECHA ──────────────────────────────────────────────────────
+function getSemanaISO() {
+    var now = new Date();
+    var tmp = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay() || 7));
+    var yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+    var semana = Math.ceil((((tmp - yearStart) / 86400000) + 1) / 7);
+    return "Semana " + semana + " - " + now.getFullYear();
 }
 
 function generarCodigoSesion(elab) {
-    var now=new Date();
-    var dia=String(now.getDate()).padStart(2,'0');
-    var mes=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'][now.getMonth()];
-    return elab + ' — ' + dia+mes;
+    var now = new Date();
+    var dia = String(now.getDate()).padStart(2, '0');
+    var mes = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'][now.getMonth()];
+    return elab + ' — ' + dia + mes;
 }
 
 function getFechaHoy() {
-    return new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'});
+    return new Date().toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit', year:'numeric'});
 }
 
-// NAVEGACION
+function getMesActual() {
+    return new Date().toLocaleDateString('es-ES', {month:'long', year:'numeric'});
+}
+
+// ─── COMPRESIÓN DE IMÁGENES ───────────────────────────────────────────────────
+function comprimirImagen(base64, maxDim, calidad) {
+    return new Promise(function(resolve) {
+        var img = new Image();
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+                if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                else       { w = Math.round(w * maxDim / h); h = maxDim; }
+            }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', calidad || 0.7));
+        };
+        img.onerror = function() { resolve(base64); }; // si falla, usa original
+        img.src = base64;
+    });
+}
+
+// ─── NAVEGACIÓN ───────────────────────────────────────────────────────────────
 function irA(screenId) {
-    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
     document.getElementById(screenId).classList.add('active');
-    if (screenId==='screenProductos') cargarProductos();
-    if (screenId==='screenStock') iniciarStock();
-    if (screenId==='screenVentas') { cargarVentas(); document.getElementById('ventasMes').value=new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'}); }
-    if (screenId==='screenCompras') cargarResumenDia();
-    if (screenId==='screenDashboard') cargarDashboard();
-    window.scrollTo(0,0);
+
+    if (screenId === 'screenProductos') cargarProductos();
+    if (screenId === 'screenStock') iniciarStock();
+    if (screenId === 'screenVentas') {
+        cargarVentas();
+        var elMes = document.getElementById('ventasMes');
+        if (elMes) elMes.value = getMesActual();
+    }
+    if (screenId === 'screenCompras') {
+        // CORRECCIÓN: cargamos productos Y resumen al entrar a Compras
+        cargarProductos();
+        cargarResumenDia();
+    }
+    if (screenId === 'screenDashboard') cargarDashboard();
+    window.scrollTo(0, 0);
 }
 
-function switchTabCocina(tabId) {
-    document.querySelectorAll('#screenCocina .tab-content').forEach(function(t){ t.classList.remove('active'); });
-    document.querySelectorAll('#screenCocina .tab-btn').forEach(function(b){ b.classList.remove('active'); });
+// CORRECCIÓN: event como parámetro explícito en ambas funciones de tab
+function switchTabCocina(tabId, ev) {
+    document.querySelectorAll('#screenCocina .tab-content').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('#screenCocina .tab-btn').forEach(function(b) { b.classList.remove('active'); });
     document.getElementById(tabId).classList.add('active');
-    event.target.classList.add('active');
-    if (tabId==='tabSemana') cargarResumenSemanaProduccion();
+    if (ev && ev.target) ev.target.classList.add('active');
+    if (tabId === 'tabSemana') cargarResumenSemanaProduccion();
 }
 
-function switchTabVentas(tabId) {
-    document.querySelectorAll('#screenVentas .tab-content').forEach(function(t){ t.classList.remove('active'); });
-    document.querySelectorAll('#screenVentas .tab-btn').forEach(function(b){ b.classList.remove('active'); });
+function switchTabVentas(tabId, ev) {
+    document.querySelectorAll('#screenVentas .tab-content').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('#screenVentas .tab-btn').forEach(function(b) { b.classList.remove('active'); });
     document.getElementById(tabId).classList.add('active');
-    event.target.classList.add('active');
-    if (tabId==='tabVerVentas') cargarVentas();
+    if (ev && ev.target) ev.target.classList.add('active');
+    if (tabId === 'tabVerVentas') cargarVentas();
 }
 
-// RESUMEN DIA COMPRAS
+// ─── RESUMEN DÍA COMPRAS ──────────────────────────────────────────────────────
 function cargarResumenDia() {
-    var c=document.getElementById('resumenDiaContainer');
-    c.innerHTML='';
-    fetch(URL_SCRIPT+"?accion=pedidosHoy")
-        .then(function(r){ return r.json(); })
+    var c = document.getElementById('resumenDiaContainer');
+    c.innerHTML = '';
+    fetch(URL_SCRIPT + "?accion=pedidosHoy")
+        .then(function(r) { return r.json(); })
         .then(function(data) {
-            var items=data.pedidos||[];
+            var items = data.pedidos || [];
             if (!items.length) return;
-            var html='<div class="resumen-dia"><div class="resumen-dia-titulo">📋 PEDIDO DE HOY — '+getFechaHoy()+'</div>';
-            items.forEach(function(item){
-                html+='<div class="resumen-dia-item"><div><div>'+getEmoji(item.producto)+' '+item.producto+'</div><div class="resumen-dia-proveedor">'+( item.proveedor||'')+'</div></div><div class="resumen-dia-cant">'+item.cantidad+' '+(item.unidad||'')+'</div></div>';
+            var html = '<div class="resumen-dia"><div class="resumen-dia-titulo">📋 PEDIDO DE HOY — ' + getFechaHoy() + '</div>';
+            items.forEach(function(item) {
+                html += '<div class="resumen-dia-item"><div><div>' + getEmoji(item.producto) + ' ' + item.producto + '</div><div class="resumen-dia-proveedor">' + (item.proveedor || '') + '</div></div><div class="resumen-dia-cant">' + item.cantidad + ' ' + (item.unidad || '') + '</div></div>';
             });
-            html+='<div style="font-size:0.75em;color:var(--muted);margin-top:10px;text-align:right;">Total: '+items.length+' productos</div></div>';
-            c.innerHTML=html;
+            html += '<div style="font-size:0.75em;color:var(--muted);margin-top:10px;text-align:right;">Total: ' + items.length + ' productos</div></div>';
+            c.innerHTML = html;
         })
-        .catch(function(){ c.innerHTML=''; });
+        .catch(function() { c.innerHTML = ''; });
 }
 
-// RESUMEN SEMANA PRODUCCION
+// ─── RESUMEN SEMANA PRODUCCIÓN ────────────────────────────────────────────────
 function cargarResumenSemanaProduccion() {
-    var lista=document.getElementById('listaSemanaProduccion');
-    lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div>';
-    fetch(URL_SCRIPT+"?accion=registrosSemana")
-        .then(function(r){ return r.json(); })
+    var lista = document.getElementById('listaSemanaProduccion');
+    lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div>';
+    fetch(URL_SCRIPT + "?accion=registrosSemana")
+        .then(function(r) { return r.json(); })
         .then(function(data) {
-            var sesiones=data.sesiones||[];
-            if (!sesiones.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin producciones esta semana.</div>'; return; }
-            lista.innerHTML=sesiones.map(function(s){
+            var sesiones = data.sesiones || [];
+            if (!sesiones.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin producciones esta semana.</div>'; return; }
+            lista.innerHTML = sesiones.map(function(s) {
                 return '<div class="sesion-resumen">' +
                     '<div class="sesion-resumen-header">' +
-                        '<div class="sesion-resumen-nombre">'+s.elaboracion+'</div>' +
-                        '<div class="sesion-resumen-fecha">'+s.fecha+'</div>' +
+                        '<div class="sesion-resumen-nombre">' + s.elaboracion + '</div>' +
+                        '<div class="sesion-resumen-fecha">' + s.fecha + '</div>' +
                     '</div>' +
-                    (s.ingredientes||[]).map(function(ing){ return '<div class="sesion-resumen-ing">'+getEmoji(ing.nombre)+' '+ing.nombre+(ing.cantidad?' — '+ing.cantidad:'')+(ing.lote&&ing.lote!=='Sin lote'?' · Lote: '+ing.lote:'')+'</div>'; }).join('') +
+                    (s.ingredientes || []).map(function(ing) {
+                        return '<div class="sesion-resumen-ing">' + getEmoji(ing.nombre) + ' ' + ing.nombre + (ing.cantidad ? ' — ' + ing.cantidad : '') + (ing.lote && ing.lote !== 'Sin lote' ? ' · Lote: ' + ing.lote : '') + '</div>';
+                    }).join('') +
                 '</div>';
             }).join('');
         })
-        .catch(function(){ lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>'; });
+        .catch(function() { lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>'; });
 }
 
-// DASHBOARD
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function cargarDashboard() {
-    document.querySelectorAll('.dash-semana-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.dash-semana-btn').forEach(function(b) { b.classList.remove('active'); });
     document.getElementById('dashBtnSemana').classList.add('active');
-    var semana=getSemanaActual();
-    var mes=new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'});
-    document.getElementById('dashContent').innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:40px;">Cargando...</div>';
+    var semana = getSemanaISO();
+    document.getElementById('dashContent').innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:40px;">Cargando...</div>';
 
     Promise.all([
-        fetch(URL_SCRIPT+"?accion=listarStock&semana="+encodeURIComponent(semana)).then(function(r){ return r.json(); }),
-        fetch(URL_SCRIPT+"?accion=registrosSemana").then(function(r){ return r.json(); }),
-        fetch(URL_SCRIPT+"?accion=pedidosHoy").then(function(r){ return r.json(); })
+        fetch(URL_SCRIPT + "?accion=listarStock&semana=" + encodeURIComponent(semana)).then(function(r) { return r.json(); }),
+        fetch(URL_SCRIPT + "?accion=registrosSemana").then(function(r) { return r.json(); }),
+        fetch(URL_SCRIPT + "?accion=pedidosHoy").then(function(r) { return r.json(); })
     ]).then(function(results) {
-        var stock=results[0].stock||[];
-        var sesiones=results[1].sesiones||[];
-        var pedidos=results[2].pedidos||[];
-        var html='';
+        var stock = results[0].stock || [];
+        var sesiones = results[1].sesiones || [];
+        var pedidos = results[2].pedidos || [];
+        var html = '';
 
-        // PRODUCCION
-        html+='<div class="card"><div class="dash-section"><div class="dash-section-title">🍳 PRODUCCION ESTA SEMANA</div>';
-        if (!sesiones.length) html+='<div style="color:var(--muted);font-size:0.82em;padding:8px;">Sin producciones.</div>';
-        else sesiones.forEach(function(s){ html+='<div class="dash-item"><div class="dash-item-nombre">'+getEmoji(s.elaboracion)+' '+s.elaboracion+'</div><div class="dash-item-valor">'+s.fecha+'</div></div>'; });
-        html+='</div></div>';
+        html += '<div class="card"><div class="dash-section"><div class="dash-section-title">🍳 PRODUCCION ESTA SEMANA</div>';
+        if (!sesiones.length) html += '<div style="color:var(--muted);font-size:0.82em;padding:8px;">Sin producciones.</div>';
+        else sesiones.forEach(function(s) { html += '<div class="dash-item"><div class="dash-item-nombre">' + getEmoji(s.elaboracion) + ' ' + s.elaboracion + '</div><div class="dash-item-valor">' + s.fecha + '</div></div>'; });
+        html += '</div></div>';
 
-        // STOCK
-        html+='<div class="card"><div class="dash-section"><div class="dash-section-title">📦 STOCK ACTUAL</div>';
-        if (!stock.length) html+='<div style="color:var(--muted);font-size:0.82em;padding:8px;">Sin stock registrado.</div>';
-        else stock.forEach(function(s){ html+='<div class="dash-item"><div class="dash-item-nombre">'+getEmoji(s.elaboracion||'')+' '+(s.elaboracion||'')+'</div><div class="dash-item-valor">'+(s.cantidad||'')+' '+(s.unidad||'')+'</div></div>'; });
-        html+='</div></div>';
+        html += '<div class="card"><div class="dash-section"><div class="dash-section-title">📦 STOCK ACTUAL</div>';
+        if (!stock.length) html += '<div style="color:var(--muted);font-size:0.82em;padding:8px;">Sin stock registrado.</div>';
+        else stock.forEach(function(s) { html += '<div class="dash-item"><div class="dash-item-nombre">' + getEmoji(s.elaboracion || '') + ' ' + (s.elaboracion || '') + '</div><div class="dash-item-valor">' + (s.cantidad || '') + ' ' + (s.unidad || '') + '</div></div>'; });
+        html += '</div></div>';
 
-        // PEDIDOS HOY
-        html+='<div class="card"><div class="dash-section"><div class="dash-section-title">🛒 PEDIDOS DE HOY</div>';
-        if (!pedidos.length) html+='<div style="color:var(--muted);font-size:0.82em;padding:8px;">Sin pedidos hoy.</div>';
-        else pedidos.forEach(function(p){ html+='<div class="dash-item"><div class="dash-item-nombre">'+getEmoji(p.producto)+' '+p.producto+'<span style="font-size:0.72em;color:var(--muted);margin-left:6px;">'+( p.proveedor||'')+'</span></div><div class="dash-item-valor">'+p.cantidad+' '+(p.unidad||'')+'</div></div>'; });
-        html+='</div></div>';
+        html += '<div class="card"><div class="dash-section"><div class="dash-section-title">🛒 PEDIDOS DE HOY</div>';
+        if (!pedidos.length) html += '<div style="color:var(--muted);font-size:0.82em;padding:8px;">Sin pedidos hoy.</div>';
+        else pedidos.forEach(function(p) { html += '<div class="dash-item"><div class="dash-item-nombre">' + getEmoji(p.producto) + ' ' + p.producto + '<span style="font-size:0.72em;color:var(--muted);margin-left:6px;">' + (p.proveedor || '') + '</span></div><div class="dash-item-valor">' + p.cantidad + ' ' + (p.unidad || '') + '</div></div>'; });
+        html += '</div></div>';
 
-        document.getElementById('dashContent').innerHTML=html;
-    }).catch(function(){ document.getElementById('dashContent').innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:40px;">Sin conexion.</div>'; });
+        document.getElementById('dashContent').innerHTML = html;
+    }).catch(function() { document.getElementById('dashContent').innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:40px;">Sin conexion.</div>'; });
 }
 
 function cargarDashboardMes() {
-    document.querySelectorAll('.dash-semana-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.dash-semana-btn').forEach(function(b) { b.classList.remove('active'); });
     document.getElementById('dashBtnMes').classList.add('active');
-    var mes=new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'});
-    document.getElementById('dashContent').innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:40px;">Cargando...</div>';
+    var mes = getMesActual();
+    document.getElementById('dashContent').innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:40px;">Cargando...</div>';
 
-    fetch(URL_SCRIPT+"?accion=listarVentas&mes="+encodeURIComponent(mes))
-        .then(function(r){ return r.json(); })
+    fetch(URL_SCRIPT + "?accion=listarVentas&mes=" + encodeURIComponent(mes))
+        .then(function(r) { return r.json(); })
         .then(function(data) {
-            var ventas=data.ventas||[];
-            var html='<div class="card"><div class="dash-section"><div class="dash-section-title">💰 VENTAS — '+mes.toUpperCase()+'</div>';
-            if (!ventas.length) html+='<div style="color:var(--muted);font-size:0.82em;padding:8px;">Sin ventas registradas este mes.</div>';
+            var ventas = data.ventas || [];
+            var html = '<div class="card"><div class="dash-section"><div class="dash-section-title">💰 VENTAS — ' + mes.toUpperCase() + '</div>';
+            if (!ventas.length) html += '<div style="color:var(--muted);font-size:0.82em;padding:8px;">Sin ventas registradas este mes.</div>';
             else {
-                var total=ventas.reduce(function(a,v){ return a+(parseFloat(v.importe)||0); },0);
-                var totalUds=ventas.reduce(function(a,v){ return a+(parseInt(v.unidades)||0); },0);
-                html+='<div class="dash-item" style="background:rgba(201,169,110,0.1);border:1px solid var(--gold-dim);border-radius:8px;margin-bottom:8px;"><div class="dash-item-nombre" style="color:var(--gold);">TOTAL</div><div class="dash-item-valor">'+totalUds+' uds · '+total.toFixed(2)+'€</div></div>';
-                ventas.slice(0,10).forEach(function(v,i){ html+='<div class="dash-item"><div class="dash-item-nombre"><span style="color:var(--gold-dim);font-size:0.8em;margin-right:6px;">'+(i+1)+'.</span>'+v.descripcion+'</div><div class="dash-item-valor">'+v.unidades+' uds</div></div>'; });
+                var total = ventas.reduce(function(a, v) { return a + (parseFloat(v.importe) || 0); }, 0);
+                var totalUds = ventas.reduce(function(a, v) { return a + (parseInt(v.unidades) || 0); }, 0);
+                html += '<div class="dash-item" style="background:rgba(201,169,110,0.1);border:1px solid var(--gold-dim);border-radius:8px;margin-bottom:8px;"><div class="dash-item-nombre" style="color:var(--gold);">TOTAL</div><div class="dash-item-valor">' + totalUds + ' uds · ' + total.toFixed(2) + '€</div></div>';
+                ventas.slice(0, 10).forEach(function(v, i) { html += '<div class="dash-item"><div class="dash-item-nombre"><span style="color:var(--gold-dim);font-size:0.8em;margin-right:6px;">' + (i + 1) + '.</span>' + v.descripcion + '</div><div class="dash-item-valor">' + v.unidades + ' uds</div></div>'; });
             }
-            html+='</div></div>';
-            document.getElementById('dashContent').innerHTML=html;
+            html += '</div></div>';
+            document.getElementById('dashContent').innerHTML = html;
         })
-        .catch(function(){ document.getElementById('dashContent').innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:40px;">Sin conexion.</div>'; });
+        .catch(function() { document.getElementById('dashContent').innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:40px;">Sin conexion.</div>'; });
 }
 
-// COCINA
-function seleccionarElab(nombre) {
-    currentElabSelected=nombre; ingredientesFotos={};
-    document.querySelectorAll('.btn-elab').forEach(function(b){ b.classList.remove('selected'); });
-    event.target.classList.add('selected');
-    document.getElementById('tituloIngredientes').textContent=nombre;
-    document.getElementById('sesionBadge').textContent=generarCodigoSesion(nombre);
-    document.getElementById('listaIngredientes').innerHTML=(RECETAS[nombre]||[]).map(function(ing,i){ return renderIngredienteRow(ing.nombre,ing.cantidad,i); }).join('');
+// ─── COCINA ───────────────────────────────────────────────────────────────────
+// CORRECCIÓN: pasar el botón pulsado como parámetro en vez de usar event.target
+function seleccionarElab(nombre, btnEl) {
+    currentElabSelected = nombre;
+    ingredientesFotos = {};
+    document.querySelectorAll('.btn-elab').forEach(function(b) { b.classList.remove('selected'); });
+    if (btnEl) btnEl.classList.add('selected');
+    document.getElementById('tituloIngredientes').textContent = nombre;
+    document.getElementById('sesionBadge').textContent = generarCodigoSesion(nombre);
+    document.getElementById('listaIngredientes').innerHTML = (RECETAS[nombre] || []).map(function(ing, i) { return renderIngredienteRow(ing.nombre, ing.cantidad, i); }).join('');
     document.getElementById('cardIngredientes').classList.remove('hidden');
     document.getElementById('btnGuardarSesion').classList.remove('hidden');
-    document.getElementById('cardIngredientes').scrollIntoView({behavior:'smooth',block:'start'});
+    document.getElementById('cardIngredientes').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function renderIngredienteRow(nombre, cantidadDefault, i) {
-    return '<div class="ingrediente-row" id="ing-row-'+i+'">' +
+    return '<div class="ingrediente-row" id="ing-row-' + i + '">' +
         '<div class="ingrediente-top">' +
-            '<input type="checkbox" class="ingrediente-check" id="ing-check-'+i+'" checked>' +
-            '<span style="font-size:1.3em">'+getEmoji(nombre)+'</span>' +
-            '<span class="ingrediente-nombre">'+nombre+'</span>' +
-            '<span class="ingrediente-cantidad-default">'+cantidadDefault+'</span>' +
+            '<input type="checkbox" class="ingrediente-check" id="ing-check-' + i + '" checked>' +
+            '<span style="font-size:1.3em">' + getEmoji(nombre) + '</span>' +
+            '<span class="ingrediente-nombre">' + nombre + '</span>' +
+            '<span class="ingrediente-cantidad-default">' + cantidadDefault + '</span>' +
         '</div>' +
         '<div class="ingrediente-fields">' +
-            '<input class="ingrediente-input" id="ing-lote-'+i+'" placeholder="Nº Lote">' +
-            '<input class="ingrediente-input" id="ing-cant-'+i+'" value="'+cantidadDefault+'" placeholder="Cant.">' +
+            '<input class="ingrediente-input" id="ing-lote-' + i + '" placeholder="Nº Lote">' +
+            '<input class="ingrediente-input" id="ing-cant-' + i + '" value="' + cantidadDefault + '" placeholder="Cant.">' +
         '</div>' +
         '<div class="foto-btns">' +
-            '<button class="ingrediente-foto-btn" id="ing-foto-cam-'+i+'" onclick="abrirCamaraIngrediente('+i+')">📷 Cámara</button>' +
-            '<button class="ingrediente-foto-btn" id="ing-foto-gal-'+i+'" onclick="abrirGaleriaIngrediente('+i+')">🖼 Galería</button>' +
+            '<button class="ingrediente-foto-btn" id="ing-foto-cam-' + i + '" onclick="abrirCamaraIngrediente(' + i + ')">📷 Cámara</button>' +
+            '<button class="ingrediente-foto-btn" id="ing-foto-gal-' + i + '" onclick="abrirGaleriaIngrediente(' + i + ')">🖼 Galería</button>' +
         '</div>' +
-        '<img class="ingrediente-foto-preview" id="ing-foto-preview-'+i+'" alt="foto">' +
+        '<img class="ingrediente-foto-preview" id="ing-foto-preview-' + i + '" alt="foto">' +
     '</div>';
 }
 
-var contadorIngredientesExtra=100;
 function anadirIngredienteExtra() {
-    var i=contadorIngredientesExtra++;
+    var i = contadorIngredientesExtra++;
     document.getElementById('listaIngredientes').insertAdjacentHTML('beforeend',
-        '<div class="ingrediente-row" id="ing-row-'+i+'">' +
+        '<div class="ingrediente-row" id="ing-row-' + i + '">' +
         '<div class="ingrediente-top">' +
-            '<input type="checkbox" class="ingrediente-check" id="ing-check-'+i+'" checked>' +
+            '<input type="checkbox" class="ingrediente-check" id="ing-check-' + i + '" checked>' +
             '<span style="font-size:1.3em">📦</span>' +
-            '<input class="ingrediente-input" id="ing-nombre-'+i+'" placeholder="Nombre del ingrediente" style="flex:1">' +
+            '<input class="ingrediente-input" id="ing-nombre-' + i + '" placeholder="Nombre del ingrediente" style="flex:1">' +
         '</div>' +
         '<div class="ingrediente-fields">' +
-            '<input class="ingrediente-input" id="ing-lote-'+i+'" placeholder="Nº Lote">' +
-            '<input class="ingrediente-input" id="ing-cant-'+i+'" placeholder="Cantidad">' +
+            '<input class="ingrediente-input" id="ing-lote-' + i + '" placeholder="Nº Lote">' +
+            '<input class="ingrediente-input" id="ing-cant-' + i + '" placeholder="Cantidad">' +
         '</div>' +
         '<div class="foto-btns">' +
-            '<button class="ingrediente-foto-btn" id="ing-foto-cam-'+i+'" onclick="abrirCamaraIngrediente('+i+')">📷 Cámara</button>' +
-            '<button class="ingrediente-foto-btn" id="ing-foto-gal-'+i+'" onclick="abrirGaleriaIngrediente('+i+')">🖼 Galería</button>' +
+            '<button class="ingrediente-foto-btn" id="ing-foto-cam-' + i + '" onclick="abrirCamaraIngrediente(' + i + ')">📷 Cámara</button>' +
+            '<button class="ingrediente-foto-btn" id="ing-foto-gal-' + i + '" onclick="abrirGaleriaIngrediente(' + i + ')">🖼 Galería</button>' +
         '</div>' +
-        '<img class="ingrediente-foto-preview" id="ing-foto-preview-'+i+'" alt="foto">' +
+        '<img class="ingrediente-foto-preview" id="ing-foto-preview-' + i + '" alt="foto">' +
         '</div>'
     );
 }
 
-function abrirCamaraIngrediente(i) {
-    ingredientesFotoTarget=i;
-    document.getElementById('inputIngredienteFotoCam').click();
-}
-
-function abrirGaleriaIngrediente(i) {
-    ingredientesFotoTarget=i;
-    document.getElementById('inputIngredienteFotoGal').click();
-}
-
+function abrirCamaraIngrediente(i) { ingredientesFotoTarget = i; document.getElementById('inputIngredienteFotoCam').click(); }
+function abrirGaleriaIngrediente(i) { ingredientesFotoTarget = i; document.getElementById('inputIngredienteFotoGal').click(); }
 function onIngredienteFotoGaleriaSelected(event) { procesarFotoIngrediente(event); }
 function onIngredienteFotoCamaraSelected(event) { procesarFotoIngrediente(event); }
 
 function procesarFotoIngrediente(event) {
-    var file=event.target.files[0]; if (!file) return;
-    var i=ingredientesFotoTarget;
-    var reader=new FileReader();
-    reader.onload=function(e) {
-        ingredientesFotos[i]=e.target.result;
-        var preview=document.getElementById('ing-foto-preview-'+i);
-        if (preview) { preview.src=e.target.result; preview.style.display='block'; }
-        var btnCam=document.getElementById('ing-foto-cam-'+i);
-        var btnGal=document.getElementById('ing-foto-gal-'+i);
-        if (btnCam) { btnCam.textContent='✅ Foto'; btnCam.classList.add('has-foto'); }
-        if (btnGal) btnGal.classList.add('has-foto');
+    var file = event.target.files[0]; if (!file) return;
+    var i = ingredientesFotoTarget;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        // CORRECCIÓN: comprimir antes de guardar (800px, calidad 0.7)
+        comprimirImagen(e.target.result, 800, 0.7).then(function(comprimida) {
+            ingredientesFotos[i] = comprimida;
+            var preview = document.getElementById('ing-foto-preview-' + i);
+            if (preview) { preview.src = comprimida; preview.style.display = 'block'; }
+            var btnCam = document.getElementById('ing-foto-cam-' + i);
+            var btnGal = document.getElementById('ing-foto-gal-' + i);
+            if (btnCam) { btnCam.textContent = '✅ Foto'; btnCam.classList.add('has-foto'); }
+            if (btnGal) btnGal.classList.add('has-foto');
+        });
     };
     reader.readAsDataURL(file);
-    event.target.value='';
+    event.target.value = '';
 }
 
 async function guardarSesion() {
     if (!currentElabSelected) return alert("Selecciona una elaboracion.");
-    var btn=document.getElementById('btnGuardarSesion');
-    btn.disabled=true; btn.innerHTML="Guardando...";
-    var sesion=generarCodigoSesion(currentElabSelected);
-    var rows=document.getElementById('listaIngredientes').querySelectorAll('.ingrediente-row');
-    var ingredientes=[];
-    rows.forEach(function(row){
-        var id=row.id.replace('ing-row-','');
-        var check=document.getElementById('ing-check-'+id);
-        if (!check||!check.checked) return;
-        var nombreEl=document.getElementById('ing-nombre-'+id);
-        var nombre=nombreEl?nombreEl.value.trim():(row.querySelector('.ingrediente-nombre')?row.querySelector('.ingrediente-nombre').textContent:'');
+    var btn = document.getElementById('btnGuardarSesion');
+    btn.disabled = true; btn.innerHTML = "Guardando...";
+    var sesion = generarCodigoSesion(currentElabSelected);
+    var rows = document.getElementById('listaIngredientes').querySelectorAll('.ingrediente-row');
+    var ingredientes = [];
+    rows.forEach(function(row) {
+        var id = row.id.replace('ing-row-', '');
+        var check = document.getElementById('ing-check-' + id);
+        if (!check || !check.checked) return;
+        var nombreEl = document.getElementById('ing-nombre-' + id);
+        var nombre = nombreEl ? nombreEl.value.trim() : (row.querySelector('.ingrediente-nombre') ? row.querySelector('.ingrediente-nombre').textContent : '');
         if (!nombre) return;
-        ingredientes.push({ nombre:nombre, lote:document.getElementById('ing-lote-'+id)?document.getElementById('ing-lote-'+id).value.trim()||'Sin lote':'Sin lote', cantidad:document.getElementById('ing-cant-'+id)?document.getElementById('ing-cant-'+id).value.trim():'', imagen:ingredientesFotos[id]||'' });
+        ingredientes.push({
+            nombre: nombre,
+            lote: (document.getElementById('ing-lote-' + id) ? document.getElementById('ing-lote-' + id).value.trim() : '') || 'Sin lote',
+            cantidad: document.getElementById('ing-cant-' + id) ? document.getElementById('ing-cant-' + id).value.trim() : '',
+            imagen: ingredientesFotos[id] || ''
+        });
     });
-    if (!ingredientes.length) return alert("Selecciona al menos un ingrediente.");
+    if (!ingredientes.length) { btn.disabled = false; btn.innerHTML = "Confirmar y Guardar Sesion"; return alert("Selecciona al menos un ingrediente."); }
     try {
-        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({modo:'sesion',elaboracion:currentElabSelected,sesion:sesion,ingredientes:ingredientes})});
-        showSuccess("Oido Cocina!",sesion+" — "+ingredientes.length+" ingredientes guardados","🍝");
-    } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Confirmar y Guardar Sesion"; }
+        await fetch(URL_SCRIPT, {method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'sesion', elaboracion:currentElabSelected, sesion:sesion, ingredientes:ingredientes})});
+        // CORRECCIÓN: no recargar página, solo mostrar éxito y resetear formulario
+        showSuccess("Oido Cocina!", sesion + " — " + ingredientes.length + " ingredientes guardados", "🍝", false);
+        // Reset formulario cocina
+        currentElabSelected = '';
+        ingredientesFotos = {};
+        document.querySelectorAll('.btn-elab').forEach(function(b) { b.classList.remove('selected'); });
+        document.getElementById('cardIngredientes').classList.add('hidden');
+        document.getElementById('btnGuardarSesion').classList.add('hidden');
+        document.getElementById('listaIngredientes').innerHTML = '';
+        btn.disabled = false; btn.innerHTML = "Confirmar y Guardar Sesion";
+    } catch(err) {
+        alert("Error de red.");
+        btn.disabled = false; btn.innerHTML = "Confirmar y Guardar Sesion";
+    }
 }
 
-// PRODUCTOS
+// ─── PRODUCTOS ────────────────────────────────────────────────────────────────
 function onFotoProductoSelected(event) {
-    var file=event.target.files[0]; if (!file) return;
-    var reader=new FileReader();
-    reader.onload=function(e){ window.photoProductoBase64=e.target.result; var p=document.getElementById('previewProducto'); p.src=e.target.result; p.style.display='block'; };
-    reader.readAsDataURL(file); event.target.value='';
+    var file = event.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        // CORRECCIÓN: comprimir foto de producto
+        comprimirImagen(e.target.result, 800, 0.75).then(function(comprimida) {
+            window.photoProductoBase64 = comprimida;
+            var p = document.getElementById('previewProducto');
+            p.src = comprimida; p.style.display = 'block';
+        });
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
 }
 
-function abrirGaleriaParaEditar(i) { editFotoIndex=i; editFotoBase64=null; document.getElementById('inputGaleria').click(); }
+function abrirGaleriaParaEditar(i) { editFotoIndex = i; editFotoBase64 = null; document.getElementById('inputGaleria').click(); }
 
 function onGaleriaSelected(event) {
-    var file=event.target.files[0]; if (!file) return;
-    var reader=new FileReader();
-    reader.onload=function(e){ editFotoBase64=e.target.result; var p=document.getElementById('editFotoPreview-'+editFotoIndex); if(p){p.src=editFotoBase64;p.style.display='block';} };
-    reader.readAsDataURL(file); event.target.value='';
+    var file = event.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        // CORRECCIÓN: comprimir foto de edición
+        comprimirImagen(e.target.result, 800, 0.75).then(function(comprimida) {
+            editFotoBase64 = comprimida;
+            var p = document.getElementById('editFotoPreview-' + editFotoIndex);
+            if (p) { p.src = comprimida; p.style.display = 'block'; }
+        });
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
 }
 
 function cargarProductos() {
-    var lista=document.getElementById('listaProductos');
-    if (lista) lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div>';
-    fetch(URL_SCRIPT+"?accion=listarProductos").then(function(r){ return r.json(); }).then(function(data){
-        productosLibreria=(data.productos||[]).filter(function(p){ return p&&p.nombre; });
-        renderListaProductos();
-    }).catch(function(){ if(lista) lista.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px;">Sin conexion.</div>'; });
+    var lista = document.getElementById('listaProductos');
+    if (lista) lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Cargando...</div>';
+    fetch(URL_SCRIPT + "?accion=listarProductos")
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            productosLibreria = (data.productos || []).filter(function(p) { return p && p.nombre; });
+            renderListaProductos();
+        })
+        .catch(function() { if (lista) lista.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Sin conexion.</div>'; });
 }
 
 function itemHTML(p, i) {
-    var ns=(p.nombre||'').replace(/'/g,"").replace(/"/g,"");
-    var icon=p.foto?'<img class="producto-item-foto" src="'+p.foto+'" onerror="this.outerHTML=\'<div class=producto-emoji-icon>'+getEmoji(p.nombre)+'</div>\'">':'<div class="producto-emoji-icon">'+getEmoji(p.nombre)+'</div>';
-    return '<div class="producto-item" id="pitem-'+i+'"><div class="producto-item-top">'+icon+'<div class="producto-item-info"><div class="producto-item-nombre">'+(p.nombre||'')+'</div><div class="producto-item-detalle">'+(p.unidad||'Sin unidad')+(p.proveedor?' · '+p.proveedor:'')+'</div></div><button class="btn-edit-producto" onclick="toggleEdit('+i+')">✏️</button></div>'+
-    '<div class="edit-form" id="editform-'+i+'"><div class="edit-row"><input class="edit-input" id="en-'+i+'" value="'+ns+'" placeholder="Nombre"><input class="edit-input" id="ec-'+i+'" value="'+(p.codigo||'')+'" placeholder="Codigo"></div><div class="edit-row"><input class="edit-input" id="eu-'+i+'" value="'+(p.unidad||'')+'" placeholder="Unidad"><input class="edit-input" id="ep-'+i+'" value="'+(p.proveedor||'')+'" placeholder="Proveedor"></div><img class="edit-foto-preview" id="editFotoPreview-'+i+'" src="" alt="Foto"><button class="btn-edit-foto" onclick="abrirGaleriaParaEditar('+i+')">🖼 Subir foto propia</button><button class="btn-edit-save" onclick="guardarEdicion('+i+',\''+ns+'\')">Guardar</button><button class="btn-edit-cancel" onclick="toggleEdit('+i+')">Cancelar</button></div></div>';
+    var ns = (p.nombre || '').replace(/'/g, "").replace(/"/g, "");
+    var icon = p.foto ? '<img class="producto-item-foto" src="' + p.foto + '" onerror="this.outerHTML=\'<div class=producto-emoji-icon>' + getEmoji(p.nombre) + '</div>\'">' : '<div class="producto-emoji-icon">' + getEmoji(p.nombre) + '</div>';
+    return '<div class="producto-item" id="pitem-' + i + '"><div class="producto-item-top">' + icon + '<div class="producto-item-info"><div class="producto-item-nombre">' + (p.nombre || '') + '</div><div class="producto-item-detalle">' + (p.unidad || 'Sin unidad') + (p.proveedor ? ' · ' + p.proveedor : '') + '</div></div><button class="btn-edit-producto" onclick="toggleEdit(' + i + ')">✏️</button></div>' +
+    '<div class="edit-form" id="editform-' + i + '"><div class="edit-row"><input class="edit-input" id="en-' + i + '" value="' + ns + '" placeholder="Nombre"><input class="edit-input" id="ec-' + i + '" value="' + (p.codigo || '') + '" placeholder="Codigo"></div><div class="edit-row"><input class="edit-input" id="eu-' + i + '" value="' + (p.unidad || '') + '" placeholder="Unidad"><input class="edit-input" id="ep-' + i + '" value="' + (p.proveedor || '') + '" placeholder="Proveedor"></div><img class="edit-foto-preview" id="editFotoPreview-' + i + '" src="" alt="Foto"><button class="btn-edit-foto" onclick="abrirGaleriaParaEditar(' + i + ')">🖼 Subir foto propia</button><button class="btn-edit-save" onclick="guardarEdicion(' + i + ',\'' + ns + '\')">Guardar</button><button class="btn-edit-cancel" onclick="toggleEdit(' + i + ')">Cancelar</button></div></div>';
 }
 
 function renderListaProductos() {
-    var lista=document.getElementById('listaProductos'); if (!lista) return;
-    if (!productosLibreria.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Aun no hay productos.</div>'; return; }
-    lista.innerHTML=productosLibreria.map(function(p,i){ return itemHTML(p,i); }).join('');
+    var lista = document.getElementById('listaProductos'); if (!lista) return;
+    if (!productosLibreria.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Aun no hay productos.</div>'; return; }
+    lista.innerHTML = productosLibreria.map(function(p, i) { return itemHTML(p, i); }).join('');
 }
 
 function filtrarProductos(texto) {
-    var t=(texto||'').toLowerCase().trim();
-    var lista=document.getElementById('listaProductos');
+    var t = (texto || '').toLowerCase().trim();
+    var lista = document.getElementById('listaProductos');
     if (!t) { renderListaProductos(); return; }
-    var f=productosLibreria.filter(function(p){ return (p.nombre||'').toLowerCase().includes(t)||(p.proveedor||'').toLowerCase().includes(t)||(p.unidad||'').toLowerCase().includes(t); });
-    if (!f.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">No encontrado.</div>'; return; }
-    lista.innerHTML=f.map(function(p){ return itemHTML(p,productosLibreria.indexOf(p)); }).join('');
+    var f = productosLibreria.filter(function(p) { return (p.nombre || '').toLowerCase().includes(t) || (p.proveedor || '').toLowerCase().includes(t) || (p.unidad || '').toLowerCase().includes(t); });
+    if (!f.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">No encontrado.</div>'; return; }
+    lista.innerHTML = f.map(function(p) { return itemHTML(p, productosLibreria.indexOf(p)); }).join('');
 }
 
-function toggleEdit(i) { var f=document.getElementById('editform-'+i); if(f) f.classList.toggle('open'); }
+function toggleEdit(i) { var f = document.getElementById('editform-' + i); if (f) f.classList.toggle('open'); }
 
 async function guardarEdicion(i, nombreOriginal) {
-    var fp=(editFotoIndex===i&&editFotoBase64)?editFotoBase64:"";
-    var p={modo:'editarProducto',nombreOriginal:nombreOriginal,nombre:document.getElementById('en-'+i)?document.getElementById('en-'+i).value.trim():'',codigo:document.getElementById('ec-'+i)?document.getElementById('ec-'+i).value.trim():'',unidad:document.getElementById('eu-'+i)?document.getElementById('eu-'+i).value.trim():'',proveedor:document.getElementById('ep-'+i)?document.getElementById('ep-'+i).value.trim():'',imagen:fp};
-    try { await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}); editFotoIndex=-1; editFotoBase64=null; setTimeout(function(){ cargarProductos(); },2000); showSuccess("Producto Actualizado","Cambios guardados","✏️"); }
-    catch(err) { alert("Error de red."); }
+    var fp = (editFotoIndex === i && editFotoBase64) ? editFotoBase64 : "";
+    var p = {
+        modo: 'editarProducto',
+        nombreOriginal: nombreOriginal,
+        nombre: document.getElementById('en-' + i) ? document.getElementById('en-' + i).value.trim() : '',
+        codigo: document.getElementById('ec-' + i) ? document.getElementById('ec-' + i).value.trim() : '',
+        unidad: document.getElementById('eu-' + i) ? document.getElementById('eu-' + i).value.trim() : '',
+        proveedor: document.getElementById('ep-' + i) ? document.getElementById('ep-' + i).value.trim() : '',
+        imagen: fp  // CORRECCIÓN: se envía la foto al script
+    };
+    try {
+        await fetch(URL_SCRIPT, {method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify(p)});
+        editFotoIndex = -1; editFotoBase64 = null;
+        setTimeout(function() { cargarProductos(); }, 2000);
+        showSuccess("Producto Actualizado", "Cambios guardados", "✏️", false);
+    } catch(err) { alert("Error de red."); }
 }
 
 async function guardarProducto() {
-    var nombre=document.getElementById('pNombre').value.trim();
+    var nombre = document.getElementById('pNombre').value.trim();
     if (!nombre) return alert("El nombre es obligatorio.");
-    var btn=document.querySelector('#screenProductos .btn-save');
-    btn.disabled=true; btn.innerHTML="Guardando...";
+    var btn = document.querySelector('#screenProductos .btn-save');
+    btn.disabled = true; btn.innerHTML = "Guardando...";
     try {
-        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({modo:'inventario',producto:nombre,codigo:document.getElementById('pCodigo').value.trim(),unidad:document.getElementById('pUnidad').value.trim(),proveedor:document.getElementById('pProveedor').value,imagen:window.photoProductoBase64||""})});
-        document.getElementById('pNombre').value=''; document.getElementById('pCodigo').value=''; document.getElementById('pUnidad').value=''; document.getElementById('pProveedor').value=''; document.getElementById('previewProducto').style.display='none'; window.photoProductoBase64=null;
-        btn.innerHTML="Guardado ✔ Recargando...";
-        setTimeout(function(){ cargarProductos(); btn.disabled=false; btn.innerHTML="Guardar en Biblioteca"; },2000);
-    } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar en Biblioteca"; }
+        await fetch(URL_SCRIPT, {method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'inventario', producto:nombre, codigo:document.getElementById('pCodigo').value.trim(), unidad:document.getElementById('pUnidad').value.trim(), proveedor:document.getElementById('pProveedor').value, imagen:window.photoProductoBase64 || ""})});
+        document.getElementById('pNombre').value = '';
+        document.getElementById('pCodigo').value = '';
+        document.getElementById('pUnidad').value = '';
+        document.getElementById('pProveedor').value = '';
+        document.getElementById('previewProducto').style.display = 'none';
+        window.photoProductoBase64 = null;
+        btn.innerHTML = "Guardado ✔ Recargando...";
+        setTimeout(function() { cargarProductos(); btn.disabled = false; btn.innerHTML = "Guardar en Biblioteca"; }, 2000);
+    } catch(err) {
+        alert("Error de red.");
+        btn.disabled = false; btn.innerHTML = "Guardar en Biblioteca";
+    }
 }
 
-// COMPRAS
+// ─── COMPRAS ──────────────────────────────────────────────────────────────────
 function cargarProductosProveedor() {
-    var proveedor=document.getElementById('gProveedor').value; if (!proveedor) return;
-    var filtrados=productosLibreria.filter(function(p){ return p&&p.proveedor&&p.proveedor.toLowerCase().trim()===proveedor.toLowerCase().trim(); });
-    var lista=document.getElementById('listaPedidoItems');
-    var npProv=document.getElementById('npProveedor'); if (npProv) npProv.value=proveedor;
-    lista.innerHTML=!filtrados.length
+    var proveedor = document.getElementById('gProveedor').value;
+    if (!proveedor) return;
+
+    // CORRECCIÓN: si la biblioteca no está cargada, esperamos a que cargue
+    if (!productosLibreria.length) {
+        var lista = document.getElementById('listaPedidoItems');
+        lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;padding:10px;">Cargando productos...</div>';
+        document.getElementById('cardPedidoItems').classList.remove('hidden');
+        fetch(URL_SCRIPT + "?accion=listarProductos")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                productosLibreria = (data.productos || []).filter(function(p) { return p && p.nombre; });
+                _renderPedidoProveedor(proveedor);
+            });
+    } else {
+        _renderPedidoProveedor(proveedor);
+    }
+}
+
+function _renderPedidoProveedor(proveedor) {
+    var filtrados = productosLibreria.filter(function(p) {
+        return p && p.proveedor && p.proveedor.toLowerCase().trim() === proveedor.toLowerCase().trim();
+    });
+
+    var npProv = document.getElementById('npProveedor');
+    if (npProv) npProv.value = proveedor;
+
+    var lista = document.getElementById('listaPedidoItems');
+
+    // CORRECCIÓN: usar un array propio con IDs string únicos para evitar colisiones de índice
+    productosEnPedido = filtrados.map(function(p, i) {
+        return { domId: 'pp-' + i, nombre: p.nombre, unidad: p.unidad || '', proveedor: p.proveedor || '' };
+    });
+
+    lista.innerHTML = !productosEnPedido.length
         ? '<div style="color:var(--muted);font-size:0.85em;padding:10px;">No tienes productos de este proveedor todavia.</div>'
-        : filtrados.map(function(p,i){ return '<div class="pedido-item"><input type="checkbox" class="pedido-item-check" id="pcheck-'+i+'" checked><div class="pedido-item-nombre">'+getEmoji(p.nombre)+' '+p.nombre+'</div><input type="number" class="pedido-item-cant" id="pcant-'+i+'" value="0" min="0"><div class="pedido-item-unidad">'+(p.unidad||'')+'</div></div>'; }).join('');
+        : productosEnPedido.map(function(p) {
+            return '<div class="pedido-item"><input type="checkbox" class="pedido-item-check" id="pcheck-' + p.domId + '" checked><div class="pedido-item-nombre">' + getEmoji(p.nombre) + ' ' + p.nombre + '</div><input type="number" class="pedido-item-cant" id="pcant-' + p.domId + '" value="0" min="0"><div class="pedido-item-unidad">' + p.unidad + '</div></div>';
+        }).join('');
+
     document.getElementById('cardPedidoItems').classList.remove('hidden');
-    document.getElementById('btnEnviarPedido').style.display='block';
-    document.getElementById('formNuevoProducto').style.display='none';
-    window.productosProveedor=filtrados;
+    document.getElementById('btnEnviarPedido').style.display = 'block';
+    document.getElementById('formNuevoProducto').style.display = 'none';
 }
 
 function toggleFormNuevoProducto() {
-    var f=document.getElementById('formNuevoProducto');
-    f.style.display=f.style.display==='none'||f.style.display===''?'block':'none';
-    if (f.style.display==='block') document.getElementById('npNombre').focus();
+    var f = document.getElementById('formNuevoProducto');
+    f.style.display = f.style.display === 'none' || f.style.display === '' ? 'block' : 'none';
+    if (f.style.display === 'block') document.getElementById('npNombre').focus();
 }
 
 async function anadirProductoNuevo() {
-    var nombre=document.getElementById('npNombre').value.trim();
-    var unidad=document.getElementById('npUnidad').value.trim();
-    var cantidad=document.getElementById('npCantidad').value.trim();
-    var proveedor=document.getElementById('gProveedor').value;
+    var nombre = document.getElementById('npNombre').value.trim();
+    var unidad = document.getElementById('npUnidad').value.trim();
+    var cantidad = document.getElementById('npCantidad').value.trim();
+    var proveedor = document.getElementById('gProveedor').value;
     if (!nombre) return alert("El nombre es obligatorio.");
-    if (!cantidad||parseFloat(cantidad)<=0) return alert("Pon una cantidad mayor que 0.");
-    var i='nuevo_'+Date.now();
+    if (!cantidad || parseFloat(cantidad) <= 0) return alert("Pon una cantidad mayor que 0.");
+
+    // CORRECCIÓN: ID con prefijo distinto para no colisionar con 'pp-N'
+    var domId = 'pnew-' + Date.now();
+
     document.getElementById('listaPedidoItems').insertAdjacentHTML('beforeend',
-        '<div class="pedido-item" id="pi-'+i+'"><input type="checkbox" class="pedido-item-check" id="pcheck-'+i+'" checked><div class="pedido-item-nombre">'+getEmoji(nombre)+' '+nombre+' <span style="font-size:0.7em;color:var(--gold-dim)">(nuevo)</span></div><input type="number" class="pedido-item-cant" id="pcant-'+i+'" value="'+cantidad+'" min="0"><div class="pedido-item-unidad">'+(unidad||'')+'</div></div>'
+        '<div class="pedido-item" id="pi-' + domId + '"><input type="checkbox" class="pedido-item-check" id="pcheck-' + domId + '" checked><div class="pedido-item-nombre">' + getEmoji(nombre) + ' ' + nombre + ' <span style="font-size:0.7em;color:var(--gold-dim)">(nuevo)</span></div><input type="number" class="pedido-item-cant" id="pcant-' + domId + '" value="' + cantidad + '" min="0"><div class="pedido-item-unidad">' + unidad + '</div></div>'
     );
-    try { await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({modo:'inventario',producto:nombre,unidad:unidad,proveedor:proveedor,codigo:'',imagen:''})}); } catch(err) {}
-    if (!window.productosProveedor) window.productosProveedor=[];
-    window.productosProveedor.push({nombre:nombre,unidad:unidad,proveedor:proveedor,_id:i,_cantidad:cantidad});
-    document.getElementById('npNombre').value=''; document.getElementById('npUnidad').value=''; document.getElementById('npCantidad').value='1';
-    document.getElementById('formNuevoProducto').style.display='none';
-    setTimeout(cargarProductos,2000);
+
+    // Añadir al array de seguimiento
+    productosEnPedido.push({ domId: domId, nombre: nombre, unidad: unidad, proveedor: proveedor });
+
+    try {
+        await fetch(URL_SCRIPT, {method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'inventario', producto:nombre, unidad:unidad, proveedor:proveedor, codigo:'', imagen:''})});
+    } catch(err) {}
+
+    document.getElementById('npNombre').value = '';
+    document.getElementById('npUnidad').value = '';
+    document.getElementById('npCantidad').value = '1';
+    document.getElementById('formNuevoProducto').style.display = 'none';
+    setTimeout(cargarProductos, 2000);
 }
 
 async function enviarYGuardarPedido() {
-    var proveedor=document.getElementById('gProveedor').value;
-    var filtrados=window.productosProveedor||[];
-    var lineas=[];
-    filtrados.forEach(function(p,i){
-        var id=p._id||i;
-        var check=document.getElementById('pcheck-'+id);
-        var cant=document.getElementById('pcant-'+id);
-        if (!p._id) { check=document.getElementById('pcheck-'+i); cant=document.getElementById('pcant-'+i); }
-        if (check&&check.checked&&cant&&parseFloat(cant.value)>0) lineas.push({producto:p.nombre,cantidad:cant.value,unidad:p.unidad||""});
+    var proveedor = document.getElementById('gProveedor').value;
+    var lineas = [];
+
+    // CORRECCIÓN: iterar sobre productosEnPedido con sus domIds propios
+    productosEnPedido.forEach(function(p) {
+        var check = document.getElementById('pcheck-' + p.domId);
+        var cant = document.getElementById('pcant-' + p.domId);
+        if (check && check.checked && cant && parseFloat(cant.value) > 0) {
+            lineas.push({ producto: p.nombre, cantidad: cant.value, unidad: p.unidad });
+        }
     });
+
     if (!lineas.length) return alert("Pon cantidad a al menos un producto.");
-    var btn=document.getElementById('btnEnviarPedido');
-    btn.disabled=true; btn.innerHTML="⌛ Guardando...";
+    var btn = document.getElementById('btnEnviarPedido');
+    btn.disabled = true; btn.innerHTML = "⌛ Guardando...";
     try {
-        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({modo:'compra',proveedor:proveedor,lineas:lineas})});
-        btn.innerHTML="✅ Guardado — Abriendo WhatsApp...";
-        var mensaje="Hola buenas, del rest. Divina Italia El Charco\n"+lineas.map(function(l){ return l.producto+' '+l.cantidad+(l.unidad?' '+l.unidad:''); }).join('\n')+"\nMuchas gracias";
-        setTimeout(function(){ window.open("https://wa.me/?text="+encodeURIComponent(mensaje),'_blank'); btn.disabled=false; btn.innerHTML="📱 ENVIAR POR WHATSAPP Y GUARDAR"; cargarResumenDia(); },1500);
-    } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="📱 ENVIAR POR WHATSAPP Y GUARDAR"; }
+        await fetch(URL_SCRIPT, {method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'compra', proveedor:proveedor, lineas:lineas})});
+        btn.innerHTML = "✅ Guardado — Abriendo WhatsApp...";
+        var mensaje = "Hola buenas, del rest. Divina Italia El Charco\n" + lineas.map(function(l) { return l.producto + ' ' + l.cantidad + (l.unidad ? ' ' + l.unidad : ''); }).join('\n') + "\nMuchas gracias";
+        setTimeout(function() {
+            window.open("https://wa.me/?text=" + encodeURIComponent(mensaje), '_blank');
+            btn.disabled = false;
+            btn.innerHTML = "📱 ENVIAR POR WHATSAPP Y GUARDAR";
+            cargarResumenDia();
+        }, 1500);
+    } catch(err) {
+        alert("Error de red.");
+        btn.disabled = false;
+        btn.innerHTML = "📱 ENVIAR POR WHATSAPP Y GUARDAR";
+    }
 }
 
-// STOCK
-function onStockElabChange() { var v=document.getElementById('sElaboracion').value; document.getElementById('stockOtroInput').classList.toggle('hidden',v!=='__otro__'); if(v==='__otro__') document.getElementById('sElaboracionOtro').focus(); }
+// ─── STOCK ────────────────────────────────────────────────────────────────────
+function onStockElabChange() {
+    var v = document.getElementById('sElaboracion').value;
+    document.getElementById('stockOtroInput').classList.toggle('hidden', v !== '__otro__');
+    if (v === '__otro__') document.getElementById('sElaboracionOtro').focus();
+}
 
 function iniciarStock() {
-    document.getElementById('semanaActual').textContent=getSemanaActual();
-    document.getElementById('sFecha').value=new Date().toISOString().split('T')[0];
-    cargarStockSemana(getSemanaActual());
+    document.getElementById('semanaActual').textContent = getSemanaISO();
+    document.getElementById('sFecha').value = new Date().toISOString().split('T')[0];
+    cargarStockSemana(getSemanaISO());
 }
 
 function cargarStockSemana(semana) {
-    fetch(URL_SCRIPT+"?accion=listarStock&semana="+encodeURIComponent(semana)).then(function(r){ return r.json(); }).then(function(data){
-        var lista=document.getElementById('listaStock');
-        var items=data.stock||[];
-        if (!items.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin registros esta semana.</div>'; return; }
-        lista.innerHTML=items.map(function(s){ return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;"><div style="font-size:1.3em">'+getEmoji(s.elaboracion||'')+'</div><div style="flex:1"><div style="font-weight:600;font-size:0.9em;color:var(--cream)">'+(s.elaboracion||'')+'</div><div style="font-size:0.82em;color:var(--gold-dim)">'+(s.cantidad||'')+' '+(s.unidad||'')+'</div>'+(s.notas?'<div style="font-size:0.75em;color:var(--muted);margin-top:2px;">'+s.notas+'</div>':'')+'</div><div style="font-size:0.72em;color:var(--muted)">'+(s.fecha||'')+'</div></div>'; }).join('');
-    }).catch(function(){ document.getElementById('listaStock').innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>'; });
+    fetch(URL_SCRIPT + "?accion=listarStock&semana=" + encodeURIComponent(semana))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var lista = document.getElementById('listaStock');
+            var items = data.stock || [];
+            if (!items.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin registros esta semana.</div>'; return; }
+            lista.innerHTML = items.map(function(s) {
+                return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;"><div style="font-size:1.3em">' + getEmoji(s.elaboracion || '') + '</div><div style="flex:1"><div style="font-weight:600;font-size:0.9em;color:var(--cream)">' + (s.elaboracion || '') + '</div><div style="font-size:0.82em;color:var(--gold-dim)">' + (s.cantidad || '') + ' ' + (s.unidad || '') + '</div>' + (s.notas ? '<div style="font-size:0.75em;color:var(--muted);margin-top:2px;">' + s.notas + '</div>' : '') + '</div><div style="font-size:0.72em;color:var(--muted)">' + (s.fecha || '') + '</div></div>';
+            }).join('');
+        })
+        .catch(function() { document.getElementById('listaStock').innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>'; });
 }
 
 async function guardarStock() {
-    var sv=document.getElementById('sElaboracion').value;
-    var elaboracion=sv==='__otro__'?document.getElementById('sElaboracionOtro').value.trim():sv;
-    var cantidad=document.getElementById('sCantidad').value.trim();
-    var unidad=document.getElementById('sUnidad').value.trim();
-    var notas=document.getElementById('sNotas').value.trim();
-    var fechaInput=document.getElementById('sFecha').value;
+    var sv = document.getElementById('sElaboracion').value;
+    var elaboracion = sv === '__otro__' ? document.getElementById('sElaboracionOtro').value.trim() : sv;
+    var cantidad = document.getElementById('sCantidad').value.trim();
+    var unidad = document.getElementById('sUnidad').value.trim();
+    var notas = document.getElementById('sNotas').value.trim();
+    var fechaInput = document.getElementById('sFecha').value;
     if (!elaboracion) return alert("Selecciona o escribe una elaboracion.");
     if (!cantidad) return alert("Introduce la cantidad.");
-    var btn=document.querySelector('#screenStock .btn-save');
-    btn.disabled=true; btn.innerHTML="Guardando...";
-    var semana=getSemanaActual();
+    var btn = document.querySelector('#screenStock .btn-save');
+    btn.disabled = true; btn.innerHTML = "Guardando...";
+    var semana = getSemanaISO();
     try {
-        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({modo:'stock',elaboracion:elaboracion,cantidad:cantidad,unidad:unidad,notas:notas,semana:semana,fechaManual:fechaInput})});
-        document.getElementById('sElaboracion').value=''; document.getElementById('sElaboracionOtro').value=''; document.getElementById('stockOtroInput').classList.add('hidden'); document.getElementById('sCantidad').value=''; document.getElementById('sUnidad').value=''; document.getElementById('sNotas').value='';
-        btn.innerHTML="Guardado ✔";
-        setTimeout(function(){ btn.disabled=false; btn.innerHTML="Guardar Stock"; cargarStockSemana(semana); },1500);
-    } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar Stock"; }
+        await fetch(URL_SCRIPT, {method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'stock', elaboracion:elaboracion, cantidad:cantidad, unidad:unidad, notas:notas, semana:semana, fechaManual:fechaInput})});
+        document.getElementById('sElaboracion').value = '';
+        document.getElementById('sElaboracionOtro').value = '';
+        document.getElementById('stockOtroInput').classList.add('hidden');
+        document.getElementById('sCantidad').value = '';
+        document.getElementById('sUnidad').value = '';
+        document.getElementById('sNotas').value = '';
+        btn.innerHTML = "Guardado ✔";
+        setTimeout(function() { btn.disabled = false; btn.innerHTML = "Guardar Stock"; cargarStockSemana(semana); }, 1500);
+    } catch(err) {
+        alert("Error de red.");
+        btn.disabled = false; btn.innerHTML = "Guardar Stock";
+    }
 }
 
-// VENTAS MANUAL
+// ─── VENTAS ───────────────────────────────────────────────────────────────────
 function procesarVentasTexto() {
-    var texto=document.getElementById('ventasTexto').value.trim();
+    var texto = document.getElementById('ventasTexto').value.trim();
     if (!texto) return alert("Pega los datos primero.");
-    ventasData=[];
-    texto.split('\n').forEach(function(linea){
-        linea=linea.trim(); if (!linea) return;
-        var partes=linea.split(/[·\|,\t]+/);
-        if (partes.length>=2) {
-            var desc=partes[0].trim();
-            var uds=parseInt(partes[1])||0;
-            var imp=parseFloat((partes[2]||'0').replace(',','.'))||0;
-            if (desc) ventasData.push({descripcion:desc,unidades:uds,importe:imp});
+    ventasData = [];
+    texto.split('\n').forEach(function(linea) {
+        linea = linea.trim(); if (!linea) return;
+        var partes = linea.split(/[·\|,\t]+/);
+        if (partes.length >= 2) {
+            var desc = partes[0].trim();
+            var uds = parseInt(partes[1]) || 0;
+            var imp = parseFloat((partes[2] || '0').replace(',', '.')) || 0;
+            if (desc) ventasData.push({descripcion:desc, unidades:uds, importe:imp});
         }
     });
     if (!ventasData.length) return alert("No se encontraron datos. Formato: Nombre · Unidades · Importe");
-    var tbody=document.getElementById('tablaVentasBody');
-    tbody.innerHTML=ventasData.map(function(v,i){ return '<tr><td><span class="ventas-rank'+(i<3?' top':'')+'">'+(i+1)+'</span></td><td>'+v.descripcion+'</td><td>'+v.unidades+'</td><td>'+v.importe+'€</td></tr>'; }).join('');
+    var tbody = document.getElementById('tablaVentasBody');
+    tbody.innerHTML = ventasData.map(function(v, i) { return '<tr><td><span class="ventas-rank' + (i < 3 ? ' top' : '') + '">' + (i + 1) + '</span></td><td>' + v.descripcion + '</td><td>' + v.unidades + '</td><td>' + v.importe + '€</td></tr>'; }).join('');
     document.getElementById('cardVentasPreview').classList.remove('hidden');
-    document.getElementById('actionVentas').style.display='flex';
+    document.getElementById('actionVentas').style.display = 'flex';
 }
 
 async function guardarVentas() {
     if (!ventasData.length) return alert("No hay datos.");
-    var btn=document.querySelector('#screenVentas .btn-save');
-    btn.disabled=true; btn.innerHTML="Guardando...";
-    var mes=document.getElementById('ventasMes').value||new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+    var btn = document.querySelector('#screenVentas .btn-save');
+    btn.disabled = true; btn.innerHTML = "Guardando...";
+    var mesEl = document.getElementById('ventasMes');
+    var mes = (mesEl && mesEl.value) ? mesEl.value : getMesActual();
     try {
-        await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',cache:'no-cache',headers:{'Content-Type':'application/json'},body:JSON.stringify({modo:'ventas',mes:mes,platos:ventasData})});
-        showSuccess("Ventas Guardadas","Ranking del mes registrado","💰");
-    } catch(err) { alert("Error de red."); btn.disabled=false; btn.innerHTML="Guardar Ventas en Sheets"; }
+        await fetch(URL_SCRIPT, {method:'POST', mode:'no-cors', cache:'no-cache', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'ventas', mes:mes, platos:ventasData})});
+        // CORRECCIÓN: no reload, solo éxito sin recarga
+        showSuccess("Ventas Guardadas", "Ranking del mes registrado", "💰", false);
+        btn.disabled = false; btn.innerHTML = "Guardar Ventas en Sheets";
+    } catch(err) {
+        alert("Error de red.");
+        btn.disabled = false; btn.innerHTML = "Guardar Ventas en Sheets";
+    }
 }
 
 function cargarVentas() {
-    var lista=document.getElementById('listaVentas');
-    var mes=document.getElementById('ventasMes')?document.getElementById('ventasMes').value||new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'}):new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'});
-    fetch(URL_SCRIPT+"?accion=listarVentas&mes="+encodeURIComponent(mes)).then(function(r){ return r.json(); }).then(function(data){
-        var items=data.ventas||[];
-        if (!items.length) { lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin ventas registradas este mes.</div>'; return; }
-        lista.innerHTML='<table class="ventas-table"><thead><tr><th>#</th><th>Plato</th><th>Uds</th><th>Importe</th></tr></thead><tbody>'+items.map(function(v,i){ return '<tr><td><span class="ventas-rank'+(i<3?' top':'')+'">'+(i+1)+'</span></td><td>'+v.descripcion+'</td><td>'+v.unidades+'</td><td>'+v.importe+'</td></tr>'; }).join('')+'</tbody></table>';
-    }).catch(function(){ lista.innerHTML='<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>'; });
+    var lista = document.getElementById('listaVentas');
+    var mesEl = document.getElementById('ventasMes');
+    var mes = (mesEl && mesEl.value) ? mesEl.value : getMesActual();
+    fetch(URL_SCRIPT + "?accion=listarVentas&mes=" + encodeURIComponent(mes))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var items = data.ventas || [];
+            if (!items.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin ventas registradas este mes.</div>'; return; }
+            lista.innerHTML = '<table class="ventas-table"><thead><tr><th>#</th><th>Plato</th><th>Uds</th><th>Importe</th></tr></thead><tbody>' + items.map(function(v, i) { return '<tr><td><span class="ventas-rank' + (i < 3 ? ' top' : '') + '">' + (i + 1) + '</span></td><td>' + v.descripcion + '</td><td>' + v.unidades + '</td><td>' + v.importe + '</td></tr>'; }).join('') + '</tbody></table>';
+        })
+        .catch(function() { lista.innerHTML = '<div style="color:var(--muted);font-size:0.85em;text-align:center;padding:20px;">Sin conexion.</div>'; });
 }
 
-function showSuccess(titulo, sub, icon) {
-    document.getElementById('successIcon').innerHTML=icon||'✅';
-    document.getElementById('successText').innerHTML=titulo;
-    document.getElementById('successSub').textContent=sub;
+// ─── SUCCESS OVERLAY ──────────────────────────────────────────────────────────
+// CORRECCIÓN: parámetro reload (bool) para controlar si recarga la página o no
+function showSuccess(titulo, sub, icon, reload) {
+    document.getElementById('successIcon').innerHTML = icon || '✅';
+    document.getElementById('successText').innerHTML = titulo;
+    document.getElementById('successSub').textContent = sub;
     document.getElementById('successOverlay').classList.add('show');
-    if (navigator.vibrate) navigator.vibrate([100,80,200]);
-    setTimeout(function(){ document.getElementById('successOverlay').classList.remove('show'); location.reload(); },2800);
+    if (navigator.vibrate) navigator.vibrate([100, 80, 200]);
+    setTimeout(function() {
+        document.getElementById('successOverlay').classList.remove('show');
+        if (reload === true) location.reload();
+    }, 2800);
 }
 
+// ─── INIT ─────────────────────────────────────────────────────────────────────
 cargarProductos();
 </script>
 <script>
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/Control-cocina/sw.js')
-        .then(function(){ console.log('SW ok'); })
-        .catch(function(e){ console.log('SW err',e); });
+        .then(function() { console.log('SW ok'); })
+        .catch(function(e) { console.log('SW err', e); });
 }
 </script>
 </body>
