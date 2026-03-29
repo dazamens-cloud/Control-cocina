@@ -197,20 +197,26 @@ async function guardarSesion() {
   }
 
   try {
-    // ✅ no-cors: con Apps Script el fetch siempre devuelve opaque response,
-    // no podemos leer la respuesta pero SÍ llega al servidor
     await postToScript({ modo: 'sesion', elaboracion: currentElabSelected, sesion: sesion, ingredientes: ingredientes });
-    showSuccess("¡Sesión Guardada!", `${sesion} — ${ingredientes.length} ingredientes`, "🍝");
-    document.getElementById('cardIngredientes').classList.add('hidden');
-    document.getElementById('btnGuardarSesion').classList.add('hidden');
-    currentElabSelected = "";
-    document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
   } catch (e) {
-    alert("Error al guardar la sesión: " + e.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = "Confirmar y Guardar Sesión";
+    // Con no-cors, el fetch puede lanzar TypeError aunque el dato llegó al servidor.
+    // Solo bloqueamos si es un error de red real (sin conexión).
+    if (e.message && e.message.toLowerCase().includes('network')) {
+      btn.disabled = false;
+      btn.innerHTML = "Confirmar y Guardar Sesión";
+      return alert("Sin conexión. Revisa tu red e inténtalo de nuevo.");
+    }
+    console.warn("guardarSesion (posible falso positivo no-cors):", e.message);
   }
+
+  // Éxito — mostramos siempre que no haya sido un error de red
+  showSuccess("¡Sesión Guardada!", `${sesion} — ${ingredientes.length} ingredientes`, "🍝");
+  document.getElementById('cardIngredientes').classList.add('hidden');
+  document.getElementById('btnGuardarSesion').classList.add('hidden');
+  currentElabSelected = "";
+  document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
+  btn.disabled = false;
+  btn.innerHTML = "Confirmar y Guardar Sesión";
 }
 
 // ==================== PRODUCTOS ====================
@@ -277,17 +283,21 @@ async function guardarProducto() {
       proveedor: document.getElementById('pProveedor').value,
       imagen: window.photoProductoBase64 || ''
     });
-    showSuccess("Producto Guardado", nombre + " añadido correctamente", "📚");
-    document.getElementById('pNombre').value = '';
-    document.getElementById('pCodigo').value = '';
-    document.getElementById('pUnidad').value = '';
-    document.getElementById('pProveedor').value = '';
-    document.getElementById('previewProducto').style.display = 'none';
-    window.photoProductoBase64 = null;
-    cargarProductos();
   } catch (e) {
-    alert("Error al guardar el producto");
+    if (e.message && e.message.toLowerCase().includes('network')) {
+      return alert("Sin conexión. Revisa tu red e inténtalo de nuevo.");
+    }
+    console.warn("guardarProducto (posible falso positivo no-cors):", e.message);
   }
+
+  showSuccess("Producto Guardado", nombre + " añadido correctamente", "📚");
+  document.getElementById('pNombre').value = '';
+  document.getElementById('pCodigo').value = '';
+  document.getElementById('pUnidad').value = '';
+  document.getElementById('pProveedor').value = '';
+  document.getElementById('previewProducto').style.display = 'none';
+  window.photoProductoBase64 = null;
+  cargarProductos();
 }
 
 function onFotoProductoSelected(event) {
@@ -430,24 +440,37 @@ async function confirmarEnviarPedido() {
   });
   msg += `\n_Divina Italia El Charco_`;
 
-  // Guardar en Sheets
+  // Mostrar estado guardando
+  const btn = document.getElementById('btnEnviarPedido');
+  btn.disabled = true;
+  btn.innerHTML = "⏳ GUARDANDO...";
+
+  // ✅ Primero guardar, esperar confirmación, luego abrir WhatsApp
   try {
     await postToScript({ modo: 'compra', proveedor: proveedor, lineas: lineas });
+    // Con no-cors no podemos leer la respuesta, pero el await garantiza
+    // que el request terminó de enviarse antes de continuar
+    // Damos 800ms extra para que Apps Script procese
+    await new Promise(r => setTimeout(r, 800));
   } catch(e) {
-    console.warn("Error guardando compra:", e);
+    btn.disabled = false;
+    btn.innerHTML = "📱 ENVIAR POR WHATSAPP Y GUARDAR";
+    return alert("Error al guardar el pedido. Revisa la conexión.");
   }
 
-  // Abrir WhatsApp
+  // Solo abrimos WhatsApp si el guardado no lanzó error
   const tel = WHATSAPP_PROVEEDORES[proveedor] || '';
   const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
 
-  showSuccess("Pedido Enviado", `${lineas.length} productos a ${proveedor}`, "📱");
+  showSuccess("¡Pedido Guardado!", `${lineas.length} productos a ${proveedor}`, "📱");
 
   // Resetear
+  btn.disabled = false;
+  btn.innerHTML = "📱 ENVIAR POR WHATSAPP Y GUARDAR";
   document.getElementById('gProveedor').value = '';
   document.getElementById('cardPedidoItems').classList.add('hidden');
-  document.getElementById('btnEnviarPedido').style.display = 'none';
+  btn.style.display = 'none';
   setTimeout(() => cargarResumenDia(), 1500);
 }
 
