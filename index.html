@@ -14,8 +14,6 @@
 </head>
 <body>
 
-    <body>
-
     <!-- NAVEGACIÓN INFERIOR -->
     <nav class="nav">
         <div class="nav-item active" onclick="irA('screenHome')">🏠</div>
@@ -36,30 +34,14 @@
             </div>
         </div>
         <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:15px;">
-            <div class="stat-card" onclick="irA('screenCocina')">
-                <div style="font-size:1.5rem;margin-bottom:8px;">🍳</div>
-                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Cocina</div>
-                <div style="font-family:'Bebas Neue';font-size:1.4rem;">REGISTRO</div>
-            </div>
-            <div class="stat-card" onclick="irA('screenProductos')">
-                <div style="font-size:1.5rem;margin-bottom:8px;">📚</div>
-                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Productos</div>
-                <div style="font-family:'Bebas Neue';font-size:1.4rem;">BIBLIOTECA</div>
-            </div>
-            <div class="stat-card" onclick="irA('screenCompras')">
-                <div style="font-size:1.5rem;margin-bottom:8px;">🛒</div>
-                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Compras</div>
-                <div style="font-family:'Bebas Neue';font-size:1.4rem;">PEDIDOS</div>
-            </div>
-            <div class="stat-card" onclick="irA('screenDashboard')">
-                <div style="font-size:1.5rem;margin-bottom:8px;">📊</div>
-                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Resumen</div>
-                <div style="font-family:'Bebas Neue';font-size:1.4rem;">SEMANAL</div>
-            </div>
+            <div class="stat-card" onclick="irA('screenCocina')"><div style="font-size:1.5rem;margin-bottom:8px;">🍳</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Cocina</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">REGISTRO</div></div>
+            <div class="stat-card" onclick="irA('screenProductos')"><div style="font-size:1.5rem;margin-bottom:8px;">📚</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Productos</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">BIBLIOTECA</div></div>
+            <div class="stat-card" onclick="irA('screenCompras')"><div style="font-size:1.5rem;margin-bottom:8px;">🛒</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Compras</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">PEDIDOS</div></div>
+            <div class="stat-card" onclick="irA('screenDashboard')"><div style="font-size:1.5rem;margin-bottom:8px;">📊</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Resumen</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">SEMANAL</div></div>
         </div>
     </div>
 
-    <!-- COCINA - REGISTRO DE SESIONES -->
+    <!-- COCINA -->
     <div id="screenCocina" class="screen">
         <div class="section-header">
             <h2 class="section-title">Registro de Cocina</h2>
@@ -67,113 +49,96 @@
         </div>
         <div class="screen-content">
             <div class="card" id="cardElab">
-                <div class="card-header">
-                    <div class="card-icon">🍳</div>
-                    <div class="card-title">¿Qué estás preparando?</div>
-                </div>
-                <div class="grid-elab" id="listaElaboraciones">
-                    <!-- Se llena con JavaScript -->
-                </div>
+                <div class="card-header"><div class="card-icon">🍳</div><div class="card-title">¿Qué estás preparando?</div></div>
+                <div class="grid-elab" id="listaElaboraciones"></div>
             </div>
-
             <div class="card hidden" id="cardIngredientes">
-                <div class="card-header">
-                    <div class="card-icon">📋</div>
-                    <div class="card-title" id="tituloIngredientes">Ingredientes</div>
-                </div>
+                <div class="card-header"><div class="card-icon">📋</div><div class="card-title" id="tituloIngredientes">Ingredientes</div></div>
                 <div class="sesion-badge" id="sesionBadge"></div>
                 <div id="listaIngredientes"></div>
                 <button class="add-ingrediente-btn" onclick="anadirIngredienteExtra()">+ Añadir ingrediente extra</button>
             </div>
         </div>
-
         <div class="action-buttons">
-            <button class="btn-save hidden" id="btnGuardarSesion" onclick="guardarSesion()">
-                Confirmar y Guardar Sesión
-            </button>
+            <button class="btn-save hidden" id="btnGuardarSesion" onclick="guardarSesion()">Confirmar y Guardar Sesión</button>
         </div>
     </div>
 
-    <!-- MIS PRODUCTOS -->
+    <!-- PRODUCTOS -->
     <div id="screenProductos" class="screen">
-        <div class="section-header">
-            <h2 class="section-title">Mis Productos</h2>
-            <p style="color:var(--muted);font-size:0.8rem;">Biblioteca de ingredientes y proveedores</p>
-        </div>
+        <div class="section-header"><h2 class="section-title">Mis Productos</h2></div>
         <div class="screen-content">
+            <!-- Formulario nuevo producto -->
             <div class="card">
-                <div class="card-header">
-                    <div class="card-icon">➕</div>
-                    <div class="card-title">Añadir Nuevo Producto</div>
-                </div>
+                <div class="card-header"><div class="card-icon">➕</div><div class="card-title">Añadir Producto</div></div>
                 <div class="input-group"><label>Nombre *</label><input type="text" id="pNombre" placeholder="Ej: Harina napoletana"></div>
                 <div class="input-group"><label>Código de barras</label><input type="text" id="pCodigo" placeholder="Escanea o escribe"></div>
-                <div class="input-group"><label>Unidad por defecto</label><input type="text" id="pUnidad" placeholder="Ej: saco 25kg, kg, ud..."></div>
+                <div class="input-group"><label>Unidad por defecto</label><input type="text" id="pUnidad" placeholder="Ej: saco 25kg"></div>
                 <div class="input-group">
                     <label>Proveedor</label>
                     <select id="pProveedor">
                         <option value="">Seleccionar...</option>
-                        <option>Matteo Comit</option>
-                        <option>Tías Fruit</option>
-                        <option>Chacon</option>
-                        <option>ReyesyBouzon</option>
-                        <option>Canarymeat</option>
-                        <option>Pescasol</option>
-                        <option>Roper</option>
-                        <option>Ortidal</option>
-                        <option>Otro</option>
+                        <option>Matteo Comit</option><option>Tías Fruit</option><option>Chacon</option>
+                        <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
+                        <option>Roper</option><option>Ortidal</option><option>Otro</option>
                     </select>
                 </div>
                 <div class="input-group" style="margin-top:12px;">
-                    <button type="button" style="width:100%;padding:12px;background:linear-gradient(135deg,#2a4a3a,#1a3a2a);color:#6abf84;border:1px solid #2a5a3a;border-radius:10px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;cursor:pointer;font-size:13px;" onclick="document.getElementById('inputFotoProducto').click()">
-                        📸 SUBIR FOTO
-                    </button>
+                    <button type="button" style="width:100%;padding:12px;background:linear-gradient(135deg,#2a4a3a,#1a3a2a);color:#6abf84;border:1px solid #2a5a3a;border-radius:10px;font-family:'Bebas Neue';letter-spacing:2px;cursor:pointer;" onclick="document.getElementById('inputFotoProducto').click()">📸 SUBIR FOTO</button>
                     <input type="file" id="inputFotoProducto" accept="image/*" style="display:none" onchange="onFotoProductoSelected(event)">
                     <img id="previewProducto" style="width:100%;border-radius:10px;display:none;margin-top:10px;border:2px solid var(--gold-dim);max-height:200px;object-fit:cover;" alt="Foto">
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header">
-                    <div class="card-icon">📋</div>
-                    <div class="card-title">Biblioteca de Productos</div>
-                </div>
-                <input type="text" id="buscadorProductos" class="buscador-productos" placeholder="Buscar por nombre o proveedor..." oninput="filtrarProductos(this.value)">
-                <div id="listaProductos">
-                    <div style="color:var(--muted);font-size:0.85em;text-align:center;padding:40px;">Cargando...</div>
-                </div>
+                <div class="card-header"><div class="card-icon">📋</div><div class="card-title">Biblioteca</div></div>
+                <input type="text" id="buscadorProductos" class="buscador-productos" placeholder="Buscar..." oninput="filtrarProductos(this.value)">
+                <div id="listaProductos"><div style="color:var(--muted);text-align:center;padding:40px;">Cargando...</div></div>
             </div>
         </div>
-
         <div class="action-buttons">
             <button class="btn-save" onclick="guardarProducto()">Guardar en Biblioteca</button>
         </div>
     </div>
 
-    <!-- COMPRAS -->
+    <!-- COMPRAS (COMPLETA) -->
     <div id="screenCompras" class="screen">
-        <div class="section-header">
-            <h2 class="section-title">Compras del Mes</h2>
-            <p style="color:var(--muted);font-size:0.8rem;">Genera pedidos y envíalos por WhatsApp</p>
-        </div>
+        <div class="section-header"><h2 class="section-title">Compras del Mes</h2></div>
         <div class="screen-content">
             <div id="resumenDiaContainer"></div>
-            <!-- El resto de la pantalla de compras se puede añadir después si quieres -->
-            <div style="text-align:center; padding:40px; color:var(--muted);">
-                Pantalla de Compras en desarrollo...<br>
-                <small>Próximamente: selección por proveedor y envío WhatsApp</small>
+            <div class="card">
+                <div class="card-header"><div class="card-icon">📤</div><div class="card-title">Generar Pedido</div></div>
+                <div class="input-group">
+                    <label>Proveedor</label>
+                    <select id="gProveedor" onchange="cargarProductosProveedor()">
+                        <option value="">Seleccionar proveedor...</option>
+                        <option>Matteo Comit</option><option>Tías Fruit</option><option>Chacon</option>
+                        <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
+                        <option>Roper</option><option>Ortidal</option><option>Otro</option>
+                    </select>
+                </div>
             </div>
+            <div class="card hidden" id="cardPedidoItems">
+                <div class="card-header"><div class="card-icon">🛒</div><div class="card-title">Selecciona y pon cantidad</div></div>
+                <div id="listaPedidoItems"></div>
+                <button type="button" style="margin-top:10px;width:100%;padding:10px;background:transparent;border:1px dashed var(--gold-dim);border-radius:8px;color:var(--gold-dim);" onclick="toggleFormNuevoProducto()">+ Añadir producto nuevo</button>
+            </div>
+        </div>
+        <div class="action-buttons">
+            <button class="btn-whatsapp" id="btnEnviarPedido" onclick="confirmarEnviarPedido()" style="display:none">📱 ENVIAR POR WHATSAPP Y GUARDAR</button>
         </div>
     </div>
 
-    <!-- DASHBOARD / RESUMEN -->
+    <!-- DASHBOARD MEJORADO -->
     <div id="screenDashboard" class="screen">
-        <div class="section-header">
-            <h2 class="section-title">Resumen Semanal</h2>
-        </div>
+        <div class="section-header"><h2 class="section-title">Resumen Semanal</h2></div>
         <div class="screen-content">
+            <div class="dash-semana-selector">
+                <button class="dash-semana-btn active" onclick="cargarDashboard()">Esta semana</button>
+                <button class="dash-semana-btn" onclick="cargarDashboardMes()">Este mes</button>
+            </div>
             <div id="dashContent">
-                <div style="color:var(--muted);font-size:0.85em;text-align:center;padding:40px;">Cargando resumen...</div>
+                <div style="color:var(--muted);text-align:center;padding:40px;">Cargando resumen...</div>
             </div>
         </div>
     </div>
@@ -191,6 +156,11 @@
     <input type="file" id="inputIngredienteFotoGal" accept="image/*" style="display:none" onchange="procesarFotoIngrediente(event)">
     <input type="file" id="inputIngredienteFotoCam" accept="image/*" capture="environment" style="display:none" onchange="procesarFotoIngrediente(event)">
 
-</body>
+    <script src="script.js"></script>
+    <script>
+        if('serviceWorker' in navigator){
+            navigator.serviceWorker.register('/Control-cocina/sw.js').catch(err => console.log("SW error", err));
+        }
+    </script>
 </body>
 </html>
