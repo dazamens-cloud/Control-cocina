@@ -646,3 +646,51 @@ function comprimirImagen(base64, maxW = 800, quality = 0.7) {
     img.src = base64;
   });
 }
+// --- GESTIÓN DE COLA OFFLINE ---
+
+/**
+ * Guarda una petición fallida en el almacenamiento local
+ */
+function guardarEnCola(datos) {
+    let cola = JSON.parse(localStorage.getItem('cola_registros') || "[]");
+    cola.push({
+        id: Date.now(),
+        cuerpo: datos
+    });
+    localStorage.setItem('cola_registros', JSON.stringify(cola));
+    console.warn("⚠️ Sin conexión. Registro guardado localmente.");
+}
+
+/**
+ * Intenta enviar lo que hay en la cola cuando vuelve el internet
+ */
+async function procesarColaPendiente() {
+    if (!navigator.onLine) return;
+    
+    let cola = JSON.parse(localStorage.getItem('cola_registros') || "[]");
+    if (cola.length === 0) return;
+
+    console.log("🔄 Procesando registros pendientes...");
+    
+    for (let i = 0; i < cola.length; i++) {
+        const item = cola[i];
+        try {
+            // Reutilizamos la lógica de fetch
+            await fetch(URL_SCRIPT, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(item.cuerpo)
+            });
+            // Si tiene éxito (o no da error de red), lo quitamos de la cola
+            cola.splice(i, 1);
+            i--; 
+        } catch (e) {
+            console.error("Fallo reintento:", e);
+            break; // Si sigue fallando, paramos
+        }
+    }
+    localStorage.setItem('cola_registros', JSON.stringify(cola));
+}
+
+// Escuchar cuando el móvil recupera internet
+window.addEventListener('online', procesarColaPendiente);
