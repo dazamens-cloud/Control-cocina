@@ -4,15 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Divina Italia El Charco</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#c9a96e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
-    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,16 +22,61 @@
     </nav>
 
     <div id="screenHome" class="screen active">
+        <div class="hero">
+            <div class="hero-content">
+                <h1 style="font-family:'Playfair Display';font-style:italic;font-weight:400;font-size:1.2rem;margin-bottom:0.3rem;">Benvenuti a</h1>
+                <h2 style="font-family:'Bebas Neue';font-size:3.5rem;letter-spacing:2px;line-height:1;">DIVINA ITALIA</h2>
+                <div style="width:40px;height:2px;background:var(--gold);margin:1rem auto;"></div>
+                <p style="font-size:0.8rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;">El Charco · Control</p>
+            </div>
         </div>
+        <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+            <div class="stat-card" onclick="irA('cocina')">
+                <div style="font-size:1.5rem;margin-bottom:8px;">🍳</div>
+                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Cocina</div>
+                <div style="font-family:'Bebas Neue';font-size:1.4rem;">GESTIÓN</div>
+            </div>
+            <div class="stat-card" onclick="irA('ventas')">
+                <div style="font-size:1.5rem;margin-bottom:8px;">📈</div>
+                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Ventas</div>
+                <div style="font-family:'Bebas Neue';font-size:1.4rem;">RANKING</div>
+            </div>
+        </div>
+    </div>
 
     <div id="screenCocina" class="screen">
+        <div class="section-header">
+            <h2 class="section-title">Control de Cocina</h2>
+            <p style="color:var(--muted);font-size:0.8rem;">Activa o desactiva platos en tiempo real</p>
         </div>
+        <div id="listaProductos" class="grid-productos">
+            <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Cargando cocina...</div>
+        </div>
+    </div>
 
     <div id="screenVentas" class="screen">
+        <div class="section-header">
+            <h2 class="section-title">Ranking Mensual</h2>
+            <p style="color:var(--muted);font-size:0.8rem;">Productos más vendidos este mes</p>
         </div>
+        <div id="listaVentas" style="padding:0 15px;">
+            <div style="text-align:center;padding:40px;color:var(--muted);">Consultando datos...</div>
+        </div>
+    </div>
 
     <div id="screenAdmin" class="screen">
+        <div class="section-header">
+            <h2 class="section-title">Administración</h2>
+            <p style="color:var(--muted);font-size:0.8rem;">Configuración del sistema</p>
         </div>
+        <div style="padding:0 20px;">
+            <div class="card" style="padding:20px;">
+                <h3 style="font-family:'Bebas Neue';margin-bottom:15px;color:var(--gold);">Sesión</h3>
+                <input type="password" id="adminPass" placeholder="Contraseña Admin" style="width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border);color:white;border-radius:8px;margin-bottom:15px;">
+                <button onclick="guardarSesion()" class="btn-gold" style="width:100%;padding:12px;border-radius:8px;border:none;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;">Acceder</button>
+            </div>
+        </div>
+    </div>
 
     <div id="successOverlay" class="success-overlay">
         <div class="success-card">
@@ -47,8 +89,7 @@
     <script src="script.js"></script>
     <script>
         if('serviceWorker' in navigator){
-            navigator.serviceWorker.register('/Control-cocina/sw.js')
-            .catch(err => console.log("Error al registrar SW:", err));
+            navigator.serviceWorker.register('/Control-cocina/sw.js').catch(err => console.log("SW error", err));
         }
     </script>
 </body>
