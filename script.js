@@ -1,5 +1,9 @@
+// 1. TU URL DE GOOGLE APPS SCRIPT
+const API_URL = "https://script.google.com/macros/s/AKfycbycmJ-p4oWV1w8JNlO4h0x2Yxn8snbtGx-fdHeIUBEFPhMmau-Qjdyqi7MijnbTg5uFjA/exec";
+
 let currentScreen = 'home';
 
+// 2. NAVEGACIÓN
 function irA(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen' + screenId.charAt(0).toUpperCase() + screenId.slice(1)).classList.add('active');
@@ -11,54 +15,52 @@ function irA(screenId) {
     currentScreen = screenId;
     window.scrollTo(0,0);
     if(screenId === 'ventas') cargarVentas();
+    if(screenId === 'cocina') cargarProductos();
 }
 
-function guardarSesion() {
-    const pass = document.getElementById('adminPass').value;
-    localStorage.setItem('divina_admin_pass', pass);
-    showSuccess('Sesión Guardada', 'Contraseña configurada correctamente', '🔐');
-}
-
+// 3. CARGAR PRODUCTOS (COCINA)
 function cargarProductos() {
     const lista = document.getElementById('listaProductos');
-    // Simulación de carga (aquí iría tu fetch real)
-    fetch('https://script.google.com/macros/s/AKfycbycmJ-p4oWV1w8JNlO4h0x2Yxn8snbtGx-fdHeIUBEFPhMmau-Qjdyqi7MijnbTg5uFjA/exec')
+    lista.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Cargando cocina...</div>';
+
+    fetch(`${API_URL}?accion=listarProductos`)
     .then(res => res.json())
     .then(data => {
-        lista.innerHTML = data.map(p => `
-            <div class="card-prod ${p.disponible ? '' : 'off'}" onclick="toggleProducto('${p.id}', ${p.disponible})">
+        const productos = data.productos || [];
+        if(productos.length === 0) {
+            lista.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">No hay productos en la base de datos.</div>';
+            return;
+        }
+        lista.innerHTML = productos.map(p => `
+            <div class="card-prod" onclick="showSuccess('${p.nombre}', 'Producto seleccionado', '📦')">
                 <div class="card-img-container">
-                    <img src="${p.imagen || 'https://via.placeholder.com/150'}" class="card-img">
+                    <img src="${p.foto || 'icons/icon-192.png'}" class="card-img">
                 </div>
                 <div class="card-info">
                     <div class="card-name">${p.nombre}</div>
+                    <div style="font-size:0.7rem; color:var(--gold);">${p.proveedor || ''}</div>
                 </div>
             </div>
         `).join('');
-    }).catch(() => {
-        lista.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Sin conexión con el servidor.</div>';
+    })
+    .catch(err => {
+        lista.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Error de conexión.</div>';
     });
 }
 
-function toggleProducto(id, estadoActual) {
-    const pass = localStorage.getItem('divina_admin_pass');
-    if(!pass) { alert('Configura la contraseña en Admin primero'); irA('admin'); return; }
-    
-    // Aquí iría tu fetch para cambiar el estado
-    showSuccess('Actualizando...', 'Cambiando disponibilidad', '⏳');
-    // Simulación de éxito
-    setTimeout(() => {
-        showSuccess(estadoActual ? 'Agotado' : 'Disponible', 'Estado actualizado', estadoActual ? '❌' : '✅', true);
-    }, 1000);
-}
-
+// 4. CARGAR VENTAS
 function cargarVentas() {
     const lista = document.getElementById('listaVentas');
-    fetch('https://script.google.com/macros/s/AKfycbx_f8_90P6841EwR_IeA7tY8Rz77E7/exec?action=getVentas')
+    lista.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">Consultando ranking...</div>';
+    
+    const mesActual = "marzo 2026"; // Esto podrías automatizarlo
+
+    fetch(`${API_URL}?accion=listarVentas&mes=${encodeURIComponent(mesActual)}`)
     .then(res => res.json())
-    .then(items => {
+    .then(data => {
+        const items = data.ventas || [];
         if(!items.length){
-            lista.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Sin ventas registradas este mes.</div>';
+            lista.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Sin ventas este mes.</div>';
             return;
         }
         lista.innerHTML = '<table class="ventas-table"><thead><tr><th>#</th><th>Plato</th><th>Uds</th><th>Importe</th></tr></thead><tbody>' + 
@@ -70,22 +72,37 @@ function cargarVentas() {
                     <td>${v.importe}€</td>
                 </tr>
             `).join('') + '</tbody></table>';
-    }).catch(() => {
-        lista.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Error al cargar ventas.</div>';
+    })
+    .catch(() => {
+        lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Error al cargar ventas.</div>';
     });
 }
 
+// 5. SESIÓN ADMIN
+function guardarSesion() {
+    const pass = document.getElementById('adminPass').value;
+    if(!pass) return;
+    localStorage.setItem('divina_admin_pass', pass);
+    showSuccess('Sesión Guardada', 'Contraseña configurada', '🔐');
+}
+
+// 6. FEEDBACK VISUAL
 function showSuccess(titulo, sub, icon, reload) {
+    const overlay = document.getElementById('successOverlay');
     document.getElementById('successIcon').innerHTML = icon || '✅';
     document.getElementById('successText').innerHTML = titulo;
     document.getElementById('successSub').textContent = sub;
-    document.getElementById('successOverlay').classList.add('show');
+    overlay.classList.add('show');
+    
     if (navigator.vibrate) navigator.vibrate([100, 80, 200]);
+    
     setTimeout(() => {
-        document.getElementById('successOverlay').classList.remove('show');
+        overlay.classList.remove('show');
         if (reload) location.reload();
-    }, 2800);
+    }, 2500);
 }
 
-// Inicializar
-document.addEventListener('DOMContentLoaded', cargarProductos);
+// INICIALIZACIÓN
+document.addEventListener('DOMContentLoaded', () => {
+    // Si quieres que cargue algo al inicio
+});
