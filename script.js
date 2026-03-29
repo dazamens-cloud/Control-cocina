@@ -593,22 +593,26 @@ function cargarDashboardMes() {
 }
 
 // ==================== IMAGEN ====================
-function comprimirImagen(base64, maxW, quality) {
+function comprimirImagen(base64, maxW = 800, quality = 0.7) {
   return new Promise(resolve => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
       let w = img.width, h = img.height;
-      if (w > maxW) { h = h * maxW / w; w = maxW; }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      
+      if (w > maxW) {
+        h = h * maxW / w;
+        w = maxW;
+      }
+      
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      
+      // Retorna la imagen comprimida en formato JPEG (más ligero que PNG)
       resolve(canvas.toDataURL('image/jpeg', quality));
     };
     img.src = base64;
   });
 }
-
-// ==================== INICIALIZACIÓN ====================
-document.addEventListener('DOMContentLoaded', () => {
-  cargarProductos();
-});
