@@ -14,82 +14,14 @@
 </head>
 <body>
 
-    <nav class="nav">
-        <div class="nav-item active" onclick="irA('home')">🏠</div>
-        <div class="nav-item" onclick="irA('cocina')">🍳</div>
-        <div class="nav-item" onclick="irA('ventas')">📈</div>
-        <div class="nav-item" onclick="irA('admin')">⚙️</div>
-    </nav>
-
-    <div id="screenHome" class="screen active">
-        <div class="hero">
-            <div class="hero-content">
-                <h1 style="font-family:'Playfair Display';font-style:italic;font-weight:400;font-size:1.2rem;margin-bottom:0.3rem;">Benvenuti a</h1>
-                <h2 style="font-family:'Bebas Neue';font-size:3.5rem;letter-spacing:2px;line-height:1;">DIVINA ITALIA</h2>
-                <div style="width:40px;height:2px;background:var(--gold);margin:1rem auto;"></div>
-                <p style="font-size:0.8rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;">El Charco · Control</p>
-            </div>
-        </div>
-        <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:15px;">
-            <div class="stat-card" onclick="irA('cocina')">
-                <div style="font-size:1.5rem;margin-bottom:8px;">🍳</div>
-                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Cocina</div>
-                <div style="font-family:'Bebas Neue';font-size:1.4rem;">GESTIÓN</div>
-            </div>
-            <div class="stat-card" onclick="irA('ventas')">
-                <div style="font-size:1.5rem;margin-bottom:8px;">📈</div>
-                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Ventas</div>
-                <div style="font-family:'Bebas Neue';font-size:1.4rem;">RANKING</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="screenCocina" class="screen">
-        <div class="section-header">
-            <h2 class="section-title">Control de Cocina</h2>
-            <p style="color:var(--muted);font-size:0.8rem;">Activa o desactiva platos en tiempo real</p>
-        </div>
-        <div id="listaProductos" class="grid-productos">
-            <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Cargando cocina...</div>
-        </div>
-    </div>
-
-    <div id="screenVentas" class="screen">
-        <div class="section-header">
-            <h2 class="section-title">Ranking Mensual</h2>
-            <p style="color:var(--muted);font-size:0.8rem;">Productos más vendidos este mes</p>
-        </div>
-        <div id="listaVentas" style="padding:0 15px;">
-            <div style="text-align:center;padding:40px;color:var(--muted);">Consultando datos...</div>
-        </div>
-    </div>
-
-    <div id="screenAdmin" class="screen">
-        <div class="section-header">
-            <h2 class="section-title">Administración</h2>
-            <p style="color:var(--muted);font-size:0.8rem;">Configuración del sistema</p>
-        </div>
-        <div style="padding:0 20px;">
-            <div class="card" style="padding:20px;">
-                <h3 style="font-family:'Bebas Neue';margin-bottom:15px;color:var(--gold);">Sesión</h3>
-                <input type="password" id="adminPass" placeholder="Contraseña Admin" style="width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border);color:white;border-radius:8px;margin-bottom:15px;">
-                <button onclick="guardarSesion()" class="btn-gold" style="width:100%;padding:12px;border-radius:8px;border:none;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;">Acceder</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="successOverlay" class="success-overlay">
-        <div class="success-card">
-            <div id="successIcon" style="font-size:3rem;margin-bottom:1rem;"></div>
-            <h2 id="successText" style="font-family:'Bebas Neue';letter-spacing:1px;margin-bottom:0.5rem;"></h2>
-            <p id="successSub" style="color:var(--muted);font-size:0.9rem;"></p>
-        </div>
-    </div>
+    <!-- Aquí irán todas las pantallas del nuevo diseño (las del index largo) -->
+    <!-- Las pegaremos en el siguiente paso -->
 
     <script src="script.js"></script>
     <script>
         if('serviceWorker' in navigator){
-            navigator.serviceWorker.register('/Control-cocina/sw.js').catch(err => console.log("SW error", err));
+            navigator.serviceWorker.register('/Control-cocina/sw.js')
+                .catch(err => console.log("SW error", err));
         }
     </script>
 </body>
