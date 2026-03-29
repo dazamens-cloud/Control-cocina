@@ -31,6 +31,19 @@ const RECETAS = {
   "Relleno Pescado": [{nombre:"Fogonero",cantidad:"1 caja"},{nombre:"Zanahoria",cantidad:"6 ud"},{nombre:"Cebolla",cantidad:"4 ud"},{nombre:"Tomate",cantidad:"6 ud"},{nombre:"Papas folio",cantidad:"6 ud"}]
 };
 
+// Números de WhatsApp por proveedor (formato internacional sin +)
+const WHATSAPP_PROVEEDORES = {
+  "Matteo Comit":   "34600000001",
+  "Tías Fruit":     "34600000002",
+  "Chacon":         "34600000003",
+  "ReyesyBouzon":   "34600000004",
+  "Canarymeat":     "34600000005",
+  "Pescasol":       "34600000006",
+  "Roper":          "34600000007",
+  "Ortidal":        "34600000008",
+  "Otro":           ""
+};
+
 const EMOJI_MAP = {"ajo":"🧄","cebolla":"🧅","tomate":"🍅","champi":"🍄","carne":"🥩","pollo":"🍗","pescado":"🐟","queso":"🧀","pasta":"🍝","harina":"🌾","default":"📦"};
 
 function getEmoji(nombre) {
@@ -59,19 +72,32 @@ function showSuccess(titulo, sub, icon = "✅") {
 function irA(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const idx = ['screenHome','screenCocina','screenProductos','screenCompras','screenDashboard'].indexOf(screenId);
+  if (idx >= 0) document.querySelectorAll('.nav-item')[idx].classList.add('active');
 
   if (screenId === 'screenProductos') cargarProductos();
   if (screenId === 'screenCocina') cargarElaboraciones();
-  if (screenId === 'screenCompras') cargarResumenDia();
+  if (screenId === 'screenCompras') { cargarProductos(); cargarResumenDia(); }
   if (screenId === 'screenDashboard') cargarDashboard();
 
   window.scrollTo(0, 0);
 }
 
+// ✅ POST helper con no-cors (obligatorio para Apps Script desde dominio externo)
+function postToScript(payload) {
+  return fetch(URL_SCRIPT, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+}
+
 // ==================== COCINA ====================
 function cargarElaboraciones() {
   const container = document.getElementById('listaElaboraciones');
-  container.innerHTML = Object.keys(RECETAS).map(elab => 
+  container.innerHTML = Object.keys(RECETAS).map(elab =>
     `<button class="btn-elab" onclick="seleccionarElab('${elab}', this)">${elab}</button>`
   ).join('');
 }
@@ -171,16 +197,16 @@ async function guardarSesion() {
   }
 
   try {
-    await fetch(URL_SCRIPT, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({modo: 'sesion', elaboracion: currentElabSelected, sesion: sesion, ingredientes: ingredientes})
-    });
+    // ✅ no-cors: con Apps Script el fetch siempre devuelve opaque response,
+    // no podemos leer la respuesta pero SÍ llega al servidor
+    await postToScript({ modo: 'sesion', elaboracion: currentElabSelected, sesion: sesion, ingredientes: ingredientes });
     showSuccess("¡Sesión Guardada!", `${sesion} — ${ingredientes.length} ingredientes`, "🍝");
     document.getElementById('cardIngredientes').classList.add('hidden');
     document.getElementById('btnGuardarSesion').classList.add('hidden');
+    currentElabSelected = "";
+    document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
   } catch (e) {
-    alert("Error al guardar la sesión");
+    alert("Error al guardar la sesión: " + e.message);
   } finally {
     btn.disabled = false;
     btn.innerHTML = "Confirmar y Guardar Sesión";
@@ -190,19 +216,20 @@ async function guardarSesion() {
 // ==================== PRODUCTOS ====================
 async function cargarProductos() {
   const lista = document.getElementById('listaProductos');
-  lista.innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px;">Cargando...</div>';
+  if (lista) lista.innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px;">Cargando...</div>';
   try {
     const res = await fetch(URL_SCRIPT + "?accion=listarProductos");
     const data = await res.json();
     productosLibreria = (data.productos || []).filter(p => p.nombre);
     renderListaProductos();
   } catch (e) {
-    lista.innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px;">Error de conexión</div>';
+    if (lista) lista.innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px;">Error de conexión</div>';
   }
 }
 
 function renderListaProductos() {
   const lista = document.getElementById('listaProductos');
+  if (!lista) return;
   lista.innerHTML = productosLibreria.map(p => `
     <div class="producto-item">
       <div class="producto-item-top">
@@ -217,7 +244,7 @@ function renderListaProductos() {
 
 function filtrarProductos(texto) {
   const t = texto.toLowerCase().trim();
-  const filtrados = productosLibreria.filter(p => 
+  const filtrados = productosLibreria.filter(p =>
     p.nombre.toLowerCase().includes(t) || (p.proveedor && p.proveedor.toLowerCase().includes(t))
   );
   const lista = document.getElementById('listaProductos');
@@ -242,19 +269,21 @@ async function guardarProducto() {
   if (!nombre) return alert("El nombre es obligatorio.");
 
   try {
-    await fetch(URL_SCRIPT, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        modo: 'inventario',
-        producto: nombre,
-        codigo: document.getElementById('pCodigo').value.trim(),
-        unidad: document.getElementById('pUnidad').value.trim(),
-        proveedor: document.getElementById('pProveedor').value
-      })
+    await postToScript({
+      modo: 'inventario',
+      producto: nombre,
+      codigo: document.getElementById('pCodigo').value.trim(),
+      unidad: document.getElementById('pUnidad').value.trim(),
+      proveedor: document.getElementById('pProveedor').value,
+      imagen: window.photoProductoBase64 || ''
     });
     showSuccess("Producto Guardado", nombre + " añadido correctamente", "📚");
     document.getElementById('pNombre').value = '';
+    document.getElementById('pCodigo').value = '';
+    document.getElementById('pUnidad').value = '';
+    document.getElementById('pProveedor').value = '';
+    document.getElementById('previewProducto').style.display = 'none';
+    window.photoProductoBase64 = null;
     cargarProductos();
   } catch (e) {
     alert("Error al guardar el producto");
@@ -288,11 +317,26 @@ function cargarResumenDia() {
         c.innerHTML = '<div style="color:var(--muted);padding:20px;text-align:center;">No hay pedidos registrados hoy.</div>';
         return;
       }
-      let html = `<div class="resumen-dia"><div class="resumen-dia-titulo">📋 PEDIDO DE HOY</div>`;
+      // Agrupar por proveedor
+      const porProveedor = {};
       items.forEach(item => {
-        html += `<div class="resumen-dia-item"><div>${getEmoji(item.producto)} ${item.producto}<div class="resumen-dia-proveedor">${item.proveedor||''}</div></div><div class="resumen-dia-cant">${item.cantidad} ${item.unidad||''}</div></div>`;
+        const prov = item.proveedor || 'Sin proveedor';
+        if (!porProveedor[prov]) porProveedor[prov] = [];
+        porProveedor[prov].push(item);
       });
-      html += '</div>';
+
+      let html = '';
+      Object.entries(porProveedor).forEach(([prov, lineas]) => {
+        html += `<div class="resumen-dia">
+          <div class="resumen-dia-titulo">📋 PEDIDO HOY — ${prov}</div>`;
+        lineas.forEach(item => {
+          html += `<div class="resumen-dia-item">
+            <div>${getEmoji(item.producto)} ${item.producto}</div>
+            <div class="resumen-dia-cant">${item.cantidad} ${item.unidad || ''}</div>
+          </div>`;
+        });
+        html += '</div>';
+      });
       c.innerHTML = html;
     })
     .catch(() => c.innerHTML = '<div style="color:var(--muted);padding:20px;text-align:center;">Error al cargar pedidos</div>');
@@ -300,55 +344,154 @@ function cargarResumenDia() {
 
 function cargarProductosProveedor() {
   const proveedor = document.getElementById('gProveedor').value;
-  if (!proveedor) return;
-  document.getElementById('cardPedidoItems').classList.remove('hidden');
+  const btnEnviar = document.getElementById('btnEnviarPedido');
+  if (!proveedor) {
+    document.getElementById('cardPedidoItems').classList.add('hidden');
+    btnEnviar.style.display = 'none';
+    return;
+  }
 
   const filtrados = productosLibreria.filter(p => p.proveedor && p.proveedor.toLowerCase() === proveedor.toLowerCase());
+
+  if (!filtrados.length) {
+    document.getElementById('cardPedidoItems').classList.remove('hidden');
+    document.getElementById('listaPedidoItems').innerHTML = '<div style="color:var(--muted);padding:20px;text-align:center;">No hay productos de este proveedor en la biblioteca.</div>';
+    btnEnviar.style.display = 'none';
+    return;
+  }
+
   productosEnPedido = filtrados.map((p, i) => ({domId: 'pp-'+i, nombre: p.nombre, unidad: p.unidad || '', proveedor: p.proveedor}));
 
   const lista = document.getElementById('listaPedidoItems');
+  // ✅ Desmarcados por defecto, cantidad vacía — solo se incluyen los que el usuario rellene
   lista.innerHTML = productosEnPedido.map(p => `
     <div class="pedido-item">
-      <input type="checkbox" class="pedido-item-check" id="pcheck-${p.domId}" checked>
+      <div class="pedido-item-check" id="pcheck-${p.domId}" onclick="togglePedidoItem(this, '${p.domId}')"></div>
       <div class="pedido-item-nombre">${getEmoji(p.nombre)} ${p.nombre}</div>
-      <input type="number" class="pedido-item-cant" id="pcant-${p.domId}" value="1" min="1">
+      <input type="number" class="pedido-item-cant" id="pcant-${p.domId}" value="" min="0" placeholder="—" oninput="onCantidadChange('${p.domId}')">
       <div class="pedido-item-unidad">${p.unidad}</div>
     </div>`).join('');
+
+  document.getElementById('cardPedidoItems').classList.remove('hidden');
+  btnEnviar.style.display = 'none'; // se muestra cuando haya al menos 1 marcado
+}
+
+function togglePedidoItem(el, domId) {
+  el.classList.toggle('on');
+  // si se marca, poner foco en cantidad
+  if (el.classList.contains('on')) {
+    const cantInput = document.getElementById(`pcant-${domId}`);
+    cantInput.focus();
+  }
+  actualizarBtnEnviar();
+}
+
+function onCantidadChange(domId) {
+  const cant = document.getElementById(`pcant-${domId}`).value;
+  const check = document.getElementById(`pcheck-${domId}`);
+  // si escribe cantidad, marcar automáticamente
+  if (cant && parseFloat(cant) > 0) {
+    check.classList.add('on');
+  } else {
+    check.classList.remove('on');
+  }
+  actualizarBtnEnviar();
+}
+
+function actualizarBtnEnviar() {
+  const alguno = productosEnPedido.some(p => {
+    const check = document.getElementById(`pcheck-${p.domId}`);
+    return check && check.classList.contains('on');
+  });
+  document.getElementById('btnEnviarPedido').style.display = alguno ? 'block' : 'none';
 }
 
 async function confirmarEnviarPedido() {
-  // Lógica simplificada - puedes expandirla más si quieres
   const proveedor = document.getElementById('gProveedor').value;
   if (!proveedor) return alert("Selecciona un proveedor");
-  showSuccess("Pedido Enviado", "Funcionalidad completa en desarrollo", "📱");
+
+  // Recoger solo los marcados con cantidad
+  const lineas = [];
+  productosEnPedido.forEach(p => {
+    const check = document.getElementById(`pcheck-${p.domId}`);
+    const cant = document.getElementById(`pcant-${p.domId}`).value.trim();
+    if (check && check.classList.contains('on') && cant) {
+      lineas.push({ producto: p.nombre, cantidad: cant, unidad: p.unidad });
+    }
+  });
+
+  if (!lineas.length) return alert("Añade al menos un producto con cantidad.");
+
+  // Construir mensaje WhatsApp
+  const fecha = new Date().toLocaleDateString('es-ES');
+  let msg = `🍕 *PEDIDO DIVINA ITALIA — ${fecha}*\n\n`;
+  lineas.forEach(l => {
+    msg += `• ${l.producto}: *${l.cantidad}* ${l.unidad}\n`;
+  });
+  msg += `\n_Divina Italia El Charco_`;
+
+  // Guardar en Sheets
+  try {
+    await postToScript({ modo: 'compra', proveedor: proveedor, lineas: lineas });
+  } catch(e) {
+    console.warn("Error guardando compra:", e);
+  }
+
+  // Abrir WhatsApp
+  const tel = WHATSAPP_PROVEEDORES[proveedor] || '';
+  const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+
+  showSuccess("Pedido Enviado", `${lineas.length} productos a ${proveedor}`, "📱");
+
+  // Resetear
+  document.getElementById('gProveedor').value = '';
+  document.getElementById('cardPedidoItems').classList.add('hidden');
+  document.getElementById('btnEnviarPedido').style.display = 'none';
+  setTimeout(() => cargarResumenDia(), 1500);
 }
 
-// ==================== DASHBOARD MEJORADO ====================
+// ==================== DASHBOARD ====================
 function cargarDashboard() {
   const content = document.getElementById('dashContent');
   content.innerHTML = '<div style="color:var(--muted);text-align:center;padding:60px;">Cargando resumen semanal...</div>';
 
   Promise.all([
     fetch(URL_SCRIPT + "?accion=registrosSemana").then(r => r.json()),
-    fetch(URL_SCRIPT + "?accion=listarStock&semana=Semana actual").then(r => r.json()) // ajusta según tu Apps Script
+    fetch(URL_SCRIPT + "?accion=listarStock&semana=").then(r => r.json())
   ]).then(([sesionesData, stockData]) => {
-    let html = `
-      <div class="card">
-        <div class="dash-section-title">🍳 PRODUCCIÓN ESTA SEMANA</div>
-        ${(sesionesData.sesiones || []).map(s => `
-          <div class="dash-item">
-            <div class="dash-item-nombre">${getEmoji(s.elaboracion)} ${s.elaboracion}</div>
-            <div class="dash-item-valor">${s.fecha || ''}</div>
-          </div>`).join('')}
-      </div>
-      <div class="card">
-        <div class="dash-section-title">📦 STOCK ACTUAL</div>
-        ${(stockData.stock || []).map(s => `
-          <div class="dash-item">
-            <div class="dash-item-nombre">${getEmoji(s.elaboracion)} ${s.elaboracion}</div>
-            <div class="dash-item-valor">${s.cantidad} ${s.unidad}</div>
-          </div>`).join('')}
-      </div>`;
+    const sesiones = sesionesData.sesiones || [];
+    const stock = stockData.stock || [];
+
+    let html = `<div class="card">
+      <div class="dash-section-title">🍳 PRODUCCIÓN ESTA SEMANA</div>`;
+
+    if (!sesiones.length) {
+      html += '<div style="color:var(--muted);padding:12px 0;">Sin registros esta semana.</div>';
+    } else {
+      sesiones.forEach(s => {
+        html += `<div class="dash-item">
+          <div class="dash-item-nombre">${getEmoji(s.elaboracion)} ${s.elaboracion}</div>
+          <div class="dash-item-valor">${s.fecha || ''} · ${s.ingredientes ? s.ingredientes.length : 0} ing.</div>
+        </div>`;
+      });
+    }
+
+    html += `</div><div class="card">
+      <div class="dash-section-title">📦 STOCK ACTUAL</div>`;
+
+    if (!stock.length) {
+      html += '<div style="color:var(--muted);padding:12px 0;">Sin stock registrado.</div>';
+    } else {
+      stock.forEach(s => {
+        html += `<div class="dash-item">
+          <div class="dash-item-nombre">${getEmoji(s.elaboracion)} ${s.elaboracion}</div>
+          <div class="dash-item-valor">${s.cantidad} ${s.unidad}</div>
+        </div>`;
+      });
+    }
+    html += '</div>';
+
     content.innerHTML = html;
   }).catch(() => {
     content.innerHTML = '<div style="color:var(--muted);text-align:center;padding:60px;">Error al cargar el dashboard</div>';
@@ -358,10 +501,44 @@ function cargarDashboard() {
 function cargarDashboardMes() {
   const content = document.getElementById('dashContent');
   content.innerHTML = '<div style="color:var(--muted);text-align:center;padding:60px;">Cargando ventas del mes...</div>';
-  // Puedes expandir esta función más tarde con listarVentas
-  setTimeout(() => {
-    content.innerHTML = `<div class="card"><div class="dash-section-title">💰 VENTAS DEL MES</div><div style="padding:20px;color:var(--muted);">Funcionalidad de ventas en desarrollo</div></div>`;
-  }, 800);
+  const mes = new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+  fetch(URL_SCRIPT + `?accion=listarVentas&mes=${encodeURIComponent(mes)}`)
+    .then(r => r.json())
+    .then(data => {
+      const ventas = data.ventas || [];
+      let html = `<div class="card"><div class="dash-section-title">💰 VENTAS — ${mes.toUpperCase()}</div>`;
+      if (!ventas.length) {
+        html += '<div style="color:var(--muted);padding:12px 0;">Sin ventas registradas este mes.</div>';
+      } else {
+        ventas.forEach(v => {
+          html += `<div class="dash-item">
+            <div class="dash-item-nombre">${getEmoji(v.descripcion)} ${v.descripcion}</div>
+            <div class="dash-item-valor">${v.unidades} ud · ${v.importe}€</div>
+          </div>`;
+        });
+      }
+      html += '</div>';
+      content.innerHTML = html;
+    })
+    .catch(() => {
+      content.innerHTML = '<div style="color:var(--muted);text-align:center;padding:60px;">Error al cargar ventas</div>';
+    });
+}
+
+// ==================== IMAGEN ====================
+function comprimirImagen(base64, maxW, quality) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = h * maxW / w; w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = base64;
+  });
 }
 
 // ==================== INICIALIZACIÓN ====================
