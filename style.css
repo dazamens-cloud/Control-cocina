@@ -3,15 +3,16 @@
    ============================================= */
 
 :root {
-    --bg: #0f0a04;          /* Fondo negro profundo */
+    --bg: #0f0a04;          /* Negro profundo para el fondo */
     --surface: #1a1208;
     --surface2: #2a1f0a;
     --border: #5a4010;
     --gold: #c9a96e;        /* Dorado principal */
     --gold-dim: #8B6914;
     --cream: #e8d5b0;
-    --text: #e8d5b0;
+     --text: #e8d5b0;        /* Crema claro para el texto (legible) */
     --muted: #8e7d5d;
+   
     
     /* ACENTOS CANARIOS */
     --atlantico: #00567a;   /* Azul profundo del mar de las islas */
