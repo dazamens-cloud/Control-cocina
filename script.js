@@ -187,6 +187,29 @@ async function enviarDatosAlServidor(payload) {
         return false;
     }
 }
+function guardarRegistro() {
+    const btn = document.querySelector('.btn-save');
+    if(btn) btn.disabled = true;
+
+    const data = {
+        modo: "cocina",
+        producto: document.getElementById('prodNombre').innerText,
+        lote: document.getElementById('inputLote').value,
+        preparacion: currentElabSelected,
+        subTipo: document.getElementById('inputSubTipo').value,
+        cantidad: document.getElementById('inputCant').value,
+        codigoBarras: document.getElementById('inputBarras').value,
+        imagen: document.getElementById('previewFoto').src.includes('base64') ? document.getElementById('previewFoto').src : ""
+    };
+
+    // --- CAMBIO AQUÍ ---
+    enviarDatosAlServidor(data).then(success => {
+        if(success) {
+            showSuccess("REGISTRO GUARDADO", "El dato se ha enviado a la nube.");
+            resetFormCocina();
+        }
+    });
+}
 async function guardarSesion() {
   if (!currentElabSelected) return alert("Selecciona una elaboración.");
   const btn = document.getElementById('btnGuardarSesion');
