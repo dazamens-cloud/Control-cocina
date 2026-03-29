@@ -19,7 +19,15 @@
     --volcan: #2c2c2c;      /* Gris basalto volcánico */
     --arena: #f2e6d0;       /* Tono arena clara */
 }
-
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg); /* Asegura que el fondo sea oscuro */
+  color: var(--text);          /* Asegura que el texto sea claro */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
 /* Mejora en la barra de navegación */
 .nav {
     border-top: 2px solid var(--gold);
