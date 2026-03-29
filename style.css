@@ -13,4 +13,11 @@ body {
     padding-bottom: 80px;
 }
 
-/* ... PEGA AQUÍ TODO EL RESTO DE TU CSS ORIGINAL ... */
+/* ... Pega aquí el resto de tus estilos (nav, screen, cards, etc.) ... */
+
+.success-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: 0.3s; z-index: 9999;
+}
+.success-overlay.show { opacity: 1; pointer-events: auto; }
