@@ -3,6 +3,7 @@
 // =============================================
 
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxFwybPB0TY67DyJWYwN7Z5FpbtYa36R1UPVt7lsPwJTrC0gdpt3scbJRNNk2wvhRflXg/exec";
+const WEB_APP_TOKEN = "restdivinaitalia";
 
 let productosLibreria = [];
 let currentElabSelected = "";
@@ -166,6 +167,26 @@ function procesarFotoIngrediente(event) {
   event.target.value = '';
 }
 
+async function enviarDatosAlServidor(payload) {
+    // Inyectamos el token de seguridad en cada petición
+    payload.token = WEB_APP_TOKEN;
+
+    try {
+        const response = await fetch(URL_SCRIPT, {
+            method: 'POST',
+            mode: 'no-cors', // Mantenemos no-cors para evitar problemas de redirección de Google
+            body: JSON.stringify(payload)
+        });
+        
+        // Nota: con no-cors no podemos leer la respuesta JSON, 
+        // pero la petición llegará correctamente al script.
+        return true; 
+    } catch (error) {
+        console.error("Error en la comunicación:", error);
+        alert("Error de conexión. Revisa el WiFi de la cocina.");
+        return false;
+    }
+}
 async function guardarSesion() {
   if (!currentElabSelected) return alert("Selecciona una elaboración.");
   const btn = document.getElementById('btnGuardarSesion');
