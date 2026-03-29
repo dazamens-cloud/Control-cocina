@@ -23,22 +23,22 @@
     </nav>
 
     <!-- HOME -->
-    <div id="screenHome" class="screen active">
-        <div class="hero">
-            <div class="hero-content">
-                <h1 style="font-family:'Playfair Display';font-style:italic;font-weight:400;font-size:1.2rem;margin-bottom:0.3rem;">Benvenuti a</h1>
-                <h2 style="font-family:'Bebas Neue';font-size:3.5rem;letter-spacing:2px;line-height:1;">DIVINA ITALIA</h2>
-                <div style="width:40px;height:2px;background:var(--gold);margin:1rem auto;"></div>
-                <p style="font-size:0.8rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;">El Charco · Control</p>
-            </div>
+    <div class="hero">
+    <div class="hero-content">
+        <h1 style="font-family:'Playfair Display'; font-style:italic; font-weight:400; font-size:1.2rem; margin-bottom:0.3rem;">Benvenuti a</h1>
+        <h2 style="font-family:'Bebas Neue'; font-size:3.5rem; letter-spacing:2px; line-height:1; color:var(--gold);">DIVINA ITALIA</h2>
+        
+        <div style="display:flex; justify-content:center; gap:2px; margin:1rem auto; width:60px;">
+            <div style="width:20px; height:2px; background:#ffffff; opacity:0.8;"></div>
+            <div style="width:20px; height:2px; background:var(--atlantico);"></div>
+            <div style="width:20px; height:2px; background:var(--gold);"></div>
         </div>
-        <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:15px;">
-            <div class="stat-card" onclick="irA('screenCocina')"><div style="font-size:1.5rem;margin-bottom:8px;">🍳</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Cocina</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">REGISTRO</div></div>
-            <div class="stat-card" onclick="irA('screenProductos')"><div style="font-size:1.5rem;margin-bottom:8px;">📚</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Productos</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">BIBLIOTECA</div></div>
-            <div class="stat-card" onclick="irA('screenCompras')"><div style="font-size:1.5rem;margin-bottom:8px;">🛒</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Compras</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">PEDIDOS</div></div>
-            <div class="stat-card" onclick="irA('screenDashboard')"><div style="font-size:1.5rem;margin-bottom:8px;">📊</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Resumen</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">SEMANAL</div></div>
-        </div>
+        
+        <p style="font-size:0.75rem; letter-spacing:4px; color:var(--muted); text-transform:uppercase; font-weight:600;">
+            EL CHARCO <span style="color:var(--atlantico); mx-1">·</span> CANARIAS
+        </p>
     </div>
+</div>
 
     <!-- COCINA -->
     <div id="screenCocina" class="screen">
