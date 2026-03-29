@@ -14,7 +14,6 @@
 </head>
 <body>
 
-    <!-- NAVEGACIÓN INFERIOR -->
     <nav class="nav">
         <div class="nav-item active" onclick="irA('screenHome')">🏠</div>
         <div class="nav-item" onclick="irA('screenCocina')">🍳</div>
@@ -34,26 +33,10 @@
             </div>
         </div>
         <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:15px;">
-            <div class="stat-card" onclick="irA('screenCocina')">
-                <div style="font-size:1.5rem;margin-bottom:8px;">🍳</div>
-                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Cocina</div>
-                <div style="font-family:'Bebas Neue';font-size:1.4rem;">REGISTRO</div>
-            </div>
-            <div class="stat-card" onclick="irA('screenProductos')">
-                <div style="font-size:1.5rem;margin-bottom:8px;">📚</div>
-                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Productos</div>
-                <div style="font-family:'Bebas Neue';font-size:1.4rem;">BIBLIOTECA</div>
-            </div>
-            <div class="stat-card" onclick="irA('screenCompras')">
-                <div style="font-size:1.5rem;margin-bottom:8px;">🛒</div>
-                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Compras</div>
-                <div style="font-family:'Bebas Neue';font-size:1.4rem;">PEDIDOS</div>
-            </div>
-            <div class="stat-card" onclick="irA('screenDashboard')">
-                <div style="font-size:1.5rem;margin-bottom:8px;">📊</div>
-                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Resumen</div>
-                <div style="font-family:'Bebas Neue';font-size:1.4rem;">SEMANAL</div>
-            </div>
+            <div class="stat-card" onclick="irA('screenCocina')"><div style="font-size:1.5rem;margin-bottom:8px;">🍳</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Cocina</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">REGISTRO</div></div>
+            <div class="stat-card" onclick="irA('screenProductos')"><div style="font-size:1.5rem;margin-bottom:8px;">📚</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Productos</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">BIBLIOTECA</div></div>
+            <div class="stat-card" onclick="irA('screenCompras')"><div style="font-size:1.5rem;margin-bottom:8px;">🛒</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Compras</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">PEDIDOS</div></div>
+            <div class="stat-card" onclick="irA('screenDashboard')"><div style="font-size:1.5rem;margin-bottom:8px;">📊</div><div style="font-size:0.7rem;text-transform:uppercase;color:var(--muted);">Resumen</div><div style="font-family:'Bebas Neue';font-size:1.4rem;">SEMANAL</div></div>
         </div>
     </div>
 
@@ -104,10 +87,9 @@
                     <img id="previewProducto" style="width:100%;border-radius:10px;display:none;margin-top:10px;border:2px solid var(--gold-dim);max-height:200px;object-fit:cover;" alt="Foto">
                 </div>
             </div>
-
             <div class="card">
                 <div class="card-header"><div class="card-icon">📋</div><div class="card-title">Biblioteca</div></div>
-                <input type="text" id="buscadorProductos" class="buscador-productos" placeholder="Buscar..." oninput="filtrarProductos(this.value)">
+                <input type="text" id="buscadorProductos" class="buscador-productos" placeholder="Buscar por nombre..." oninput="filtrarProductos(this.value)">
                 <div id="listaProductos"><div style="color:var(--muted);text-align:center;padding:40px;">Cargando...</div></div>
             </div>
         </div>
@@ -143,7 +125,7 @@
         </div>
     </div>
 
-    <!-- DASHBOARD MEJORADO -->
+    <!-- DASHBOARD -->
     <div id="screenDashboard" class="screen">
         <div class="section-header"><h2 class="section-title">Resumen Semanal</h2></div>
         <div class="screen-content">
@@ -152,7 +134,7 @@
                 <button class="dash-semana-btn" onclick="cargarDashboardMes()">Este mes</button>
             </div>
             <div id="dashContent">
-                <div style="color:var(--muted);text-align:center;padding:60px;">Cargando resumen semanal...</div>
+                <div style="color:var(--muted);text-align:center;padding:60px;">Cargando resumen...</div>
             </div>
         </div>
     </div>
