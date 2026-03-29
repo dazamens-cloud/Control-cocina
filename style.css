@@ -1,0 +1,16 @@
+:root {
+    --bg:#0f0a04; --surface:#1a1208; --surface2:#2a1f0a;
+    --border:#5a4010; --gold:#c9a96e; --gold-dim:#8B6914;
+    --cream:#e8d5b0; --text:#e8d5b0; --muted:#8e7d5d;
+    --shadow:0 8px 30px rgba(0,0,0,0.7);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif; margin: 0;
+    overflow-x: hidden; user-select: none;
+    padding-bottom: 80px;
+}
+
+/* ... PEGA AQUÍ TODO EL RESTO DE TU CSS ORIGINAL ... */
