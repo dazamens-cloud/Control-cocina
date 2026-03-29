@@ -1,33 +1,38 @@
-const CACHE_NAME = 'divina-italia-v3';
+const CACHE_NAME = 'divina-italia-v4'; // Subimos versión
 const ASSETS = [
-  '/Control-cocina/',
-  '/Control-cocina/index.html',
-  '/Control-cocina/style.css',
-  '/Control-cocina/script.js',
-  '/Control-cocina/manifest.json'
+  './',
+  './index.html',
+  './style.css',
+  './script.js',
+  './manifest.json',
+  './icons/icon-192.png'
 ];
 
+// Instalación: Guardar archivos esenciales
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
-  self.skipWaiting(); // activa el nuevo SW inmediatamente
+  self.skipWaiting();
 });
 
+// Activación: Limpiar versiones viejas
 self.addEventListener('activate', e => {
-  // elimina cachés viejas
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
-    )
+    caches.keys().then(keys => Promise.all(
+      keys.map(k => { if(k !== CACHE_NAME) return caches.delete(k); })
+    ))
   );
-  self.clients.claim(); // toma control de todas las pestañas abiertas
 });
 
+// Estrategia: Cache First, luego Network (para que la app abra instantáneo)
 self.addEventListener('fetch', e => {
+  // Solo cacheamos peticiones GET (archivos), no los POST de datos
+  if (e.request.method !== 'GET') return;
+
   e.respondWith(
-    caches.match(e.request).then(res => res || fetch(e.request))
+    caches.match(e.request).then(response => {
+      return response || fetch(e.request);
+    })
   );
 });
