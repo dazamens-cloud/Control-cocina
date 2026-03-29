@@ -187,26 +187,56 @@ async function enviarDatosAlServidor(payload) {
         return false;
     }
 }
-function guardarRegistro() {
+async function guardarRegistro() {
     const btn = document.querySelector('.btn-save');
-    if(btn) btn.disabled = true;
+    const producto = document.getElementById('prodNombre').innerText;
+    const cantidad = document.getElementById('inputCant').value;
+
+    // VALIDACIÓN BÁSICA: No enviar si no hay producto o cantidad
+    if (!producto || producto === "Selecciona un producto" || !cantidad) {
+        alert("⚠️ Por favor, selecciona un producto y pon una cantidad.");
+        return;
+    }
+
+    if(btn) {
+        btn.disabled = true;
+        btn.innerText = "ENVIANDO...";
+    }
+
+    const fotoPreview = document.getElementById('previewFoto').src;
+    let imagenFinal = "";
+    
+    // Solo enviamos la imagen si realmente se tomó una foto nueva (base64)
+    if (fotoPreview.startsWith('data:image')) {
+        imagenFinal = await comprimirImagen(fotoPreview);
+    }
 
     const data = {
+        token: "restdivinaitalia", // Tu clave segura
         modo: "cocina",
-        producto: document.getElementById('prodNombre').innerText,
+        producto: producto,
         lote: document.getElementById('inputLote').value,
         preparacion: currentElabSelected,
         subTipo: document.getElementById('inputSubTipo').value,
-        cantidad: document.getElementById('inputCant').value,
+        cantidad: cantidad,
         codigoBarras: document.getElementById('inputBarras').value,
-        imagen: document.getElementById('previewFoto').src.includes('base64') ? document.getElementById('previewFoto').src : ""
+        imagen: imagenFinal
     };
 
-    // --- CAMBIO AQUÍ ---
-    enviarDatosAlServidor(data).then(success => {
-        if(success) {
-            showSuccess("REGISTRO GUARDADO", "El dato se ha enviado a la nube.");
-            resetFormCocina();
+    fetch(URL_SCRIPT, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(data)
+    }).then(() => {
+        showSuccess("REGISTRO GUARDADO", "Datos enviados a la nube.");
+        resetFormCocina();
+    }).catch(err => {
+        console.error(err);
+        alert("Error al conectar con el servidor.");
+    }).finally(() => {
+        if(btn) {
+            btn.disabled = false;
+            btn.innerText = "GUARDAR REGISTRO";
         }
     });
 }
