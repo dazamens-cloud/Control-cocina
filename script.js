@@ -168,23 +168,28 @@ function procesarFotoIngrediente(event) {
 }
 
 async function enviarDatosAlServidor(payload) {
-    // Inyectamos el token de seguridad en cada petición
-    payload.token = WEB_APP_TOKEN;
+    payload.token = "restdivinaitalia";
 
     try {
-        const response = await fetch(URL_SCRIPT, {
+        // navigator.onLine nos dice si el móvil cree que tiene red
+        if (!navigator.onLine) {
+            guardarEnCola(payload);
+            showSuccess("MODO OFFLINE", "Guardado en el móvil. Se enviará al conectar WiFi.");
+            return true;
+        }
+
+        await fetch(URL_SCRIPT, {
             method: 'POST',
-            mode: 'no-cors', // Mantenemos no-cors para evitar problemas de redirección de Google
+            mode: 'no-cors',
             body: JSON.stringify(payload)
         });
         
-        // Nota: con no-cors no podemos leer la respuesta JSON, 
-        // pero la petición llegará correctamente al script.
         return true; 
     } catch (error) {
-        console.error("Error en la comunicación:", error);
-        alert("Error de conexión. Revisa el WiFi de la cocina.");
-        return false;
+        // Si el fetch falla por red, guardamos en la cola
+        guardarEnCola(payload);
+        showSuccess("SIN CONEXIÓN", "Datos protegidos localmente.");
+        return true; 
     }
 }
 async function guardarRegistro() {
