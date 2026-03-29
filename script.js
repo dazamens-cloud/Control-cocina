@@ -22,7 +22,7 @@ function guardarSesion() {
 function cargarProductos() {
     const lista = document.getElementById('listaProductos');
     // Simulación de carga (aquí iría tu fetch real)
-    fetch('https://script.google.com/macros/s/AKfycbx_f8_90P6841EwR_IeA7tY8Rz77E7/exec?action=getProductos')
+    fetch('https://script.google.com/macros/s/AKfycbycmJ-p4oWV1w8JNlO4h0x2Yxn8snbtGx-fdHeIUBEFPhMmau-Qjdyqi7MijnbTg5uFjA/exec')
     .then(res => res.json())
     .then(data => {
         lista.innerHTML = data.map(p => `
