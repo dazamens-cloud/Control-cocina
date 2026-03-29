@@ -82,6 +82,7 @@
                     </select>
                 </div>
                 <div class="input-group" style="margin-top:12px;">
+                    <!-- ✅ Un solo input para foto de producto, aquí mismo donde se usa -->
                     <button type="button" style="width:100%;padding:12px;background:linear-gradient(135deg,#2a4a3a,#1a3a2a);color:#6abf84;border:1px solid #2a5a3a;border-radius:10px;font-family:'Bebas Neue';letter-spacing:2px;cursor:pointer;" onclick="document.getElementById('inputFotoProducto').click()">📸 SUBIR FOTO</button>
                     <input type="file" id="inputFotoProducto" accept="image/*" style="display:none" onchange="onFotoProductoSelected(event)">
                     <img id="previewProducto" style="width:100%;border-radius:10px;display:none;margin-top:10px;border:2px solid var(--gold-dim);max-height:200px;object-fit:cover;" alt="Foto">
@@ -148,10 +149,9 @@
         </div>
     </div>
 
-    <!-- INPUTS PARA FOTOS -->
+    <!-- INPUTS OCULTOS PARA FOTOS DE INGREDIENTES -->
     <input type="file" id="inputIngredienteFotoGal" accept="image/*" style="display:none" onchange="procesarFotoIngrediente(event)">
     <input type="file" id="inputIngredienteFotoCam" accept="image/*" capture="environment" style="display:none" onchange="procesarFotoIngrediente(event)">
-    <input type="file" id="inputFotoProducto" accept="image/*" style="display:none" onchange="onFotoProductoSelected(event)">
 
     <script src="script.js"></script>
     <script>
