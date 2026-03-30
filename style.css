@@ -41,7 +41,6 @@ html, body {
 
 .screen.active { display: flex; flex-direction: column; }
 
-/* ✅ Padding inferior reducido (ya no hay nav inferior) */
 .screen-content {
     padding: 20px 15px 40px; 
     display: flex;
@@ -49,7 +48,7 @@ html, body {
     gap: 15px;
 }
 
-/* ✅ CABECERA PEQUEÑA CON LOGO (Para volver) ───── */
+/* ── CABECERA PEQUEÑA CON LOGO (Para volver) ───── */
 .app-header {
     height: 70px;
     background: var(--surface2);
@@ -83,7 +82,7 @@ html, body {
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: url('https://www.transparenttextures.com/patterns/dark-matter.png'); /* Sutil textura volcánica */
+    background: url('https://www.transparenttextures.com/patterns/dark-matter.png');
     opacity: 0.3;
 }
 
@@ -95,7 +94,7 @@ html, body {
     filter: drop-shadow(0 8px 16px rgba(0,0,0,0.8));
 }
 
-/* ── GRID DE ACCESOS RÁPIDOS (AJUSTADO PARA 5) ── */
+/* ── GRID DE ACCESOS RÁPIDOS ── */
 .grid-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -103,7 +102,7 @@ html, body {
     padding: 20px 15px;
 }
 
-/* ✅ Hace que el quinto botón ocupe toda la anchura */
+/* Hace que el quinto botón ocupe toda la anchura */
 .grid-stats div:nth-child(5) {
     grid-column: span 2;
 }
@@ -119,7 +118,6 @@ html, body {
 }
 
 .stat-card:active { transform: scale(0.95); border-color: var(--gold); }
-
 .stat-icon { font-size: 2.2rem; margin-bottom: 10px; }
 .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
 .stat-desc { font-family: 'Bebas Neue'; font-size: 1.6rem; color: var(--gold); line-height: 1; margin-top: 5px; }
@@ -135,10 +133,8 @@ html, body {
     border-radius: 14px;
     padding: 18px;
     box-shadow: var(--shadow);
+    margin-bottom: 10px;
 }
-
-.input-group { margin-bottom: 15px; }
-.input-group label { display: block; color: var(--muted); font-size: 0.8rem; margin-bottom: 6px; text-transform: uppercase; }
 
 input, select, .buscador-productos {
     width: 100%;
@@ -148,10 +144,62 @@ input, select, .buscador-productos {
     padding: 16px !important;
     border-radius: 12px;
     font-size: 1rem;
+    margin-bottom: 10px;
 }
 
-/* ── BOTONES ────────────────────────────────── */
-/* ✅ Posicionamiento sticky ajustado */
+/* ── ELEMENTOS DE COCINA (NUEVO) ──────────────── */
+.grid-elab {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-elab {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 15px 10px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.btn-elab.selected {
+    background: var(--gold);
+    color: var(--bg);
+    font-weight: bold;
+}
+
+.ingrediente-row {
+    background: var(--surface2);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+}
+
+.ingrediente-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.ingrediente-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.ingrediente-fields input {
+    padding: 8px !important;
+    font-size: 0.8rem;
+    margin-bottom: 0;
+}
+
+/* ── BOTONES DE ACCIÓN ────────────────────────── */
 .action-buttons { position: sticky; bottom: 20px; padding: 0 15px; z-index: 999; }
 
 .btn-save, .btn-whatsapp {
@@ -167,15 +215,17 @@ input, select, .buscador-productos {
 }
 
 .btn-save { background: linear-gradient(135deg, var(--gold), var(--gold-dim)); color: var(--bg); }
-.btn-whatsapp { background: linear-gradient(135deg, #25d366, #128c7e); color: white; }
+.btn-save:disabled { opacity: 0.5; filter: grayscale(1); }
 
 /* ── OVERLAYS ───────────────────────────────── */
 .success-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
     opacity: 0; pointer-events: none; z-index: 11000; transition: 0.3s;
 }
 .success-overlay.show { opacity: 1; pointer-events: auto; }
+#successIcon { font-size: 4rem; margin-bottom: 10px; }
+#successText { font-family: 'Bebas Neue'; font-size: 2rem; color: var(--gold); }
 
 /* ── ANIMACIONES ───────────────────────────── */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
