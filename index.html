@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Divina Italia El Charco</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#c9a96e">
+    <meta name="theme-color" content="#0f0a04">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -63,15 +63,17 @@
         </div>
         <div class="screen-content">
             <div class="card">
-                <label>🍳 ¿Qué preparas?</label>
-                <div id="listaElaboraciones" class="grid-elab"></div> 
+                <label>🍳 Selecciona la preparación:</label>
+                <div id="listaElaboraciones" class="grid-elab">
+                    </div>
             </div>
 
-            <div id="listaIngredientes"></div>
+            <div id="listaIngredientes">
+                </div>
 
             <div class="action-buttons">
                 <button id="btnGuardarSesion" class="btn-save hidden" onclick="guardarSesion()">
-                    GUARDAR REGISTRO
+                    GUARDAR EN REGISTROS
                 </button>
             </div>
         </div>
@@ -81,12 +83,13 @@
         <div class="app-header">
             <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')">
         </div>
+        <div class="section-header">
+            <h2 class="section-title">PRODUCTOS</h2>
+        </div>
         <div class="screen-content">
-            <div class="section-header"><h2 class="section-title">Biblioteca</h2></div>
-            <div class="card">
-                <input type="text" id="buscadorProductos" placeholder="Buscar producto..." oninput="filtrarProductos(this.value)">
-                <div id="listaProductos"></div>
-            </div>
+            <input type="text" id="busquedaProd" placeholder="Buscar producto..." onkeyup="filtrarProductos()">
+            <div id="listaProductos">
+                </div>
         </div>
     </div>
 
@@ -94,37 +97,27 @@
         <div class="app-header">
             <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')">
         </div>
-        <div class="screen-content">
-            <div class="section-header"><h2 class="section-title">Stock Almacén</h2></div>
-            <div class="card"><p style="text-align:center; color:var(--muted);">Gestión de inventario próximamente...</p></div>
-        </div>
-    </div>
-
-    <div id="screenCompras" class="screen">
-        <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')">
+        <div class="section-header">
+            <h2 class="section-title">CONTROL STOCK</h2>
         </div>
         <div class="screen-content">
-            <div class="section-header"><h2 class="section-title">Pedidos</h2></div>
             <div class="card">
-                <select id="gProveedor" onchange="cargarProductosProveedor()">
-                    <option value="">Seleccionar Proveedor...</option>
-                    <option>Matteo Comit</option><option>Tías Fruit</option>
-                </select>
-            </div>
+                <p>Niveles actuales del almacén</p>
+                </div>
         </div>
     </div>
 
-    <div id="screenDashboard" class="screen">
-        <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')">
-        </div>
-        <div class="screen-content">
-            <div class="section-header"><h2 class="section-title">Resumen Semanal</h2></div>
-            <div id="dashContent"></div>
-        </div>
+    <div id="successOverlay" class="success-overlay">
+        <div id="successIcon">✅</div>
+        <h2 id="successText">¡GUARDADO!</h2>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Registrar Service Worker para modo Offline
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 </html>
