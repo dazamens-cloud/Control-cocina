@@ -57,11 +57,22 @@
         <div class="app-header">
             <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')">
         </div>
+        <div class="section-header">
+            <h2 class="section-title">REGISTRO DE COCINA</h2>
+            <p style="color: var(--muted)">Elabora y registra ingredientes</p>
+        </div>
         <div class="screen-content">
-            <div class="section-header"><h2 class="section-title">Registro de Cocina</h2></div>
-            <div class="card" id="cardElab">
-                <div class="card-header"><div class="card-icon">🍳</div><div class="card-title">¿Qué preparas?</div></div>
-                <div class="grid-elab" id="listaElaboraciones"></div>
+            <div class="card">
+                <label>🍳 ¿Qué preparas?</label>
+                <div id="listaElaboraciones" class="grid-elab"></div> 
+            </div>
+
+            <div id="listaIngredientes"></div>
+
+            <div class="action-buttons">
+                <button id="btnGuardarSesion" class="btn-save hidden" onclick="guardarSesion()">
+                    GUARDAR REGISTRO
+                </button>
             </div>
         </div>
     </div>
