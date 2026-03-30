@@ -9,82 +9,127 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <nav class="nav">
-        <div class="nav-item active" onclick="irA('screenHome')"><div>🏠</div><span>Inicio</span></div>
-        <div class="nav-item" onclick="irA('screenCocina')"><div>🍳</div><span>Cocina</span></div>
-        <div class="nav-item" onclick="irA('screenProductos')"><div>📚</div><span>Stock</span></div>
-        <div class="nav-item" onclick="irA('screenCompras')"><div>🛒</div><span>Pedidos</span></div>
-        <div class="nav-item" onclick="irA('screenDashboard')"><div>📊</div><span>Resumen</span></div>
-    </nav>
 
     <div id="screenHome" class="screen active">
         <div class="hero-canario">
             <div class="hero-overlay"></div>
             <img src="icons/logo-hero.png" alt="Divina Italia" class="logo-principal">
         </div>
+
         <div class="grid-stats">
             <div class="stat-card" onclick="irA('screenCocina')">
-                <div class="stat-icon">🍳</div><div class="stat-label">Cocina</div><div class="stat-desc">REGISTRO</div>
+                <div class="stat-icon">🍳</div>
+                <div class="stat-label">Cocina</div>
+                <div class="stat-desc">REGISTRO</div>
             </div>
+            
             <div class="stat-card" onclick="irA('screenProductos')">
-                <div class="stat-icon">📚</div><div class="stat-label">Productos</div><div class="stat-desc">BIBLIOTECA</div>
+                <div class="stat-icon">📚</div>
+                <div class="stat-label">Productos</div>
+                <div class="stat-desc">BIBLIOTECA</div>
             </div>
+            
+            <div class="stat-card" onclick="irA('screenStock')">
+                <div class="stat-icon">📦</div>
+                <div class="stat-label">Almacén</div>
+                <div class="stat-desc">STOCK</div>
+            </div>
+            
             <div class="stat-card" onclick="irA('screenCompras')">
-                <div class="stat-icon">🛒</div><div class="stat-label">Compras</div><div class="stat-desc">PEDIDOS</div>
+                <div class="stat-icon">🛒</div>
+                <div class="stat-label">Compras</div>
+                <div class="stat-desc">PEDIDOS</div>
             </div>
+            
             <div class="stat-card" onclick="irA('screenDashboard')">
-                <div class="stat-icon">📊</div><div class="stat-label">Resumen</div><div class="stat-desc">SEMANAL</div>
+                <div class="stat-icon">📊</div>
+                <div class="stat-label">Resumen</div>
+                <div class="stat-desc">SEMANAL</div>
             </div>
         </div>
     </div>
 
     <div id="screenCocina" class="screen">
-        <div class="section-header">
-            <h2 class="section-title">Registro de Cocina</h2>
-            <p style="color:var(--muted);font-size:0.8rem;">Elabora y registra ingredientes con fotos</p>
+        <div class="app-header">
+            <img src="icons/logo-hero.png" alt="Volver" class="logo-small" onclick="irA('screenHome')">
         </div>
+        
         <div class="screen-content">
+            <div class="section-header">
+                <h2 class="section-title">Registro de Cocina</h2>
+                <p style="color:var(--muted);font-size:0.8rem;">Elabora y registra ingredientes</p>
+            </div>
+            
             <div class="card" id="cardElab">
                 <div class="card-header"><div class="card-icon">🍳</div><div class="card-title">¿Qué preparas?</div></div>
                 <div class="grid-elab" id="listaElaboraciones"></div>
             </div>
-            <div class="card hidden" id="cardIngredientes">
-                <div class="card-header"><div class="card-icon">📋</div><div class="card-title" id="tituloIngredientes">Ingredientes</div></div>
-                <div id="listaIngredientes"></div>
-                <button class="add-ingrediente-btn" onclick="anadirIngredienteExtra()">+ Añadir extra</button>
+            
+            <div class="action-buttons">
+                <button class="btn-save hidden" id="btnGuardarSesion" onclick="guardarSesion()">Confirmar y Guardar</button>
             </div>
-        </div>
-        <div class="action-buttons">
-            <button class="btn-save hidden" id="btnGuardarSesion" onclick="guardarSesion()">Confirmar y Guardar</button>
         </div>
     </div>
 
     <div id="screenProductos" class="screen">
-        <div class="section-header"><h2 class="section-title">Mis Productos</h2></div>
+        <div class="app-header">
+            <img src="icons/logo-hero.png" alt="Volver" class="logo-small" onclick="irA('screenHome')">
+        </div>
+        
         <div class="screen-content">
+            <div class="section-header"><h2 class="section-title">Mis Productos</h2></div>
             <div class="card">
                 <div class="input-group"><label>Nombre</label><input type="text" id="pNombre"></div>
-                <div class="input-group"><label>Proveedor</label>
-                    <select id="pProveedor">
-                        <option value="">Seleccionar...</option>
-                        <option>Matteo Comit</option><option>Tías Fruit</option><option>Chacon</option>
-                        <option>ReyesyBouzon</option><option>Canarymeat</option><option>Pescasol</option>
-                        <option>Roper</option><option>Ortidal</option><option>Otro</option>
-                    </select>
-                </div>
-                <button class="btn-save" onclick="guardarProducto()">Guardar Producto</button>
+                <button class="btn-save" onclick="guardarProducto()">Guardar</button>
             </div>
+        </div>
+    </div>
+
+    <div id="screenStock" class="screen">
+        <div class="app-header">
+            <img src="icons/logo-hero.png" alt="Volver" class="logo-small" onclick="irA('screenHome')">
+        </div>
+        
+        <div class="screen-content">
+            <div class="section-header"><h2 class="section-title">Control de Stock</h2></div>
             <div class="card">
-                <input type="text" id="buscadorProductos" class="buscador-productos" placeholder="Buscar..." oninput="filtrarProductos(this.value)">
-                <div id="listaProductos"></div>
+                <div class="card-header"><div class="card-icon">📦</div><div class="card-title">Estado de Inventario</div></div>
+                <p style="text-align:center; color:var(--muted);">Aquí irá la lista de inventario.</p>
             </div>
         </div>
     </div>
 
     <div id="screenCompras" class="screen">
-        <div class="section-header"><h2 class="section-title">Pedidos</h2></div>
+        <div class="app-header">
+            <img src="icons/logo-hero.png" alt="Volver" class="logo-small" onclick="irA('screenHome')">
+        </div>
+        
+        <div class="screen-content">
+            <div class="section-header"><h2 class="section-title">Pedidos</h2></div>
+            <div class="card">
+                <select id="gProveedor" onchange="cargarProductosProveedor()">
+                    <option value="">Proveedor...</option>
+                    <option>Matteo Comit</option><option>Otro</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="screenDashboard" class="screen">
+        <div class="app-header">
+            <img src="icons/logo-hero.png" alt="Volver" class="logo-small" onclick="irA('screenHome')">
+        </div>
+        
+        <div class="section-header"><h2 class="section-title">Resumen</h2></div>
+        <div class="screen-content">
+            <div id="dashContent"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
