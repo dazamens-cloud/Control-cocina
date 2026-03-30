@@ -2,7 +2,7 @@
 // script.js COMPLETO - Divina Italia El Charco
 // =============================================
 
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxFwybPB0TY67DyJWYwN7Z5FpbtYa36R1UPVt7lsPwJTrC0gdpt3scbJRNNk2wvhRflXg/exec";
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbycmJ-p4oWV1w8JNlO4h0x2Yxn8snbtGx-fdHeIUBEFPhMmau-Qjdyqi7MijnbTg5uFjA/exec";
 const WEB_APP_TOKEN = "restdivinaitalia";
 
 let productosLibreria = [];
