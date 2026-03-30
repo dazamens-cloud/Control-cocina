@@ -55,27 +55,21 @@ function getEmoji(nombre) {
 
 // ── NAVEGACIÓN (CORREGIDA) ──────────────────
 function irA(screenId) {
-    console.log("Navegando a:", screenId);
-    
-    // Ocultar todas
     document.querySelectorAll('.screen').forEach(s => {
         s.classList.remove('active');
         s.style.display = 'none';
     });
 
-    // Mostrar destino
     const target = document.getElementById(screenId);
     if (target) {
         target.classList.add('active');
         target.style.display = 'flex';
         
-        // Cargas automáticas según pantalla
-        if (screenId === 'screenCocina') cargarElaboraciones();
-        if (screenId === 'screenProductos') cargarProductos();
-        if (screenId === 'screenStock') cargarStock(); // Nueva función
-        if (screenId === 'screenCompras') { cargarProductos(); cargarResumenDia(); }
-        if (screenId === 'screenDashboard') cargarDashboard();
-
+        // ESTA LÍNEA ES LA QUE CARGA TUS PREPARACIONES
+        if (screenId === 'screenCocina') {
+            cargarElaboraciones(); 
+        }
+        
         window.scrollTo(0, 0);
     }
 }
