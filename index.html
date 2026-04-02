@@ -4,58 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Divina Italia El Charco</title>
+
+    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f0a04">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Divina Italia">
+
+    <!-- SEO básico -->
+    <meta name="description" content="Sistema de cocina profesional - Divina Italia El Charco">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Iconos -->
     <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- ── PANTALLA HOME ─────────────────────── -->
     <div id="screenHome" class="screen active">
         <div class="hero-canario">
             <div class="hero-overlay"></div>
-            <img src="icons/logo-hero.png" alt="Divina Italia" class="logo-principal">
+            <img src="icons/logo-hero.png" alt="Divina Italia El Charco" class="logo-principal">
         </div>
 
         <div class="grid-stats">
-            <div class="stat-card" onclick="irA('screenCocina')">
-                <div class="stat-icon">&#x1F373;</div>
+            <div class="stat-card" onclick="irA('screenCocina')" role="button" aria-label="Ir a Cocina">
+                <div class="stat-icon">🍳</div>
                 <div class="stat-label">Cocina</div>
                 <div class="stat-desc">REGISTRO</div>
             </div>
-            
-            <div class="stat-card" onclick="irA('screenProductos')">
-                <div class="stat-icon">&#x1F4DA;</div>
+
+            <div class="stat-card" onclick="irA('screenProductos')" role="button" aria-label="Ir a Productos">
+                <div class="stat-icon">📚</div>
                 <div class="stat-label">Productos</div>
                 <div class="stat-desc">BIBLIOTECA</div>
             </div>
-            
-            <div class="stat-card" onclick="irA('screenStock')">
-                <div class="stat-icon">&#x1F4E6;</div>
+
+            <div class="stat-card" onclick="irA('screenStock')" role="button" aria-label="Ir a Almacén">
+                <div class="stat-icon">📦</div>
                 <div class="stat-label">Almacén</div>
                 <div class="stat-desc">STOCK</div>
             </div>
-            
-            <div class="stat-card" onclick="irA('screenCompras')">
-                <div class="stat-icon">&#x1F6D2;</div>
+
+            <div class="stat-card" onclick="irA('screenCompras')" role="button" aria-label="Ir a Compras">
+                <div class="stat-icon">🛒</div>
                 <div class="stat-label">Compras</div>
                 <div class="stat-desc">PEDIDOS</div>
             </div>
-            
-            <div class="stat-card" onclick="irA('screenDashboard')">
-                <div class="stat-icon">&#x1F4CA;</div>
+
+            <div class="stat-card" onclick="irA('screenDashboard')" role="button" aria-label="Ir a Resumen">
+                <div class="stat-icon">📊</div>
                 <div class="stat-label">Resumen</div>
                 <div class="stat-desc">SEMANAL</div>
             </div>
         </div>
     </div>
 
+    <!-- ── PANTALLA COCINA ───────────────────── -->
     <div id="screenCocina" class="screen">
         <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')" 
+                 alt="Volver al inicio" role="button" aria-label="Volver al inicio">
         </div>
         <div class="section-header">
             <h2 class="section-title">REGISTRO DE COCINA</h2>
@@ -64,59 +84,100 @@
         <div class="screen-content">
             <div class="card">
                 <label>🍳 Selecciona la preparación:</label>
-                <div id="listaElaboraciones" class="grid-elab">
-                    </div>
+                <div id="listaElaboraciones" class="grid-elab"></div>
             </div>
 
-            <div id="listaIngredientes">
-                </div>
+            <div id="listaIngredientes"></div>
 
             <div class="action-buttons">
-                <button id="btnGuardarSesion" class="btn-save hidden" onclick="guardarSesion()">
+                <button id="btnGuardarSesion" class="btn-save hidden" onclick="guardarSesion()" 
+                        aria-label="Guardar sesión en registros">
                     GUARDAR EN REGISTROS
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- ── PANTALLA PRODUCTOS ────────────────── -->
     <div id="screenProductos" class="screen">
         <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
+                 alt="Volver al inicio" role="button" aria-label="Volver al inicio">
         </div>
         <div class="section-header">
             <h2 class="section-title">PRODUCTOS</h2>
         </div>
         <div class="screen-content">
-            <input type="text" id="busquedaProd" placeholder="Buscar producto..." onkeyup="filtrarProductos()">
-            <div id="listaProductos">
-                </div>
+            <input type="search" id="busquedaProd" 
+                   placeholder="🔍 Buscar producto..." 
+                   onkeyup="filtrarProductos()"
+                   aria-label="Buscar producto">
+            <div id="listaProductos" aria-live="polite"></div>
         </div>
     </div>
 
+    <!-- ── PANTALLA STOCK ────────────────────── -->
     <div id="screenStock" class="screen">
         <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
+                 alt="Volver al inicio" role="button" aria-label="Volver al inicio">
         </div>
         <div class="section-header">
             <h2 class="section-title">CONTROL STOCK</h2>
         </div>
         <div class="screen-content">
-            <div class="card">
-                <p>Niveles actuales del almacén</p>
-                </div>
+            <div class="card" id="stockContainer">
+                <p style="color: var(--muted); text-align: center">Cargando niveles de stock...</p>
+            </div>
         </div>
     </div>
 
-    <div id="successOverlay" class="success-overlay">
+    <!-- ── PANTALLA COMPRAS ──────────────────── -->
+    <div id="screenCompras" class="screen">
+        <div class="app-header">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
+                 alt="Volver al inicio" role="button" aria-label="Volver al inicio">
+        </div>
+        <div class="section-header">
+            <h2 class="section-title">COMPRAS</h2>
+        </div>
+        <div class="screen-content">
+            <div class="card" id="resumenDiaContainer">
+                <p style="color: var(--muted); text-align: center">Cargando pedidos de hoy...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── PANTALLA DASHBOARD ────────────────── -->
+    <div id="screenDashboard" class="screen">
+        <div class="app-header">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
+                 alt="Volver al inicio" role="button" aria-label="Volver al inicio">
+        </div>
+        <div class="section-header">
+            <h2 class="section-title">RESUMEN SEMANAL</h2>
+        </div>
+        <div class="screen-content">
+            <div class="card" id="dashContent">
+                <p style="color: var(--muted); text-align: center">Cargando analíticas...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── OVERLAY DE ÉXITO ──────────────────── -->
+    <div id="successOverlay" class="success-overlay" role="alert" aria-live="assertive">
         <div id="successIcon">✅</div>
         <h2 id="successText">¡GUARDADO!</h2>
     </div>
 
+    <!-- ── SCRIPTS ───────────────────────────── -->
     <script src="script.js"></script>
     <script>
         // Registrar Service Worker para modo Offline
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('✅ Service Worker registrado'))
+                .catch(err => console.error('❌ Error registrando SW:', err));
         }
     </script>
 </body>
