@@ -13,6 +13,7 @@ let contadorIngredientesExtra = 100;
 let productosEnPedido = [];
 let ingredientesFotoTarget = -1;
 let cargandoProductos = false;
+let WHATSAPP_PROVEEDORES = {}; // ✅ Se carga dinámicamente desde el backend
 
 // ── CONSTANTES ──────────────────────────────
 const RECETAS = {
@@ -33,18 +34,6 @@ const RECETAS = {
   "Relleno Queso": [{nombre:"Gorgonzola",cantidad:"2 ud 2kg"},{nombre:"Mozzarella filante pizza",cantidad:"1.4kg"},{nombre:"Ricotta",cantidad:"20 ud 250gr"},{nombre:"Parmesano rallado",cantidad:"2kg"}],
   "Relleno Porcini": [{nombre:"Champiñones",cantidad:"1 caja"},{nombre:"Porcini seco",cantidad:"1 bolsa 200gr"},{nombre:"Rabo de buey",cantidad:"30gr"},{nombre:"Mantequilla",cantidad:"200gr"},{nombre:"Ricotta",cantidad:"3 ud 250gr"}],
   "Relleno Pescado": [{nombre:"Fogonero",cantidad:"1 caja"},{nombre:"Zanahoria",cantidad:"6 ud"},{nombre:"Cebolla",cantidad:"4 ud"},{nombre:"Tomate",cantidad:"6 ud"},{nombre:"Papas folio",cantidad:"6 ud"}]
-};
-
-const WHATSAPP_PROVEEDORES = {
-  "Matteo Comit": "34600000001",
-  "Tías Fruit": "34600000002",
-  "Chacon": "34600000003",
-  "ReyesyBouzon": "34600000004",
-  "Canarymeat": "34600000005",
-  "Pescasol": "34600000006",
-  "Roper": "34600000007",
-  "Ortidal": "34600000008",
-  "Otro": ""
 };
 
 const EMOJI_MAP = {
@@ -163,9 +152,33 @@ async function getFromScript(params = {}) {
     return await res.json();
   } catch (err) {
     console.error("Error en getFromScript:", err);
-    showError("Error al obtener datos del servidor.");
     return null;
   }
+}
+
+// ── PROVEEDORES ─────────────────────────────
+
+async function cargarProveedores() {
+  const data = await getFromScript({ accion: 'proveedores' });
+  if (data && data.proveedores) {
+    WHATSAPP_PROVEEDORES = data.proveedores;
+    console.log('✅ Proveedores cargados');
+  } else {
+    console.warn('⚠️ No se pudieron cargar los proveedores');
+  }
+}
+
+function enviarPedidoWhatsApp(proveedor, lineas) {
+  const numero = WHATSAPP_PROVEEDORES[proveedor];
+  if (!numero) {
+    showError(`No hay número de WhatsApp para ${proveedor}`);
+    return;
+  }
+  const mensaje = `🛒 *PEDIDO DIVINA ITALIA*\n\n${lineas.map(l => 
+    `• ${l.producto}: ${l.cantidad} ${l.unidad}`
+  ).join('\n')}\n\n_${new Date().toLocaleDateString('es-ES')}_`;
+  
+  window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 
 // ── COCINA ──────────────────────────────────
@@ -247,7 +260,7 @@ async function guardarSesion() {
 
   showSuccess("REGISTRADO", currentElabSelected, "🍳");
 
-  // ✅ Reset estado después de guardar
+  // ✅ Reset estado
   currentElabSelected = "";
   const listContainer = document.getElementById('listaIngredientes');
   if (listContainer) listContainer.innerHTML = '';
@@ -255,23 +268,4 @@ async function guardarSesion() {
     btn.disabled = false;
     btn.classList.add('hidden');
   }
-  document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
-
-  irA('screenHome');
-}
-
-// ── PRODUCTOS ───────────────────────────────
-
-async function cargarProductos() {
-  if (cargandoProductos) return;
-  cargandoProductos = true;
-
-  const lista = document.getElementById('listaProductos');
-  if (lista) lista.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando productos...</p>';
-
-  const data = await getFromScript({ accion: 'listarProductos' });
-
-  if (data && data.productos) {
-    productosLibreria = data.productos;
-    renderListaProductos();
-  } else {
+  document.querySelectorAll('.btn-elab').forEach(
