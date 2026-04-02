@@ -1,5 +1,5 @@
 /* =============================================
-   DIVINA ITALIA EL CHARCO — style.css (ULTRA-CLEAN V2)
+   DIVINA ITALIA EL CHARCO — style.css (ULTRA-CLEAN V3)
    ============================================= */
 
 :root {
@@ -17,12 +17,17 @@
 }
 
 /* ── BASE & RESET ──────────────────────────── */
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+    outline: none; 
+}
 
 html, body {
     background-color: var(--bg) !important;
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -37,9 +42,13 @@ html, body {
     width: 100%;
     background-color: var(--bg);
     animation: fadeIn 0.3s ease-out;
+    will-change: opacity, transform;
 }
 
-.screen.active { display: flex; flex-direction: column; }
+.screen.active { 
+    display: flex; 
+    flex-direction: column; 
+}
 
 .screen-content {
     padding: 20px 15px 40px; 
@@ -115,16 +124,47 @@ html, body {
     text-align: center;
     box-shadow: var(--shadow);
     transition: transform 0.2s;
+    cursor: pointer;
 }
 
-.stat-card:active { transform: scale(0.95); border-color: var(--gold); }
-.stat-icon { font-size: 2.2rem; margin-bottom: 10px; }
-.stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-.stat-desc { font-family: 'Bebas Neue'; font-size: 1.6rem; color: var(--gold); line-height: 1; margin-top: 5px; }
+.stat-card:active { 
+    transform: scale(0.95); 
+    border-color: var(--gold); 
+}
+
+.stat-icon { 
+    font-size: 2.2rem; 
+    margin-bottom: 10px; 
+}
+
+.stat-label { 
+    font-size: 0.7rem; 
+    color: var(--muted); 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+}
+
+.stat-desc { 
+    font-family: 'Bebas Neue'; 
+    font-size: 1.6rem; 
+    color: var(--gold); 
+    line-height: 1; 
+    margin-top: 5px; 
+}
 
 /* ── TARJETAS Y FORMULARIOS ─────────────────── */
-.section-header { padding: 40px 20px 10px; text-align: center; }
-.section-title { font-family: 'Bebas Neue'; font-size: 2.8rem; color: var(--gold); margin: 0; letter-spacing: 2px; }
+.section-header { 
+    padding: 40px 20px 10px; 
+    text-align: center; 
+}
+
+.section-title { 
+    font-family: 'Bebas Neue'; 
+    font-size: 2.8rem; 
+    color: var(--gold); 
+    margin: 0; 
+    letter-spacing: 2px; 
+}
 
 .card {
     background: var(--surface);
@@ -147,7 +187,14 @@ input, select, .buscador-productos {
     margin-bottom: 10px;
 }
 
-/* ── ELEMENTOS DE COCINA (NUEVO) ──────────────── */
+/* ✅ Focus visible para inputs */
+input:focus, select:focus {
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 8px rgba(201, 169, 110, 0.4);
+    outline: none;
+}
+
+/* ── ELEMENTOS DE COCINA ──────────────────── */
 .grid-elab {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -164,12 +211,24 @@ input, select, .buscador-productos {
     font-family: 'DM Sans', sans-serif;
     font-size: 0.9rem;
     cursor: pointer;
+    transition: transform 0.15s, background 0.2s;
+}
+
+.btn-elab:active {
+    transform: scale(0.96);
 }
 
 .btn-elab.selected {
     background: var(--gold);
     color: var(--bg);
     font-weight: bold;
+}
+
+/* ✅ Focus visible para botones */
+.btn-elab:focus-visible,
+.btn-save:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
 }
 
 .ingrediente-row {
@@ -200,7 +259,12 @@ input, select, .buscador-productos {
 }
 
 /* ── BOTONES DE ACCIÓN ────────────────────────── */
-.action-buttons { position: sticky; bottom: 20px; padding: 0 15px; z-index: 999; }
+.action-buttons { 
+    position: sticky; 
+    bottom: 20px; 
+    padding: 0 15px; 
+    z-index: 999; 
+}
 
 .btn-save, .btn-whatsapp {
     width: 100%;
@@ -212,22 +276,122 @@ input, select, .buscador-productos {
     border: none;
     cursor: pointer;
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    transition: transform 0.15s, opacity 0.2s;
 }
 
-.btn-save { background: linear-gradient(135deg, var(--gold), var(--gold-dim)); color: var(--bg); }
-.btn-save:disabled { opacity: 0.5; filter: grayscale(1); }
+.btn-save { 
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim)); 
+    color: var(--bg); 
+}
+
+.btn-save:active {
+    transform: scale(0.97);
+}
+
+/* ✅ Botón deshabilitado mejorado */
+.btn-save:disabled { 
+    opacity: 0.5; 
+    filter: grayscale(1); 
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.btn-whatsapp {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #fff;
+    margin-top: 10px;
+}
 
 /* ── OVERLAYS ───────────────────────────────── */
 .success-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none; z-index: 11000; transition: 0.3s;
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0,0,0,0.95);
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    opacity: 0; 
+    pointer-events: none; 
+    z-index: 11000; 
+    transition: opacity 0.3s;
 }
-.success-overlay.show { opacity: 1; pointer-events: auto; }
-#successIcon { font-size: 4rem; margin-bottom: 10px; }
-#successText { font-family: 'Bebas Neue'; font-size: 2rem; color: var(--gold); }
+
+.success-overlay.show { 
+    opacity: 1; 
+    pointer-events: auto; 
+}
+
+#successIcon { 
+    font-size: 4rem; 
+    margin-bottom: 10px; 
+    animation: bounceIn 0.4s ease-out;
+}
+
+#successText { 
+    font-family: 'Bebas Neue'; 
+    font-size: 2rem; 
+    color: var(--gold); 
+}
 
 /* ── ANIMACIONES ───────────────────────────── */
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(8px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
 
+@keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── RESPONSIVE ─────────────────────────────── */
+@media (max-width: 480px) {
+    .grid-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-stats div:nth-child(5) {
+        grid-column: span 1;
+    }
+
+    .section-title {
+        font-size: 2.2rem;
+    }
+
+    .grid-elab {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-desc {
+        font-size: 1.3rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .screen-content {
+        max-width: 600px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .grid-stats {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .section-header {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+
+/* ── UTILIDADES ─────────────────────────────── */
 .hidden { display: none !important; }
+
+.text-gold { color: var(--gold); }
+.text-muted { color: var(--muted); }
+.text-center { text-align: center; }
+.mt-10 { margin-top: 10px; }
+.mb-10 { margin-bottom: 10px; }
