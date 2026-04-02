@@ -12,7 +12,7 @@ let ingredientesFotos = {};
 let contadorIngredientesExtra = 100;
 let productosEnPedido = [];
 let ingredientesFotoTarget = -1;
-let cargandoProductos = false; // ✅ Flag para evitar cargas duplicadas
+let cargandoProductos = false;
 
 // ── CONSTANTES ──────────────────────────────
 const RECETAS = {
@@ -48,24 +48,14 @@ const WHATSAPP_PROVEEDORES = {
 };
 
 const EMOJI_MAP = {
-  "ajo": "🧄",
-  "cebolla": "🧅",
-  "tomate": "🍅",
-  "champi": "🍄",
-  "carne": "🥩",
-  "pollo": "🍗",
-  "pescado": "🐟",
-  "queso": "🧀",
-  "pasta": "🍝",
-  "harina": "🌾",
-  "default": "📦"
+  "ajo": "🧄", "cebolla": "🧅", "tomate": "🍅",
+  "champi": "🍄", "carne": "🥩", "pollo": "🍗",
+  "pescado": "🐟", "queso": "🧀", "pasta": "🍝",
+  "harina": "🌾", "default": "📦"
 };
 
 // ── UTILIDADES ──────────────────────────────
 
-/**
- * Devuelve un emoji según el nombre del ingrediente
- */
 function getEmoji(nombre) {
   if (!nombre) return "📦";
   const s = nombre.toLowerCase();
@@ -75,9 +65,6 @@ function getEmoji(nombre) {
   return EMOJI_MAP['default'];
 }
 
-/**
- * Genera un código de sesión con nombre de elaboración y fecha
- */
 function generarCodigoSesion(elab) {
   const now = new Date();
   const dia = String(now.getDate()).padStart(2, '0');
@@ -85,14 +72,10 @@ function generarCodigoSesion(elab) {
   return `${elab} — ${dia}${mes}`;
 }
 
-/**
- * Muestra overlay de éxito con icono, título y vibración
- */
 function showSuccess(titulo, sub = "", icon = "✅") {
   const iconEl = document.getElementById('successIcon');
   const titleEl = document.getElementById('successText');
   const overlay = document.getElementById('successOverlay');
-
   if (iconEl) iconEl.innerHTML = icon;
   if (titleEl) titleEl.innerHTML = titulo;
   if (overlay) {
@@ -102,9 +85,6 @@ function showSuccess(titulo, sub = "", icon = "✅") {
   if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
 }
 
-/**
- * Muestra un mensaje de error al usuario
- */
 function showError(mensaje) {
   console.error(mensaje);
   alert("❌ " + mensaje);
@@ -112,9 +92,6 @@ function showError(mensaje) {
 
 // ── NAVEGACIÓN ──────────────────────────────
 
-/**
- * Navega a una pantalla por su ID
- */
 function irA(screenId) {
   document.querySelectorAll('.screen').forEach(s => {
     s.classList.remove('active');
@@ -131,7 +108,6 @@ function irA(screenId) {
   target.style.display = 'flex';
   window.scrollTo(0, 0);
 
-  // ✅ Carga de datos según pantalla
   switch (screenId) {
     case 'screenCocina':
       cargarElaboraciones();
@@ -153,10 +129,6 @@ function irA(screenId) {
 
 // ── COMUNICACIÓN CON SERVER ─────────────────
 
-/**
- * Envía datos al backend con POST
- * Si no hay conexión, guarda en cola local
- */
 async function postToScript(payload) {
   payload.token = WEB_APP_TOKEN;
 
@@ -181,9 +153,6 @@ async function postToScript(payload) {
   }
 }
 
-/**
- * Hace una petición GET al backend con token
- */
 async function getFromScript(params = {}) {
   params.token = WEB_APP_TOKEN;
   const query = new URLSearchParams(params).toString();
@@ -201,9 +170,6 @@ async function getFromScript(params = {}) {
 
 // ── COCINA ──────────────────────────────────
 
-/**
- * Renderiza los botones de elaboraciones disponibles
- */
 function cargarElaboraciones() {
   const container = document.getElementById('listaElaboraciones');
   if (!container) return;
@@ -212,9 +178,6 @@ function cargarElaboraciones() {
   ).join('');
 }
 
-/**
- * Selecciona una elaboración y muestra sus ingredientes
- */
 function seleccionarElab(nombre, btnEl) {
   currentElabSelected = nombre;
   document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
@@ -232,9 +195,6 @@ function seleccionarElab(nombre, btnEl) {
   if (btnSave) btnSave.classList.remove('hidden');
 }
 
-/**
- * Genera el HTML de una fila de ingrediente
- */
 function renderIngredienteRow(nombre, cantidadDefault, i) {
   const nombreSeguro = nombre.replace(/"/g, '&quot;');
   return `
@@ -251,9 +211,6 @@ function renderIngredienteRow(nombre, cantidadDefault, i) {
     </div>`;
 }
 
-/**
- * Guarda la sesión de cocina en el backend
- */
 async function guardarSesion() {
   if (!currentElabSelected) {
     showError("Selecciona una elaboración antes de guardar.");
@@ -289,5 +246,32 @@ async function guardarSesion() {
   });
 
   showSuccess("REGISTRADO", currentElabSelected, "🍳");
-  
+
   // ✅ Reset estado después de guardar
+  currentElabSelected = "";
+  const listContainer = document.getElementById('listaIngredientes');
+  if (listContainer) listContainer.innerHTML = '';
+  if (btn) {
+    btn.disabled = false;
+    btn.classList.add('hidden');
+  }
+  document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
+
+  irA('screenHome');
+}
+
+// ── PRODUCTOS ───────────────────────────────
+
+async function cargarProductos() {
+  if (cargandoProductos) return;
+  cargandoProductos = true;
+
+  const lista = document.getElementById('listaProductos');
+  if (lista) lista.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando productos...</p>';
+
+  const data = await getFromScript({ accion: 'listarProductos' });
+
+  if (data && data.productos) {
+    productosLibreria = data.productos;
+    renderListaProductos();
+  } else {
