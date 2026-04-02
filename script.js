@@ -36,14 +36,14 @@ const RECETAS = {
 };
 
 const WHATSAPP_PROVEEDORES = {
-  "Matteo Comit": "34600000001",
-  "Tías Fruit": "34600000002",
-  "Chacon": "34600000003",
+  "Matteo Comit": "34661379351",
+  "Tías Fruit": "34686652946",
+  "Chacon": "34699978166",
   "ReyesyBouzon": "34600000004",
-  "Canarymeat": "34600000005",
-  "Pescasol": "34600000006",
-  "Roper": "34600000007",
-  "Ortidal": "34600000008",
+  "Canarymeat": "34689414910",
+  "Pescasol": "34661960711",
+  "Roper": "34686468113",
+  "Ortidal": "34633767226",
   "Otro": ""
 };
 
