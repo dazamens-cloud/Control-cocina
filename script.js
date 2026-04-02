@@ -5,13 +5,16 @@
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbycmJ-p4oWV1w8JNlO4h0x2Yxn8snbtGx-fdHeIUBEFPhMmau-Qjdyqi7MijnbTg5uFjA/exec";
 const WEB_APP_TOKEN = "restdivinaitalia";
 
+// ── ESTADO GLOBAL ───────────────────────────
 let productosLibreria = [];
 let currentElabSelected = "";
 let ingredientesFotos = {};
 let contadorIngredientesExtra = 100;
 let productosEnPedido = [];
 let ingredientesFotoTarget = -1;
+let cargandoProductos = false; // ✅ Flag para evitar cargas duplicadas
 
+// ── CONSTANTES ──────────────────────────────
 const RECETAS = {
   "Salsa Bolognese": [{nombre:"Carne molida vacuno",cantidad:"5kg"},{nombre:"Carne molida cerdo",cantidad:"5kg"},{nombre:"Chorizo criollo blanco",cantidad:"2kg"},{nombre:"Cebolla blanca",cantidad:"2kg"},{nombre:"Puerro",cantidad:"4 ud"},{nombre:"Zanahoria",cantidad:"6-8 ud"},{nombre:"Vino tinto",cantidad:"2lt"},{nombre:"Tomate triturado",cantidad:"1 lata"}],
   "Salsa Tomate": [{nombre:"Cebolla blanca",cantidad:"9 ud"},{nombre:"Zanahoria",cantidad:"10 ud"},{nombre:"Tomate para salsa",cantidad:"3kg"},{nombre:"Tomate triturado",cantidad:"4 latas"}],
@@ -44,37 +47,37 @@ const WHATSAPP_PROVEEDORES = {
   "Otro": ""
 };
 
-const EMOJI_MAP = {"ajo":"🧄","cebolla":"🧅","tomate":"🍅","champi":"🍄","carne":"🥩","pollo":"🍗","pescado":"🐟","queso":"🧀","pasta":"🍝","harina":"🌾","default":"📦"};
+const EMOJI_MAP = {
+  "ajo": "🧄",
+  "cebolla": "🧅",
+  "tomate": "🍅",
+  "champi": "🍄",
+  "carne": "🥩",
+  "pollo": "🍗",
+  "pescado": "🐟",
+  "queso": "🧀",
+  "pasta": "🍝",
+  "harina": "🌾",
+  "default": "📦"
+};
 
+// ── UTILIDADES ──────────────────────────────
+
+/**
+ * Devuelve un emoji según el nombre del ingrediente
+ */
 function getEmoji(nombre) {
   if (!nombre) return "📦";
   const s = nombre.toLowerCase();
-  for (let k in EMOJI_MAP) if (s.includes(k)) return EMOJI_MAP[k];
-  return "📦";
+  for (let k in EMOJI_MAP) {
+    if (k !== 'default' && s.includes(k)) return EMOJI_MAP[k];
+  }
+  return EMOJI_MAP['default'];
 }
 
-// ── NAVEGACIÓN (CORREGIDA) ──────────────────
-function irA(screenId) {
-    document.querySelectorAll('.screen').forEach(s => {
-        s.classList.remove('active');
-        s.style.display = 'none';
-    });
-
-    const target = document.getElementById(screenId);
-    if (target) {
-        target.classList.add('active');
-        target.style.display = 'flex';
-        
-        // ESTA LÍNEA ES LA QUE CARGA TUS PREPARACIONES
-        if (screenId === 'screenCocina') {
-            cargarElaboraciones(); 
-        }
-        
-        window.scrollTo(0, 0);
-    }
-}
-
-// ── UTILIDADES ──────────────────────────────
+/**
+ * Genera un código de sesión con nombre de elaboración y fecha
+ */
 function generarCodigoSesion(elab) {
   const now = new Date();
   const dia = String(now.getDate()).padStart(2, '0');
@@ -82,45 +85,136 @@ function generarCodigoSesion(elab) {
   return `${elab} — ${dia}${mes}`;
 }
 
-function showSuccess(titulo, sub, icon = "✅") {
-  // Asegúrate de tener estos IDs en tu HTML o esta función fallará
+/**
+ * Muestra overlay de éxito con icono, título y vibración
+ */
+function showSuccess(titulo, sub = "", icon = "✅") {
   const iconEl = document.getElementById('successIcon');
   const titleEl = document.getElementById('successText');
   const overlay = document.getElementById('successOverlay');
-  
-  if(iconEl) iconEl.innerHTML = icon;
-  if(titleEl) titleEl.innerHTML = titulo;
-  if(overlay) {
-      overlay.classList.add('show');
-      setTimeout(() => overlay.classList.remove('show'), 2500);
+
+  if (iconEl) iconEl.innerHTML = icon;
+  if (titleEl) titleEl.innerHTML = titulo;
+  if (overlay) {
+    overlay.classList.add('show');
+    setTimeout(() => overlay.classList.remove('show'), 2500);
   }
   if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
 }
 
+/**
+ * Muestra un mensaje de error al usuario
+ */
+function showError(mensaje) {
+  console.error(mensaje);
+  alert("❌ " + mensaje);
+}
+
+// ── NAVEGACIÓN ──────────────────────────────
+
+/**
+ * Navega a una pantalla por su ID
+ */
+function irA(screenId) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+
+  const target = document.getElementById(screenId);
+  if (!target) {
+    console.warn(`Pantalla no encontrada: ${screenId}`);
+    return;
+  }
+
+  target.classList.add('active');
+  target.style.display = 'flex';
+  window.scrollTo(0, 0);
+
+  // ✅ Carga de datos según pantalla
+  switch (screenId) {
+    case 'screenCocina':
+      cargarElaboraciones();
+      break;
+    case 'screenProductos':
+      if (productosLibreria.length === 0) cargarProductos();
+      break;
+    case 'screenStock':
+      cargarStock();
+      break;
+    case 'screenCompras':
+      cargarResumenDia();
+      break;
+    case 'screenDashboard':
+      cargarDashboard();
+      break;
+  }
+}
+
 // ── COMUNICACIÓN CON SERVER ─────────────────
+
+/**
+ * Envía datos al backend con POST
+ * Si no hay conexión, guarda en cola local
+ */
 async function postToScript(payload) {
-    payload.token = WEB_APP_TOKEN;
-    if (!navigator.onLine) {
-        guardarEnCola(payload);
-        alert("Sin conexión. Se guardó localmente.");
-        return;
-    }
-    return fetch(URL_SCRIPT, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(payload)
+  payload.token = WEB_APP_TOKEN;
+
+  if (!navigator.onLine) {
+    guardarEnCola(payload);
+    showError("Sin conexión. Los datos se guardarán cuando vuelva la conexión.");
+    return null;
+  }
+
+  try {
+    const response = await fetch(URL_SCRIPT, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(payload)
     });
+    return response;
+  } catch (err) {
+    console.error("Error en postToScript:", err);
+    guardarEnCola(payload);
+    showError("Error al enviar datos. Se guardaron localmente.");
+    return null;
+  }
+}
+
+/**
+ * Hace una petición GET al backend con token
+ */
+async function getFromScript(params = {}) {
+  params.token = WEB_APP_TOKEN;
+  const query = new URLSearchParams(params).toString();
+
+  try {
+    const res = await fetch(`${URL_SCRIPT}?${query}`);
+    if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.error("Error en getFromScript:", err);
+    showError("Error al obtener datos del servidor.");
+    return null;
+  }
 }
 
 // ── COCINA ──────────────────────────────────
+
+/**
+ * Renderiza los botones de elaboraciones disponibles
+ */
 function cargarElaboraciones() {
   const container = document.getElementById('listaElaboraciones');
-  if(!container) return;
+  if (!container) return;
   container.innerHTML = Object.keys(RECETAS).map(elab =>
-    `<button class="btn-elab" onclick="seleccionarElab('${elab}', this)">${elab}</button>`
+    `<button class="btn-elab" onclick="seleccionarElab('${elab.replace(/'/g, "\\'")}', this)">${elab}</button>`
   ).join('');
 }
 
+/**
+ * Selecciona una elaboración y muestra sus ingredientes
+ */
 function seleccionarElab(nombre, btnEl) {
   currentElabSelected = nombre;
   document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
@@ -128,123 +222,72 @@ function seleccionarElab(nombre, btnEl) {
 
   const receta = RECETAS[nombre] || [];
   const listContainer = document.getElementById('listaIngredientes');
-  if(listContainer) {
-      listContainer.innerHTML = receta.map((ing, i) => renderIngredienteRow(ing.nombre, ing.cantidad, i)).join('');
+  if (listContainer) {
+    listContainer.innerHTML = receta.map((ing, i) =>
+      renderIngredienteRow(ing.nombre, ing.cantidad, i)
+    ).join('');
   }
-  
+
   const btnSave = document.getElementById('btnGuardarSesion');
-  if(btnSave) btnSave.classList.remove('hidden');
+  if (btnSave) btnSave.classList.remove('hidden');
 }
 
+/**
+ * Genera el HTML de una fila de ingrediente
+ */
 function renderIngredienteRow(nombre, cantidadDefault, i) {
+  const nombreSeguro = nombre.replace(/"/g, '&quot;');
   return `
     <div class="ingrediente-row" id="ing-row-${i}">
       <div class="ingrediente-top">
         <input type="checkbox" id="ing-check-${i}" checked>
         <span>${getEmoji(nombre)}</span>
-        <span class="ingrediente-nombre">${nombre}</span>
+        <span class="ingrediente-nombre">${nombreSeguro}</span>
       </div>
       <div class="ingrediente-fields">
-        <input id="ing-lote-${i}" placeholder="Lote">
-        <input id="ing-cant-${i}" value="${cantidadDefault}" placeholder="Cant">
+        <input id="ing-lote-${i}" placeholder="Lote (opcional)">
+        <input id="ing-cant-${i}" value="${cantidadDefault}" placeholder="Cantidad">
       </div>
     </div>`;
 }
 
+/**
+ * Guarda la sesión de cocina en el backend
+ */
 async function guardarSesion() {
-  if (!currentElabSelected) return;
+  if (!currentElabSelected) {
+    showError("Selecciona una elaboración antes de guardar.");
+    return;
+  }
+
   const btn = document.getElementById('btnGuardarSesion');
-  btn.disabled = true;
-  
+  if (btn) btn.disabled = true;
+
   const ingredientes = [];
   document.querySelectorAll('.ingrediente-row').forEach(row => {
-      const id = row.id.replace('ing-row-', '');
-      if (document.getElementById(`ing-check-${id}`).checked) {
-          ingredientes.push({
-              nombre: row.querySelector('.ingrediente-nombre').textContent,
-              lote: document.getElementById(`ing-lote-${id}`).value || 'N/A',
-              cantidad: document.getElementById(`ing-cant-${id}`).value
-          });
-      }
+    const id = row.id.replace('ing-row-', '');
+    const check = document.getElementById(`ing-check-${id}`);
+    if (check && check.checked) {
+      ingredientes.push({
+        nombre: row.querySelector('.ingrediente-nombre')?.textContent || '',
+        lote: document.getElementById(`ing-lote-${id}`)?.value || 'N/A',
+        cantidad: document.getElementById(`ing-cant-${id}`)?.value || ''
+      });
+    }
   });
 
-  await postToScript({ 
-      modo: 'sesion', 
-      elaboracion: currentElabSelected, 
-      ingredientes: ingredientes 
+  if (ingredientes.length === 0) {
+    showError("Selecciona al menos un ingrediente.");
+    if (btn) btn.disabled = false;
+    return;
+  }
+
+  await postToScript({
+    modo: 'sesion',
+    elaboracion: currentElabSelected,
+    ingredientes: ingredientes
   });
 
   showSuccess("REGISTRADO", currentElabSelected, "🍳");
-  irA('screenHome');
-  btn.disabled = false;
-}
-
-// ── PRODUCTOS & STOCK ───────────────────────
-async function cargarProductos() {
-  try {
-    const res = await fetch(URL_SCRIPT + "?accion=listarProductos");
-    const data = await res.json();
-    productosLibreria = data.productos || [];
-    renderListaProductos();
-  } catch (e) { console.error("Error cargando productos", e); }
-}
-
-function renderListaProductos() {
-  const lista = document.getElementById('listaProductos');
-  if (!lista) return;
-  lista.innerHTML = productosLibreria.map(p => `
-    <div class="card" style="margin-bottom:10px">
-        <b>${getEmoji(p.nombre)} ${p.nombre}</b><br>
-        <small>${p.proveedor || 'Sin proveedor'}</small>
-    </div>`).join('');
-}
-
-function cargarStock() {
-    const cont = document.querySelector('#screenStock .card');
-    if(cont) cont.innerHTML = "Cargando niveles de stock...";
-    // Aquí podrías llamar a fetch(URL_SCRIPT + "?accion=listarStock")
-}
-
-// ── COMPRAS ─────────────────────────────────
-function cargarResumenDia() {
-  const c = document.getElementById('resumenDiaContainer');
-  if(!c) return;
-  fetch(URL_SCRIPT + "?accion=pedidosHoy")
-    .then(r => r.json())
-    .then(data => {
-      const items = data.pedidos || [];
-      c.innerHTML = items.length ? items.map(i => `<div>${i.producto}: ${i.cantidad}</div>`).join('') : "Sin pedidos hoy";
-    });
-}
-
-function cargarProductosProveedor() {
-  const prov = document.getElementById('gProveedor').value;
-  // Lógica para filtrar productosEnPedido según proveedor
-}
-
-// ── DASHBOARD ───────────────────────────────
-function cargarDashboard() {
-  const content = document.getElementById('dashContent');
-  if(!content) return;
-  content.innerHTML = "Cargando analíticas...";
-  // Lógica de fetch similar a tu original
-}
-
-// ── OFFLINE ─────────────────────────────────
-function guardarEnCola(datos) {
-  let cola = JSON.parse(localStorage.getItem('cola_registros') || "[]");
-  cola.push({ id: Date.now(), cuerpo: datos });
-  localStorage.setItem('cola_registros', JSON.stringify(cola));
-}
-
-async function procesarColaPendiente() {
-  if (!navigator.onLine) return;
-  let cola = JSON.parse(localStorage.getItem('cola_registros') || "[]");
-  if (!cola.length) return;
-  for (let item of cola) {
-      await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(item.cuerpo) });
-  }
-  localStorage.removeItem('cola_registros');
-}
-
-window.addEventListener('online', procesarColaPendiente);
+  
+  // ✅ Reset estado después de guardar
