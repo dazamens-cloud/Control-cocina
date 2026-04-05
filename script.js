@@ -269,3 +269,151 @@ async function guardarSesion() {
     btn.classList.add('hidden');
   }
   document.querySelectorAll('.btn-elab').forEach(
+
+        b.classList.remove('selected'));
+  irA('screenHome');
+}
+
+// ── PRODUCTOS ───────────────────────────────
+
+async function cargarProductos() {
+  if (cargandoProductos) return;
+  cargandoProductos = true;
+
+  const lista = document.getElementById('listaProductos');
+  if (lista) lista.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando productos...</p>';
+
+  const data = await getFromScript({ accion: 'listarProductos' });
+
+  if (data && data.productos) {
+    productosLibreria = data.productos;
+    renderListaProductos();
+  } else {
+    if (lista) lista.innerHTML = '<p style="color:var(--muted);text-align:center">Error cargando productos</p>';
+  }
+  cargandoProductos = false;
+}
+
+function renderListaProductos(filtro = "") {
+  const lista = document.getElementById('listaProductos');
+  if (!lista) return;
+
+  const filtrados = productosLibreria.filter(p =>
+    p.nombre.toLowerCase().includes(filtro.toLowerCase())
+  );
+
+  lista.innerHTML = filtrados.length ? filtrados.map(p => `
+    <div class="card" style="margin-bottom:10px">
+      <b>${getEmoji(p.nombre)} ${p.nombre}</b><br>
+      <small style="color:var(--muted)">${p.proveedor || 'Sin proveedor'}</small>
+      ${p.unidad ? `<small style="color:var(--muted)"> · ${p.unidad}</small>` : ''}
+    </div>`).join('') 
+  : '<p style="color:var(--muted);text-align:center">No se encontraron productos</p>';
+}
+
+function filtrarProductos() {
+  const filtro = document.getElementById('busquedaProd')?.value || '';
+  renderListaProductos(filtro);
+}
+
+// ── STOCK ────────────────────────────────────
+
+async function cargarStock() {
+  const cont = document.getElementById('stockContainer');
+  if (!cont) return;
+  cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando stock...</p>';
+
+  const semana = obtenerSemanaActual();
+  const data = await getFromScript({ accion: 'listarStock', semana: semana });
+
+  if (data && data.stock && data.stock.length > 0) {
+    cont.innerHTML = data.stock.map(s => `
+      <div style="padding:10px;border-bottom:1px solid var(--border)">
+        <b style="color:var(--gold)">${s.elaboracion}</b><br>
+        <small style="color:var(--muted)">${s.cantidad} ${s.unidad} · ${s.notas || ''}</small>
+      </div>`).join('');
+  } else {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">No hay stock registrado esta semana</p>';
+  }
+}
+
+function obtenerSemanaActual() {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const week = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+  return `${now.getFullYear()}-W${String(week).padStart(2, '0')}`;
+}
+
+// ── COMPRAS ──────────────────────────────────
+
+async function cargarResumenDia() {
+  const cont = document.getElementById('resumenDiaContainer');
+  if (!cont) return;
+  cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando pedidos...</p>';
+
+  const data = await getFromScript({ accion: 'pedidosHoy' });
+
+  if (data && data.pedidos && data.pedidos.length > 0) {
+    cont.innerHTML = data.pedidos.map(p => `
+      <div style="padding:10px;border-bottom:1px solid var(--border)">
+        <b style="color:var(--gold)">${p.producto}</b><br>
+        <small style="color:var(--muted)">${p.cantidad} ${p.unidad} · ${p.proveedor}</small>
+      </div>`).join('');
+  } else {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Sin pedidos hoy</p>';
+  }
+}
+
+// ── DASHBOARD ────────────────────────────────
+
+async function cargarDashboard() {
+  const cont = document.getElementById('dashContent');
+  if (!cont) return;
+  cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando analíticas...</p>';
+
+  const data = await getFromScript({ accion: 'registrosSemana' });
+
+  if (data && data.sesiones && data.sesiones.length > 0) {
+    cont.innerHTML = data.sesiones.map(s => `
+      <div style="padding:10px;border-bottom:1px solid var(--border)">
+        <b style="color:var(--gold)">${s.elaboracion}</b>
+        <small style="color:var(--muted)"> · ${s.fecha}</small><br>
+        <small style="color:var(--muted)">${s.ingredientes.length} ingredientes</small>
+      </div>`).join('');
+  } else {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">No hay registros esta semana</p>';
+  }
+}
+
+// ── OFFLINE ──────────────────────────────────
+
+function guardarEnCola(datos) {
+  let cola = JSON.parse(localStorage.getItem('cola_registros') || "[]");
+  cola.push({ id: Date.now(), cuerpo: datos });
+  localStorage.setItem('cola_registros', JSON.stringify(cola));
+}
+
+async function procesarColaPendiente() {
+  if (!navigator.onLine) return;
+  let cola = JSON.parse(localStorage.getItem('cola_registros') || "[]");
+  if (!cola.length) return;
+
+  for (let item of cola) {
+    await fetch(URL_SCRIPT, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(item.cuerpo)
+    });
+  }
+  localStorage.removeItem('cola_registros');
+  console.log('✅ Cola de registros procesada');
+}
+
+window.addEventListener('online', procesarColaPendiente);
+
+// ── INICIO ───────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  cargarProveedores();
+  procesarColaPendiente();
+});
