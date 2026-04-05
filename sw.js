@@ -1,4 +1,4 @@
-const CACHE_NAME = 'divina-italia-v6'; // ✅ Subimos versión para forzar actualización
+const CACHE_NAME = 'divina-italia-v7';
 const ASSETS = [
   './',
   './index.html',
@@ -10,7 +10,6 @@ const ASSETS = [
   './icons/icon-512.png'
 ];
 
-// Instalación: Guardar archivos esenciales
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
@@ -18,7 +17,6 @@ self.addEventListener('install', e => {
   self.skipWaiting();
 });
 
-// Activación: Limpiar versiones viejas
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => Promise.all(
@@ -30,49 +28,35 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// ✅ Estrategia: Cache First con Network fallback corregido
 self.addEventListener('fetch', e => {
-  // Solo cacheamos peticiones GET
+  // ✅ No interceptar peticiones POST ni a Google Script
   if (e.request.method !== 'GET') return;
-
-  // No cachear peticiones al Google Apps Script
   if (e.request.url.includes('script.google.com')) return;
+  if (e.request.url.includes('fonts.googleapis.com')) return;
 
   e.respondWith(
     caches.match(e.request).then(cachedResponse => {
-      if (cachedResponse) {
-        // ✅ Actualizar caché en background sin bloquear
-        e.waitUntil(
-          fetch(e.request).then(networkResponse => {
-            if (networkResponse && networkResponse.status === 200) {
-              return caches.open(CACHE_NAME).then(cache => {
-                return cache.put(e.request, networkResponse);
-              });
-            }
-          }).catch(() => {})
-        );
-        return cachedResponse;
-      }
+      // ✅ Si está en caché lo devolvemos directamente
+      if (cachedResponse) return cachedResponse;
 
-      // No hay caché, intentar red
-      return fetch(e.request).then(networkResponse => {
-        if (!networkResponse || networkResponse.status !== 200) {
+      // ✅ Si no está en caché intentamos la red
+      return fetch(e.request)
+        .then(networkResponse => {
+          // ✅ Solo cacheamos respuestas válidas
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
+            return networkResponse;
+          }
+          // ✅ Clonamos ANTES de cachear
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
           return networkResponse;
-        }
-
-        // ✅ Clonar ANTES de usar la respuesta
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(e.request, responseToCache);
+        })
+        .catch(() => {
+          // ✅ Sin red → página offline
+          if (e.request.destination === 'document') {
+            return caches.match('./offline.html');
+          }
         });
-
-        return networkResponse;
-      }).catch(() => {
-        // Sin red y sin caché → página offline
-        if (e.request.destination === 'document') {
-          return caches.match('./offline.html');
-        }
-      });
     })
   );
 });
