@@ -13,7 +13,7 @@ let contadorIngredientesExtra = 100;
 let productosEnPedido = [];
 let ingredientesFotoTarget = -1;
 let cargandoProductos = false;
-let WHATSAPP_PROVEEDORES = {}; // ✅ Se carga dinámicamente desde el backend
+let WHATSAPP_PROVEEDORES = {};
 
 // ── CONSTANTES ──────────────────────────────
 const RECETAS = {
@@ -147,7 +147,10 @@ async function getFromScript(params = {}) {
   const query = new URLSearchParams(params).toString();
 
   try {
-    const res = await fetch(`${URL_SCRIPT}?${query}`);
+    const res = await fetch(`${URL_SCRIPT}?${query}`, {
+      method: 'GET',
+      mode: 'cors'
+    });
     if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -174,10 +177,9 @@ function enviarPedidoWhatsApp(proveedor, lineas) {
     showError(`No hay número de WhatsApp para ${proveedor}`);
     return;
   }
-  const mensaje = `🛒 *PEDIDO DIVINA ITALIA*\n\n${lineas.map(l => 
+  const mensaje = `🛒 *PEDIDO DIVINA ITALIA*\n\n${lineas.map(l =>
     `• ${l.producto}: ${l.cantidad} ${l.unidad}`
   ).join('\n')}\n\n_${new Date().toLocaleDateString('es-ES')}_`;
-  
   window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 
@@ -260,7 +262,6 @@ async function guardarSesion() {
 
   showSuccess("REGISTRADO", currentElabSelected, "🍳");
 
-  // ✅ Reset estado
   currentElabSelected = "";
   const listContainer = document.getElementById('listaIngredientes');
   if (listContainer) listContainer.innerHTML = '';
@@ -268,12 +269,9 @@ async function guardarSesion() {
     btn.disabled = false;
     btn.classList.add('hidden');
   }
-  document.querySelectorAll('.btn-elab').forEach(
-
-        b.classList.remove('selected'));
+  document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
   irA('screenHome');
 }
-
 // ── PRODUCTOS ───────────────────────────────
 
 async function cargarProductos() {
@@ -307,7 +305,7 @@ function renderListaProductos(filtro = "") {
       <b>${getEmoji(p.nombre)} ${p.nombre}</b><br>
       <small style="color:var(--muted)">${p.proveedor || 'Sin proveedor'}</small>
       ${p.unidad ? `<small style="color:var(--muted)"> · ${p.unidad}</small>` : ''}
-    </div>`).join('') 
+    </div>`).join('')
   : '<p style="color:var(--muted);text-align:center">No se encontraron productos</p>';
 }
 
