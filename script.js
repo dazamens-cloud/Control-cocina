@@ -2,7 +2,7 @@
 // script.js COMPLETO - Divina Italia El Charco
 // =============================================
 
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbycmJ-p4oWV1w8JNlO4h0x2Yxn8snbtGx-fdHeIUBEFPhMmau-Qjdyqi7MijnbTg5uFjA/exec";
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwf5bu75Dlcmrikjxj49XvP6JFPo4p65tx06Nr2mPGVJfQpSoqxSLUsftuiiUNw9tpEjA/exec";
 const WEB_APP_TOKEN = "restdivinaitalia";
 
 // ── ESTADO GLOBAL ───────────────────────────
