@@ -145,18 +145,29 @@ async function postToScript(payload) {
 async function getFromScript(params = {}) {
   params.token = WEB_APP_TOKEN;
   const query = new URLSearchParams(params).toString();
+  const url = `${URL_SCRIPT}?${query}`;
 
-  try {
-    const res = await fetch(`${URL_SCRIPT}?${query}`, {
-      method: 'GET',
-      mode: 'cors'
-    });
-    if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-    return await res.json();
-  } catch (err) {
-    console.error("Error en getFromScript:", err);
-    return null;
-  }
+  return new Promise((resolve) => {
+    // ✅ Usamos JSONP para evitar CORS
+    const callbackName = 'jsonp_' + Date.now();
+    const script = document.createElement('script');
+    
+    window[callbackName] = function(data) {
+      resolve(data);
+      delete window[callbackName];
+      document.body.removeChild(script);
+    };
+
+    script.src = url + '&callback=' + callbackName;
+    script.onerror = function() {
+      console.error('Error en JSONP');
+      resolve(null);
+      delete window[callbackName];
+      document.body.removeChild(script);
+    };
+
+    document.body.appendChild(script);
+  });
 }
 
 // ── PROVEEDORES ─────────────────────────────
