@@ -3,7 +3,7 @@
 // v2.1 — Fix CORS/JSONP + ISO week + cola POST
 // =============================================
 
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbypRh56UKX2M49ehR74T8K2zb1fGyntOzj17EjmpxeuxHDqkEzfzxOaMIE0jeFSDLHq2g/exec";
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbz0umwR8SfmIotgI76Qu2VuaQkY2vT8fGmIUgn7bE5Y6x4VIsTGDzGxo9vGbFCdFAKanw/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
