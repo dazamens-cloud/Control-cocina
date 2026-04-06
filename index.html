@@ -199,7 +199,10 @@
                 <input type="search" id="busquedaProdPedido"
                        placeholder="🔍 Buscar en biblioteca..."
                        oninput="filtrarProductosPedido()"
+                       onkeyup="filtrarProductosPedido()"
                        autocomplete="off"
+                       autocorrect="off"
+                       spellcheck="false"
                        aria-label="Buscar producto para pedido">
                 <div id="sugerenciasPedido" class="sugerencias-container"></div>
 
@@ -281,6 +284,8 @@
                 .then(() => console.log('✅ Service Worker registrado'))
                 .catch(err => console.error('❌ Error registrando SW:', err));
         }
+        // Inicializar estado de historial para que el botón atrás funcione
+        history.replaceState({ screen: 'screenHome' }, '', '#screenHome');
     </script>
 </body>
 </html>
