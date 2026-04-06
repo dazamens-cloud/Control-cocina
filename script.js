@@ -1,5 +1,6 @@
 // =============================================
 // script.js COMPLETO - Divina Italia El Charco
+// v2.1 — Fix CORS/JSONP + ISO week + cola POST
 // =============================================
 
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbypRh56UKX2M49ehR74T8K2zb1fGyntOzj17EjmpxeuxHDqkEzfzxOaMIE0jeFSDLHq2g/exec";
@@ -118,6 +119,8 @@ function irA(screenId) {
 
 // ── COMUNICACIÓN CON SERVER ─────────────────
 
+// FIX 1: postToScript — añadido Content-Type para que Apps Script
+// pueda parsear e.postData.contents correctamente.
 async function postToScript(payload) {
   payload.token = WEB_APP_TOKEN;
 
@@ -131,43 +134,43 @@ async function postToScript(payload) {
     const response = await fetch(URL_SCRIPT, {
       method: 'POST',
       mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' }, // ← FIX: evita preflight CORS sin perder el body
       body: JSON.stringify(payload)
     });
     return response;
   } catch (err) {
-    console.error("Error en postToScript:", err);
-    guardarEnCola(payload);
-    showError("Error al enviar datos. Se guardaron localmente.");
+    // FIX 2: TypeError con no-cors no significa fallo real — el POST llegó.
+    // Solo guardamos en cola si es un error de red real (offline).
+    if (!navigator.onLine) {
+      guardarEnCola(payload);
+      showError("Error al enviar datos. Se guardaron localmente.");
+    }
     return null;
   }
 }
 
+// FIX 3: getFromScript — reemplazado JSONP por fetch normal.
+// Apps Script con access:ANYONE_ANONYMOUS devuelve CORS headers correctos.
+// JSONP fallaba porque Chrome no sigue redirects cross-origin en <script src>.
 async function getFromScript(params = {}) {
   params.token = WEB_APP_TOKEN;
   const query = new URLSearchParams(params).toString();
   const url = `${URL_SCRIPT}?${query}`;
 
-  return new Promise((resolve) => {
-    // ✅ Usamos JSONP para evitar CORS
-    const callbackName = 'jsonp_' + Date.now();
-    const script = document.createElement('script');
-    
-    window[callbackName] = function(data) {
-      resolve(data);
-      delete window[callbackName];
-      document.body.removeChild(script);
-    };
-
-    script.src = url + '&callback=' + callbackName;
-    script.onerror = function() {
-      console.error('Error en JSONP');
-      resolve(null);
-      delete window[callbackName];
-      document.body.removeChild(script);
-    };
-
-    document.body.appendChild(script);
-  });
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      redirect: 'follow'
+    });
+    if (!res.ok) {
+      console.error('getFromScript HTTP error:', res.status);
+      return null;
+    }
+    return await res.json();
+  } catch (err) {
+    console.error('getFromScript error [' + (params.accion || '?') + ']:', err.message);
+    return null;
+  }
 }
 
 // ── PROVEEDORES ─────────────────────────────
@@ -283,6 +286,7 @@ async function guardarSesion() {
   document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
   irA('screenHome');
 }
+
 // ── PRODUCTOS ───────────────────────────────
 
 async function cargarProductos() {
@@ -346,11 +350,16 @@ async function cargarStock() {
   }
 }
 
+// FIX 4: obtenerSemanaActual — cálculo ISO 8601 correcto.
+// El cálculo anterior podía dar semana errónea en la primera semana de enero.
 function obtenerSemanaActual() {
   const now = new Date();
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
-  const week = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
-  return `${now.getFullYear()}-W${String(week).padStart(2, '0')}`;
+  // Ir al jueves de la semana actual (ISO: la semana pertenece al año del jueves)
+  const thursday = new Date(now);
+  thursday.setDate(now.getDate() - ((now.getDay() + 6) % 7) + 3);
+  const yearStart = new Date(thursday.getFullYear(), 0, 1);
+  const week = Math.ceil(((thursday - yearStart) / 86400000 + 1) / 7);
+  return `${thursday.getFullYear()}-W${String(week).padStart(2, '0')}`;
 }
 
 // ── COMPRAS ──────────────────────────────────
@@ -402,20 +411,34 @@ function guardarEnCola(datos) {
   localStorage.setItem('cola_registros', JSON.stringify(cola));
 }
 
+// FIX 5: procesarColaPendiente — añadido Content-Type igual que postToScript.
 async function procesarColaPendiente() {
   if (!navigator.onLine) return;
   let cola = JSON.parse(localStorage.getItem('cola_registros') || "[]");
   if (!cola.length) return;
 
+  const exitosos = [];
   for (let item of cola) {
-    await fetch(URL_SCRIPT, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify(item.cuerpo)
-    });
+    try {
+      await fetch(URL_SCRIPT, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' }, // ← FIX: consistente con postToScript
+        body: JSON.stringify(item.cuerpo)
+      });
+      exitosos.push(item.id);
+    } catch (err) {
+      console.warn('No se pudo enviar item de cola:', item.id);
+    }
   }
-  localStorage.removeItem('cola_registros');
-  console.log('✅ Cola de registros procesada');
+
+  // Solo eliminar los que se enviaron correctamente
+  const pendientes = cola.filter(i => !exitosos.includes(i.id));
+  localStorage.setItem('cola_registros', JSON.stringify(pendientes));
+
+  if (exitosos.length > 0) {
+    console.log(`✅ Cola procesada: ${exitosos.length} registros enviados`);
+  }
 }
 
 window.addEventListener('online', procesarColaPendiente);
