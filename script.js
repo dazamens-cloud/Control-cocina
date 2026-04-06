@@ -216,7 +216,39 @@ function enviarPedidoWhatsApp(proveedor, lineas) {
   window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 
+
+// ── COMPRESIÓN DE IMÁGENES ───────────────────
+// Reduce la imagen a max 800px y calidad 0.75 antes de enviarla al servidor.
+// Evita subir fotos de 5-10MB innecesariamente.
+function comprimirImagen(file, maxPx = 800, calidad = 0.75) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxPx) { height = Math.round(height * maxPx / width); width = maxPx; }
+        } else {
+          if (height > maxPx) { width = Math.round(width * maxPx / height); height = maxPx; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', calidad));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 // ── COCINA ──────────────────────────────────
+
+// Fotos por ingrediente: { indice: base64 }
+const fotosIngredientes = {};
+let fotoIngTarget = -1;
 
 function cargarElaboraciones() {
   const container = document.getElementById('listaElaboraciones');
@@ -228,6 +260,7 @@ function cargarElaboraciones() {
 
 function seleccionarElab(nombre, btnEl) {
   currentElabSelected = nombre;
+  Object.keys(fotosIngredientes).forEach(k => delete fotosIngredientes[k]); // limpiar fotos
   document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
   if (btnEl) btnEl.classList.add('selected');
 
@@ -256,7 +289,43 @@ function renderIngredienteRow(nombre, cantidadDefault, i) {
         <input id="ing-lote-${i}" placeholder="Lote (opcional)">
         <input id="ing-cant-${i}" value="${cantidadDefault}" placeholder="Cantidad">
       </div>
+      <div class="foto-row" style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <button onclick="pedirFotoCocina(${i}, 'camara')"
+                style="flex:1;background:var(--surface2);border:1px solid var(--border);
+                       color:var(--muted);padding:8px;border-radius:8px;font-size:0.8rem;cursor:pointer">
+          📷 Cámara
+        </button>
+        <button onclick="pedirFotoCocina(${i}, 'archivo')"
+                style="flex:1;background:var(--surface2);border:1px solid var(--border);
+                       color:var(--muted);padding:8px;border-radius:8px;font-size:0.8rem;cursor:pointer">
+          🖼 Archivo
+        </button>
+        <span id="foto-status-${i}" style="font-size:0.8rem;color:var(--muted)"></span>
+      </div>
     </div>`;
+}
+
+function pedirFotoCocina(idx, modo) {
+  fotoIngTarget = idx;
+  const input = document.getElementById('inputFotoCocina');
+  if (!input) return;
+  if (modo === 'camara') {
+    input.setAttribute('capture', 'environment');
+  } else {
+    input.removeAttribute('capture');
+  }
+  input.value = ''; // reset para poder seleccionar la misma foto dos veces
+  input.click();
+}
+
+async function onFotoCocinaSeleccionada(event) {
+  const file = event.target.files[0];
+  if (!file || fotoIngTarget < 0) return;
+  const base64 = await comprimirImagen(file);
+  fotosIngredientes[fotoIngTarget] = base64;
+  const status = document.getElementById(`foto-status-${fotoIngTarget}`);
+  if (status) status.textContent = '✅';
+  fotoIngTarget = -1;
 }
 
 async function guardarSesion() {
@@ -276,7 +345,8 @@ async function guardarSesion() {
       ingredientes.push({
         nombre: row.querySelector('.ingrediente-nombre')?.textContent || '',
         lote: document.getElementById(`ing-lote-${id}`)?.value || 'N/A',
-        cantidad: document.getElementById(`ing-cant-${id}`)?.value || ''
+        cantidad: document.getElementById(`ing-cant-${id}`)?.value || '',
+        imagen: fotosIngredientes[id] || ''   // foto comprimida si existe
       });
     }
   });
@@ -303,6 +373,7 @@ async function guardarSesion() {
     btn.classList.add('hidden');
   }
   document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
+  Object.keys(fotosIngredientes).forEach(k => delete fotosIngredientes[k]);
   irA('screenHome');
 }
 
@@ -618,6 +689,93 @@ async function cargarDashboard() {
   } else {
     cont.innerHTML = '<p style="color:var(--muted);text-align:center">No hay registros esta semana</p>';
   }
+}
+
+
+// ── BIBLIOTECA — NUEVO PRODUCTO ──────────────
+
+let fotoNPBase64 = '';
+
+function mostrarFormNuevoProducto() {
+  document.getElementById('formNuevoProducto').style.display = 'block';
+  document.getElementById('npNombre').focus();
+}
+
+function ocultarFormNuevoProducto() {
+  document.getElementById('formNuevoProducto').style.display = 'none';
+  limpiarFormNP();
+}
+
+function limpiarFormNP() {
+  ['npNombre','npUnidad','npCodigo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const sel = document.getElementById('npProveedor');
+  if (sel) sel.value = '';
+  quitarFotoNP();
+}
+
+function abrirCamaraNP() {
+  const input = document.getElementById('inputFotoNP_camara');
+  if (input) { input.value = ''; input.click(); }
+}
+
+function abrirArchivosNP() {
+  const input = document.getElementById('inputFotoNP_archivo');
+  if (input) { input.value = ''; input.click(); }
+}
+
+async function onFotoNPSeleccionada(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  fotoNPBase64 = await comprimirImagen(file, 800, 0.75);
+  const preview = document.getElementById('previewFotoNP');
+  const img     = document.getElementById('imgPreviewNP');
+  if (preview && img) {
+    img.src = fotoNPBase64;
+    preview.style.display = 'block';
+  }
+}
+
+function quitarFotoNP() {
+  fotoNPBase64 = '';
+  const preview = document.getElementById('previewFotoNP');
+  if (preview) preview.style.display = 'none';
+  ['inputFotoNP_camara','inputFotoNP_archivo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+async function guardarNuevoProducto() {
+  const nombre    = (document.getElementById('npNombre')?.value || '').trim();
+  const unidad    = (document.getElementById('npUnidad')?.value || '').trim();
+  const proveedor = (document.getElementById('npProveedor')?.value || '').trim();
+  const codigo    = (document.getElementById('npCodigo')?.value || '').trim();
+
+  if (!nombre) { showError('El nombre del producto es obligatorio.'); return; }
+
+  const btn = document.querySelector('#formNuevoProducto .btn-save');
+  if (btn) btn.disabled = true;
+
+  await postToScript({
+    modo: 'inventario',
+    producto:  nombre,
+    unidad:    unidad,
+    proveedor: proveedor,
+    codigo:    codigo,
+    imagen:    fotoNPBase64
+  });
+
+  showSuccess('PRODUCTO AÑADIDO', nombre, '📚');
+  ocultarFormNuevoProducto();
+
+  // Refrescar la biblioteca
+  productosLibreria = [];
+  await cargarProductos();
+
+  if (btn) btn.disabled = false;
 }
 
 // ── OFFLINE ──────────────────────────────────
