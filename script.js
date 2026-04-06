@@ -4,7 +4,7 @@
 // =============================================
 
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbypRh56UKX2M49ehR74T8K2zb1fGyntOzj17EjmpxeuxHDqkEzfzxOaMIE0jeFSDLHq2g/exec";
-const WEB_APP_TOKEN = "restdivinaitalia";
+const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
 let productosLibreria = [];
@@ -331,20 +331,68 @@ function filtrarProductos() {
 
 // ── STOCK ────────────────────────────────────
 
+// Rellena el selector de elaboraciones del formulario de stock
+function inicializarSelectStock() {
+  const sel = document.getElementById('selectStockElab');
+  if (!sel || sel.options.length > 1) return; // ya inicializado
+  Object.keys(RECETAS).forEach(elab => {
+    const opt = document.createElement('option');
+    opt.value = elab;
+    opt.textContent = elab;
+    sel.appendChild(opt);
+  });
+}
+
+async function guardarStock() {
+  const elaboracion = document.getElementById('selectStockElab')?.value || '';
+  const cantidad    = document.getElementById('inputStockCantidad')?.value || '';
+  const unidad      = document.getElementById('inputStockUnidad')?.value.trim() || '';
+  const notas       = document.getElementById('inputStockNotas')?.value.trim() || '';
+
+  if (!elaboracion) { showError('Selecciona una elaboración.'); return; }
+  if (!cantidad)    { showError('Indica la cantidad.'); return; }
+
+  const btn = document.querySelector('#screenStock .btn-save');
+  if (btn) btn.disabled = true;
+
+  await postToScript({
+    modo: 'stock',
+    semana: obtenerSemanaActual(),
+    elaboracion,
+    cantidad,
+    unidad,
+    notas
+  });
+
+  showSuccess('STOCK GUARDADO', elaboracion, '📦');
+
+  // Limpiar campos
+  document.getElementById('selectStockElab').value = '';
+  document.getElementById('inputStockCantidad').value = '';
+  document.getElementById('inputStockUnidad').value = '';
+  document.getElementById('inputStockNotas').value = '';
+  if (btn) btn.disabled = false;
+
+  cargarStock(); // refresca la lista
+}
+
 async function cargarStock() {
   const cont = document.getElementById('stockContainer');
   if (!cont) return;
+  inicializarSelectStock();
   cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando stock...</p>';
 
   const semana = obtenerSemanaActual();
   const data = await getFromScript({ accion: 'listarStock', semana: semana });
 
   if (data && data.stock && data.stock.length > 0) {
-    cont.innerHTML = data.stock.map(s => `
-      <div style="padding:10px;border-bottom:1px solid var(--border)">
-        <b style="color:var(--gold)">${s.elaboracion}</b><br>
-        <small style="color:var(--muted)">${s.cantidad} ${s.unidad} · ${s.notas || ''}</small>
-      </div>`).join('');
+    cont.innerHTML = `
+      <div style="color:var(--muted);font-size:0.8rem;margin-bottom:10px">Semana ${semana}</div>
+      ${data.stock.map(s => `
+        <div style="padding:10px;border-bottom:1px solid var(--border)">
+          <b style="color:var(--gold)">${s.elaboracion}</b><br>
+          <small style="color:var(--muted)">${s.cantidad} ${s.unidad}${s.notas ? ' · ' + s.notas : ''}</small>
+        </div>`).join('')}`;
   } else {
     cont.innerHTML = '<p style="color:var(--muted);text-align:center">No hay stock registrado esta semana</p>';
   }
@@ -364,18 +412,159 @@ function obtenerSemanaActual() {
 
 // ── COMPRAS ──────────────────────────────────
 
+// Estado local del pedido en curso
+let pedidoActual = [];   // [{producto, cantidad, unidad}]
+let proveedorActual = "";
+
+function onProveedorChange() {
+  const sel = document.getElementById('selectProveedor');
+  proveedorActual = sel.value;
+  const mostrar = !!proveedorActual;
+  document.getElementById('formPedidoContainer').style.display  = mostrar ? 'block' : 'none';
+  document.getElementById('resumenPedidoContainer').style.display = pedidoActual.length > 0 ? 'block' : 'none';
+}
+
+// Filtra la biblioteca de productos mientras el usuario escribe
+function filtrarProductosPedido() {
+  const q = (document.getElementById('busquedaProdPedido')?.value || '').toLowerCase().trim();
+  const cont = document.getElementById('sugerenciasPedido');
+  if (!cont) return;
+
+  if (!q || productosLibreria.length === 0) {
+    cont.innerHTML = '';
+    return;
+  }
+
+  const matches = productosLibreria
+    .filter(p => p.nombre.toLowerCase().includes(q))
+    .slice(0, 6);
+
+  if (matches.length === 0) {
+    cont.innerHTML = '';
+    return;
+  }
+
+  cont.innerHTML = matches.map(p => `
+    <div class="sugerencia-item" onclick="seleccionarProductoPedido('${p.nombre.replace(/'/g,"\\'")}','${(p.unidad||'').replace(/'/g,"\\'")}')">
+      ${getEmoji(p.nombre)} <b>${p.nombre}</b>
+      <small style="color:var(--muted)"> · ${p.unidad || ''} · ${p.proveedor || ''}</small>
+    </div>`).join('');
+}
+
+function seleccionarProductoPedido(nombre, unidad) {
+  document.getElementById('inputProductoPedido').value = nombre;
+  document.getElementById('inputUnidadPedido').value   = unidad;
+  document.getElementById('busquedaProdPedido').value  = '';
+  document.getElementById('sugerenciasPedido').innerHTML = '';
+  document.getElementById('inputCantidadPedido').focus();
+}
+
+function agregarLineaPedido() {
+  const producto  = (document.getElementById('inputProductoPedido')?.value || '').trim();
+  const cantidad  = (document.getElementById('inputCantidadPedido')?.value || '').trim();
+  const unidad    = (document.getElementById('inputUnidadPedido')?.value   || '').trim();
+
+  if (!producto) { showError('Escribe el nombre del producto.'); return; }
+  if (!cantidad) { showError('Indica la cantidad.'); return; }
+
+  pedidoActual.push({ producto, cantidad, unidad });
+
+  // Limpiar campos
+  document.getElementById('inputProductoPedido').value = '';
+  document.getElementById('inputCantidadPedido').value = '';
+  document.getElementById('inputUnidadPedido').value   = '';
+  document.getElementById('busquedaProdPedido').value  = '';
+  document.getElementById('sugerenciasPedido').innerHTML = '';
+
+  renderLineasPedido();
+}
+
+function eliminarLineaPedido(idx) {
+  pedidoActual.splice(idx, 1);
+  renderLineasPedido();
+}
+
+function renderLineasPedido() {
+  const cont = document.getElementById('lineasPedido');
+  const resCont = document.getElementById('resumenPedidoContainer');
+  if (!cont || !resCont) return;
+
+  if (pedidoActual.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Sin líneas añadidas</p>';
+    resCont.style.display = 'none';
+    return;
+  }
+
+  resCont.style.display = 'block';
+  cont.innerHTML = pedidoActual.map((l, i) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;
+                padding:8px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <b style="color:var(--text)">${getEmoji(l.producto)} ${l.producto}</b><br>
+        <small style="color:var(--muted)">${l.cantidad} ${l.unidad}</small>
+      </div>
+      <button onclick="eliminarLineaPedido(${i})"
+              style="background:transparent;border:none;color:var(--muted);
+                     font-size:1.2rem;cursor:pointer;padding:4px 8px"
+              aria-label="Eliminar ${l.producto}">✕</button>
+    </div>`).join('');
+}
+
+async function guardarPedido() {
+  if (!proveedorActual) { showError('Selecciona un proveedor.'); return; }
+  if (pedidoActual.length === 0) { showError('Añade al menos un producto.'); return; }
+
+  const payload = {
+    modo: 'compra',
+    proveedor: proveedorActual,
+    lineas: pedidoActual
+  };
+
+  await postToScript(payload);
+  showSuccess('PEDIDO GUARDADO', proveedorActual, '🛒');
+  limpiarPedido();
+  cargarResumenDia(); // refresca "registrado hoy"
+}
+
+function enviarPedidoActualWhatsApp() {
+  if (!proveedorActual) { showError('Selecciona un proveedor.'); return; }
+  if (pedidoActual.length === 0) { showError('Añade al menos un producto.'); return; }
+  enviarPedidoWhatsApp(proveedorActual, pedidoActual);
+}
+
+function limpiarPedido() {
+  pedidoActual = [];
+  document.getElementById('inputProductoPedido').value = '';
+  document.getElementById('inputCantidadPedido').value = '';
+  document.getElementById('inputUnidadPedido').value   = '';
+  document.getElementById('busquedaProdPedido').value  = '';
+  document.getElementById('sugerenciasPedido').innerHTML = '';
+  renderLineasPedido();
+}
+
 async function cargarResumenDia() {
   const cont = document.getElementById('resumenDiaContainer');
   if (!cont) return;
-  cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando pedidos...</p>';
+  cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando...</p>';
 
   const data = await getFromScript({ accion: 'pedidosHoy' });
 
   if (data && data.pedidos && data.pedidos.length > 0) {
-    cont.innerHTML = data.pedidos.map(p => `
-      <div style="padding:10px;border-bottom:1px solid var(--border)">
-        <b style="color:var(--gold)">${p.producto}</b><br>
-        <small style="color:var(--muted)">${p.cantidad} ${p.unidad} · ${p.proveedor}</small>
+    // Agrupar por proveedor para mejor lectura
+    const porProveedor = {};
+    data.pedidos.forEach(p => {
+      if (!porProveedor[p.proveedor]) porProveedor[p.proveedor] = [];
+      porProveedor[p.proveedor].push(p);
+    });
+
+    cont.innerHTML = Object.entries(porProveedor).map(([prov, items]) => `
+      <div style="margin-bottom:12px">
+        <div style="color:var(--gold);font-weight:700;margin-bottom:4px">🏪 ${prov}</div>
+        ${items.map(p => `
+          <div style="padding:4px 0 4px 10px;border-left:2px solid var(--border)">
+            <span style="color:var(--text)">${getEmoji(p.producto)} ${p.producto}</span>
+            <small style="color:var(--muted)"> · ${p.cantidad} ${p.unidad}</small>
+          </div>`).join('')}
       </div>`).join('');
   } else {
     cont.innerHTML = '<p style="color:var(--muted);text-align:center">Sin pedidos hoy</p>';
