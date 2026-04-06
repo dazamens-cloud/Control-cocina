@@ -82,7 +82,7 @@ function showError(mensaje) {
 
 // ── NAVEGACIÓN ──────────────────────────────
 
-function irA(screenId) {
+function irA(screenId, pushState = true) {
   document.querySelectorAll('.screen').forEach(s => {
     s.classList.remove('active');
     s.style.display = 'none';
@@ -97,6 +97,11 @@ function irA(screenId) {
   target.classList.add('active');
   target.style.display = 'flex';
   window.scrollTo(0, 0);
+
+  // Gestión del historial para que el botón atrás funcione dentro de la app
+  if (pushState) {
+    history.pushState({ screen: screenId }, '', '#' + screenId);
+  }
 
   switch (screenId) {
     case 'screenCocina':
@@ -116,6 +121,12 @@ function irA(screenId) {
       break;
   }
 }
+
+// Botón atrás del móvil navega al home en vez de salir de la app
+window.addEventListener('popstate', (e) => {
+  const screen = e.state?.screen || 'screenHome';
+  irA(screen, false); // false = no volver a hacer pushState
+});
 
 // ── COMUNICACIÓN CON SERVER ─────────────────
 
@@ -191,9 +202,17 @@ function enviarPedidoWhatsApp(proveedor, lineas) {
     showError(`No hay número de WhatsApp para ${proveedor}`);
     return;
   }
-  const mensaje = `🛒 *PEDIDO DIVINA ITALIA*\n\n${lineas.map(l =>
-    `• ${l.producto}: ${l.cantidad} ${l.unidad}`
-  ).join('\n')}\n\n_${new Date().toLocaleDateString('es-ES')}_`;
+  // Formato natural tipo mensaje real de restaurante
+  const lineasTexto = lineas.map(l => {
+    const unidad = l.unidad ? ` ${l.unidad}` : '';
+    return `${l.producto} ${l.cantidad}${unidad}`;
+  }).join('\n');
+
+  const mensaje =
+    `Hola buenas del rest Divina Italia del charco\n\n` +
+    `${lineasTexto}\n\n` +
+    `Muchas gracias`;
+
   window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 
@@ -425,22 +444,31 @@ function onProveedorChange() {
 }
 
 // Filtra la biblioteca de productos mientras el usuario escribe
-function filtrarProductosPedido() {
+// Robusto para móvil: también carga productos si aún no están en memoria
+async function filtrarProductosPedido() {
   const q = (document.getElementById('busquedaProdPedido')?.value || '').toLowerCase().trim();
   const cont = document.getElementById('sugerenciasPedido');
   if (!cont) return;
 
-  if (!q || productosLibreria.length === 0) {
-    cont.innerHTML = '';
+  if (!q) { cont.innerHTML = ''; return; }
+
+  // Si la biblioteca no está cargada aún, cargarla primero
+  if (productosLibreria.length === 0 && !cargandoProductos) {
+    cont.innerHTML = '<div class="sugerencia-item" style="color:var(--muted)">Cargando productos...</div>';
+    await cargarProductos();
+  }
+
+  if (productosLibreria.length === 0) {
+    cont.innerHTML = '<div class="sugerencia-item" style="color:var(--muted)">Sin productos en biblioteca</div>';
     return;
   }
 
   const matches = productosLibreria
     .filter(p => p.nombre.toLowerCase().includes(q))
-    .slice(0, 6);
+    .slice(0, 8);
 
   if (matches.length === 0) {
-    cont.innerHTML = '';
+    cont.innerHTML = '<div class="sugerencia-item" style="color:var(--muted)">Sin resultados</div>';
     return;
   }
 
