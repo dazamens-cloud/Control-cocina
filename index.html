@@ -125,11 +125,36 @@
         </div>
         <div class="section-header">
             <h2 class="section-title">CONTROL STOCK</h2>
+            <p style="color: var(--muted)">Stock de la semana actual</p>
         </div>
         <div class="screen-content">
-            <div class="card" id="stockContainer">
-                <p style="color: var(--muted); text-align: center">Cargando niveles de stock...</p>
+
+            <!-- Formulario para registrar stock -->
+            <div class="card">
+                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">
+                    ➕ Registrar stock
+                </label>
+                <select id="selectStockElab" aria-label="Elaboración">
+                    <option value="">— Selecciona elaboración —</option>
+                </select>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px">
+                    <input id="inputStockCantidad" type="number" min="0" step="0.5"
+                           placeholder="Cantidad" aria-label="Cantidad de stock">
+                    <input id="inputStockUnidad" placeholder="Unidad (kg, ud...)" aria-label="Unidad">
+                </div>
+                <input id="inputStockNotas" placeholder="Notas (opcional)"
+                       style="margin-top:8px" aria-label="Notas de stock">
+                <button class="btn-save" style="margin-top:12px; font-size:1.1rem"
+                        onclick="guardarStock()">
+                    💾 GUARDAR STOCK
+                </button>
             </div>
+
+            <!-- Stock registrado esta semana -->
+            <div class="card" id="stockContainer">
+                <p style="color: var(--muted); text-align: center">Cargando stock...</p>
+            </div>
+
         </div>
     </div>
 
@@ -141,11 +166,88 @@
         </div>
         <div class="section-header">
             <h2 class="section-title">COMPRAS</h2>
+            <p style="color: var(--muted)">Crea pedidos por proveedor</p>
         </div>
         <div class="screen-content">
-            <div class="card" id="resumenDiaContainer">
-                <p style="color: var(--muted); text-align: center">Cargando pedidos de hoy...</p>
+
+            <!-- 1. Selector de proveedor -->
+            <div class="card">
+                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">
+                    🏪 Proveedor
+                </label>
+                <select id="selectProveedor" onchange="onProveedorChange()" aria-label="Seleccionar proveedor">
+                    <option value="">— Elige un proveedor —</option>
+                    <option value="Matteo Comit">Matteo Comit</option>
+                    <option value="Tías Fruit">Tías Fruit</option>
+                    <option value="Chacon">Chacon</option>
+                    <option value="ReyesyBouzon">ReyesyBouzon</option>
+                    <option value="Canarymeat">Canarymeat</option>
+                    <option value="Pescasol">Pescasol</option>
+                    <option value="Roper">Roper</option>
+                    <option value="Ortidal">Ortidal</option>
+                    <option value="Otro">Otro</option>
+                </select>
             </div>
+
+            <!-- 2. Añadir líneas de pedido -->
+            <div class="card" id="formPedidoContainer" style="display:none">
+                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">
+                    ➕ Añadir producto al pedido
+                </label>
+
+                <!-- Búsqueda de producto de la biblioteca -->
+                <input type="search" id="busquedaProdPedido"
+                       placeholder="🔍 Buscar en biblioteca..."
+                       oninput="filtrarProductosPedido()"
+                       autocomplete="off"
+                       aria-label="Buscar producto para pedido">
+                <div id="sugerenciasPedido" class="sugerencias-container"></div>
+
+                <!-- Campos manuales -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px">
+                    <input id="inputProductoPedido" placeholder="Producto" aria-label="Nombre del producto">
+                    <input id="inputUnidadPedido"   placeholder="Unidad (kg, ud...)" aria-label="Unidad">
+                </div>
+                <input id="inputCantidadPedido" placeholder="Cantidad" type="number" min="0" step="0.5"
+                       style="margin-top:8px" aria-label="Cantidad">
+
+                <button class="btn-save" style="margin-top:12px; font-size:1.1rem"
+                        onclick="agregarLineaPedido()">
+                    + AÑADIR AL PEDIDO
+                </button>
+            </div>
+
+            <!-- 3. Resumen del pedido actual -->
+            <div class="card" id="resumenPedidoContainer" style="display:none">
+                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">
+                    📋 Pedido actual
+                </label>
+                <div id="lineasPedido"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px">
+                    <button class="btn-save" onclick="guardarPedido()" aria-label="Guardar pedido en Sheets">
+                        💾 GUARDAR
+                    </button>
+                    <button class="btn-whatsapp" onclick="enviarPedidoActualWhatsApp()" aria-label="Enviar por WhatsApp">
+                        📲 WHATSAPP
+                    </button>
+                </div>
+                <button onclick="limpiarPedido()"
+                        style="width:100%; margin-top:8px; background:transparent; border:1px solid var(--border);
+                               color:var(--muted); padding:10px; border-radius:10px; font-size:0.85rem; cursor:pointer">
+                    🗑 Vaciar pedido
+                </button>
+            </div>
+
+            <!-- 4. Pedidos guardados hoy -->
+            <div class="card">
+                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">
+                    📅 Registrado hoy
+                </label>
+                <div id="resumenDiaContainer">
+                    <p style="color:var(--muted); text-align:center">Cargando...</p>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -174,7 +276,6 @@
     <!-- ── SCRIPTS ───────────────────────────── -->
     <script src="script.js"></script>
     <script>
-        // Registrar Service Worker para modo Offline
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .then(() => console.log('✅ Service Worker registrado'))
