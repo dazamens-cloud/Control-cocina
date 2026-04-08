@@ -490,6 +490,7 @@ async function cargarStockItems() {
   if (data && data.items) {
     STOCK_ITEMS = data.items;
     console.log(`✅ Stock Items cargados: ${STOCK_ITEMS.length}`);
+    renderListaStockItems(); // ✅ Solo añade esta línea
   } else {
     console.warn('⚠️ No se pudieron cargar los Stock Items');
   }
