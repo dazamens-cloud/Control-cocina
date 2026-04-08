@@ -12,6 +12,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Divina Italia">
+
+    <!-- SEO -->
     <meta name="description" content="Sistema de cocina profesional - Divina Italia El Charco">
     <meta name="robots" content="noindex, nofollow">
 
@@ -24,7 +26,88 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos -->
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ── MODALES ─────────────────────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-title {
+            font-family: 'Bebas Neue';
+            font-size: 1.8rem;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin: 0;
+        }
+        .modal-box input,
+        .modal-box select {
+            width: 100%;
+            background: var(--surface2) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            padding: 14px !important;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+        .modal-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .btn-cancelar {
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--muted);
+            font-family: 'Bebas Neue';
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+        /* ── SUGERENCIAS PEDIDO ──────────────── */
+        .sugerencias-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: -8px;
+        }
+        /* ── FORM NUEVO STOCK ITEM ───────────── */
+        .form-nuevo-item {
+            background: var(--surface2);
+            border: 1px solid var(--gold);
+            border-radius: 14px;
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
 
@@ -34,36 +117,36 @@
             <div class="hero-overlay"></div>
             <img src="icons/logo-hero.png" alt="Divina Italia El Charco" class="logo-principal">
         </div>
+
         <div class="grid-stats">
-            <!-- 1 Registro -->
-            <div class="stat-card" onclick="irA('screenCocina')" role="button">
+            <div class="stat-card" onclick="irA('screenCocina')" role="button" aria-label="Ir a Cocina">
                 <div class="stat-icon">🍳</div>
                 <div class="stat-label">Cocina</div>
                 <div class="stat-desc">REGISTRO</div>
             </div>
-            <!-- 2 Stock -->
-            <div class="stat-card" onclick="irA('screenStock')" role="button">
+
+            <div class="stat-card" onclick="irA('screenProductos')" role="button" aria-label="Ir a Productos">
+                <div class="stat-icon">📚</div>
+                <div class="stat-label">Productos</div>
+                <div class="stat-desc">BIBLIOTECA</div>
+            </div>
+
+            <div class="stat-card" onclick="irA('screenStock')" role="button" aria-label="Ir a Almacén">
                 <div class="stat-icon">📦</div>
                 <div class="stat-label">Almacén</div>
                 <div class="stat-desc">STOCK</div>
             </div>
-            <!-- 3 Pedidos -->
-            <div class="stat-card" onclick="irA('screenCompras')" role="button">
+
+            <div class="stat-card" onclick="irA('screenCompras')" role="button" aria-label="Ir a Compras">
                 <div class="stat-icon">🛒</div>
                 <div class="stat-label">Compras</div>
                 <div class="stat-desc">PEDIDOS</div>
             </div>
-            <!-- 4 Resumen -->
-            <div class="stat-card" onclick="irA('screenDashboard')" role="button">
+
+            <div class="stat-card" onclick="irA('screenDashboard')" role="button" aria-label="Ir a Resumen">
                 <div class="stat-icon">📊</div>
                 <div class="stat-label">Resumen</div>
                 <div class="stat-desc">SEMANAL</div>
-            </div>
-            <!-- 5 Biblioteca (ancho completo, último) -->
-            <div class="stat-card" onclick="irA('screenProductos')" role="button">
-                <div class="stat-icon">📚</div>
-                <div class="stat-label">Productos</div>
-                <div class="stat-desc">BIBLIOTECA</div>
             </div>
         </div>
     </div>
@@ -83,18 +166,38 @@
                 <label>🍳 Selecciona la preparación:</label>
                 <div id="listaElaboraciones" class="grid-elab"></div>
             </div>
-            <div id="listaIngredientes"></div>
 
-            <!-- Input de foto oculto (cámara + archivo) -->
+            <!-- Input oculto para fotos de cocina -->
             <input type="file" id="inputFotoCocina" accept="image/*"
                    style="display:none" onchange="onFotoCocinaSeleccionada(event)">
 
+            <div id="listaIngredientes"></div>
+
             <div class="action-buttons">
-                <button id="btnGuardarSesion" class="btn-save hidden" onclick="guardarSesion()"
-                        aria-label="Guardar sesión en registros">
+                <button id="btnGuardarSesion" class="btn-save hidden"
+                        onclick="guardarSesion()" aria-label="Guardar sesión">
                     GUARDAR EN REGISTROS
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- ── PANTALLA PRODUCTOS ────────────────── -->
+    <div id="screenProductos" class="screen">
+        <div class="app-header">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
+                 alt="Volver al inicio" role="button" aria-label="Volver al inicio">
+        </div>
+        <div class="section-header">
+            <h2 class="section-title">PRODUCTOS</h2>
+            <p style="color: var(--muted)">Biblioteca de productos</p>
+        </div>
+        <div class="screen-content">
+            <input type="search" id="busquedaProd"
+                   placeholder="🔍 Buscar producto..."
+                   onkeyup="filtrarProductos()"
+                   aria-label="Buscar producto">
+            <div id="listaProductos" aria-live="polite"></div>
         </div>
     </div>
 
@@ -106,49 +209,84 @@
         </div>
         <div class="section-header">
             <h2 class="section-title">CONTROL STOCK</h2>
-            <p style="color: var(--muted)">Stock de la semana actual</p>
+            <p style="color: var(--muted)">Registro semanal de elaboraciones</p>
         </div>
         <div class="screen-content">
 
-            <!-- Formulario de entrada -->
+            <!-- Formulario añadir línea -->
             <div class="card">
-                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">
-                    ➕ Añadir a la lista
-                </label>
-                <select id="selectStockElab" aria-label="Elaboración">
-                    <option value="">— Selecciona elaboración —</option>
+                <label>📦 Elaboración:</label>
+                <select id="selectStockElab">
+                    <option value="">Selecciona elaboración...</option>
                 </select>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px">
-                    <input id="inputStockCantidad" type="number" min="0" step="0.5"
-                           placeholder="Cantidad" aria-label="Cantidad">
-                    <input id="inputStockUnidad" placeholder="Unidad (kg, ud...)" aria-label="Unidad">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+                    <input type="text" id="inputStockCantidad" placeholder="Cantidad">
+                    <input type="text" id="inputStockUnidad"   placeholder="Unidad (kg, ud...)">
                 </div>
-                <input id="inputStockNotas" placeholder="Notas (opcional)" style="margin-top:8px"
-                       aria-label="Notas">
-                <button id="btnAddStock" class="btn-save"
-                        style="margin-top:12px; font-size:1rem; background:var(--surface2);
-                               color:var(--gold); border:1px solid var(--gold)"
+                <input type="text" id="inputStockNotas"
+                       placeholder="Notas (opcional)" style="margin-top:8px">
+                <button id="btnAddStock" class="btn-save" style="margin-top:10px"
                         onclick="agregarLineaStock()">
                     + AÑADIR A LA LISTA
                 </button>
             </div>
 
-            <!-- Lista de items + botón guardar todo -->
-            <div class="card" id="stockContainer">
-                <p style="color:var(--muted); text-align:center">Cargando stock...</p>
+            <!-- Añadir nueva elaboración permanente -->
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <label>⚙️ Gestionar elaboraciones</label>
+                    <button onclick="mostrarFormNuevoStockItem()"
+                            style="background:var(--surface2);border:1px solid var(--gold);
+                                   color:var(--gold);padding:8px 14px;border-radius:10px;
+                                   font-size:0.85rem;cursor:pointer">
+                        ➕ Nueva
+                    </button>
+                </div>
+
+                <!-- Form nuevo stock item -->
+                <div id="formNuevoStockItem" class="form-nuevo-item" style="margin-top:12px">
+                    <input type="text" id="niNombre" placeholder="Nombre de la elaboración">
+                    <select id="niCategoria">
+                        <option value="">Categoría...</option>
+                        <option value="Salsas">Salsas</option>
+                        <option value="Raviolis">Raviolis</option>
+                        <option value="Salsas Raviolis">Salsas Raviolis</option>
+                        <option value="Pastas">Pastas</option>
+                        <option value="Carnes">Carnes</option>
+                        <option value="Postres">Postres</option>
+                        <option value="General">General</option>
+                    </select>
+                    <div class="modal-buttons">
+                        <button class="btn-cancelar" onclick="ocultarFormNuevoStockItem()">
+                            CANCELAR
+                        </button>
+                        <button id="btnGuardarNuevoStockItem" class="btn-save"
+                                onclick="guardarNuevoStockItem()">
+                            GUARDAR
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de elaboraciones para editar/eliminar -->
+                <div id="listaStockItems" style="margin-top:12px"></div>
             </div>
 
+            <!-- Lista stock semanal -->
+            <div class="card" id="stockContainer">
+                <p style="color:var(--muted);text-align:center">Cargando stock...</p>
+            </div>
+
+            <!-- Botón guardar todo -->
             <div class="action-buttons">
-                <button id="btnGuardarTodoStock" class="btn-save" style="display:none"
-                        onclick="guardarTodoStock()">
-                    💾 GUARDAR EN SHEETS
+                <button id="btnGuardarTodoStock" class="btn-save"
+                        style="display:none" onclick="guardarTodoStock()">
+                    💾 GUARDAR STOCK
                 </button>
             </div>
 
         </div>
     </div>
-
-    <!-- ── PANTALLA COMPRAS ──────────────────── -->
+        <!-- ── PANTALLA COMPRAS ──────────────────── -->
     <div id="screenCompras" class="screen">
         <div class="app-header">
             <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
@@ -156,18 +294,19 @@
         </div>
         <div class="section-header">
             <h2 class="section-title">COMPRAS</h2>
-            <p style="color: var(--muted)">Crea pedidos por proveedor</p>
+            <p style="color: var(--muted)">Registra pedidos a proveedores</p>
         </div>
         <div class="screen-content">
-            <!-- 1. Selector proveedor -->
+
+            <!-- Selector proveedor -->
             <div class="card">
-                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">🏪 Proveedor</label>
-                <select id="selectProveedor" onchange="onProveedorChange()" aria-label="Proveedor">
-                    <option value="">— Elige un proveedor —</option>
+                <label>🏪 Proveedor:</label>
+                <select id="selectProveedor" onchange="onProveedorChange()">
+                    <option value="">Selecciona proveedor...</option>
                     <option value="Matteo Comit">Matteo Comit</option>
                     <option value="Tías Fruit">Tías Fruit</option>
                     <option value="Chacon">Chacon</option>
-                    <option value="ReyesyBouzon">ReyesyBouzon</option>
+                    <option value="ReyesyBouzon">Reyes y Bouzon</option>
                     <option value="Canarymeat">Canarymeat</option>
                     <option value="Pescasol">Pescasol</option>
                     <option value="Roper">Roper</option>
@@ -175,48 +314,55 @@
                     <option value="Otro">Otro</option>
                 </select>
             </div>
-            <!-- 2. Añadir línea -->
-            <div class="card" id="formPedidoContainer" style="display:none">
-                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">➕ Añadir producto</label>
+
+            <!-- Formulario añadir producto al pedido -->
+            <div id="formPedidoContainer" class="card" style="display:none">
+                <label>📦 Añadir producto:</label>
+
+                <!-- Búsqueda con sugerencias -->
                 <input type="search" id="busquedaProdPedido"
                        placeholder="🔍 Buscar en biblioteca..."
                        oninput="filtrarProductosPedido()"
-                       onkeyup="filtrarProductosPedido()"
-                       autocomplete="off" autocorrect="off" spellcheck="false"
-                       aria-label="Buscar producto para pedido">
-                <div id="sugerenciasPedido" class="sugerencias-container"></div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px">
-                    <input id="inputProductoPedido" placeholder="Producto" aria-label="Producto">
-                    <input id="inputUnidadPedido"   placeholder="Unidad (kg, ud...)" aria-label="Unidad">
+                       autocomplete="off">
+                <div id="sugerenciasPedido" class="sugerencias-box"></div>
+
+                <!-- Campos del producto -->
+                <input type="text" id="inputProductoPedido"
+                       placeholder="Nombre del producto" style="margin-top:8px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+                    <input type="text" id="inputCantidadPedido" placeholder="Cantidad">
+                    <input type="text" id="inputUnidadPedido"   placeholder="Unidad">
                 </div>
-                <input id="inputCantidadPedido" placeholder="Cantidad" type="number" min="0" step="0.5"
-                       style="margin-top:8px" aria-label="Cantidad">
-                <button class="btn-save" style="margin-top:12px; font-size:1.1rem"
+                <button class="btn-save" style="margin-top:10px"
                         onclick="agregarLineaPedido()">
-                    + AÑADIR AL PEDIDO
+                    ➕ AÑADIR AL PEDIDO
                 </button>
             </div>
-            <!-- 3. Resumen pedido -->
-            <div class="card" id="resumenPedidoContainer" style="display:none">
-                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">📋 Pedido actual</label>
-                <div id="lineasPedido"></div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px">
-                    <button class="btn-save" onclick="guardarPedido()">💾 GUARDAR</button>
-                    <button class="btn-whatsapp" onclick="enviarPedidoActualWhatsApp()">📲 WHATSAPP</button>
+
+            <!-- Resumen pedido actual -->
+            <div id="resumenPedidoContainer" class="card" style="display:none">
+                <label>🛒 Pedido actual:</label>
+                <div id="lineasPedido">
+                    <p style="color:var(--muted);text-align:center">Sin líneas añadidas</p>
                 </div>
-                <button onclick="limpiarPedido()"
-                        style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);
-                               color:var(--muted);padding:10px;border-radius:10px;font-size:0.85rem;cursor:pointer">
-                    🗑 Vaciar pedido
-                </button>
+                <div class="action-buttons" style="margin-top:12px">
+                    <button class="btn-save" onclick="guardarPedido()">
+                        💾 GUARDAR PEDIDO
+                    </button>
+                    <button class="btn-whatsapp" onclick="enviarPedidoActualWhatsApp()">
+                        📱 ENVIAR WHATSAPP
+                    </button>
+                </div>
             </div>
-            <!-- 4. Pedidos hoy -->
+
+            <!-- Pedidos de hoy -->
             <div class="card">
-                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">📅 Registrado hoy</label>
+                <label>📅 Pedidos de hoy:</label>
                 <div id="resumenDiaContainer">
-                    <p style="color:var(--muted); text-align:center">Cargando...</p>
+                    <p style="color:var(--muted);text-align:center">Cargando...</p>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -236,92 +382,63 @@
         </div>
     </div>
 
-    <!-- ── PANTALLA PRODUCTOS (BIBLIOTECA) ───── -->
-    <div id="screenProductos" class="screen">
-        <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
-                 alt="Volver al inicio" role="button" aria-label="Volver al inicio">
-        </div>
-        <div class="section-header">
-            <h2 class="section-title">BIBLIOTECA</h2>
-        </div>
-        <div class="screen-content">
-            <!-- Buscador -->
-            <input type="search" id="busquedaProd"
-                   placeholder="🔍 Buscar producto..."
-                   onkeyup="filtrarProductos()"
-                   aria-label="Buscar producto">
-
-            <!-- Botón nuevo producto -->
-            <button class="btn-save" style="font-size:1rem" onclick="mostrarFormNuevoProducto()">
-                ➕ NUEVO PRODUCTO
-            </button>
-
-            <!-- Formulario nuevo producto (oculto por defecto) -->
-            <div class="card" id="formNuevoProducto" style="display:none">
-                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:12px">
-                    🆕 Añadir producto
-                </label>
-                <input id="npNombre"    placeholder="Nombre del producto *" aria-label="Nombre">
-                <input id="npUnidad"    placeholder="Unidad (kg, ud, lt...)" aria-label="Unidad" style="margin-top:8px">
-                <select id="npProveedor" style="margin-top:8px" aria-label="Proveedor">
-                    <option value="">— Proveedor (opcional) —</option>
-                    <option value="Matteo Comit">Matteo Comit</option>
-                    <option value="Tías Fruit">Tías Fruit</option>
-                    <option value="Chacon">Chacon</option>
-                    <option value="ReyesyBouzon">ReyesyBouzon</option>
-                    <option value="Canarymeat">Canarymeat</option>
-                    <option value="Pescasol">Pescasol</option>
-                    <option value="Roper">Roper</option>
-                    <option value="Ortidal">Ortidal</option>
-                    <option value="Otro">Otro</option>
-                </select>
-                <input id="npCodigo"    placeholder="Código de barras (opcional)" style="margin-top:8px" aria-label="Código">
-
-                <!-- Foto del producto -->
-                <div style="margin-top:12px">
-                    <label style="color:var(--muted); font-size:0.85rem; display:block; margin-bottom:8px">
-                        📸 Foto del producto (opcional)
-                    </label>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
-                        <button onclick="abrirCamaraNP()"
-                                style="background:var(--surface2);border:1px solid var(--border);
-                                       color:var(--text);padding:12px;border-radius:10px;cursor:pointer;font-size:0.9rem">
-                            📷 Cámara
-                        </button>
-                        <button onclick="abrirArchivosNP()"
-                                style="background:var(--surface2);border:1px solid var(--border);
-                                       color:var(--text);padding:12px;border-radius:10px;cursor:pointer;font-size:0.9rem">
-                            🖼 Archivo
-                        </button>
-                    </div>
-                    <input type="file" id="inputFotoNP_camara"  accept="image/*" capture="environment"
-                           style="display:none" onchange="onFotoNPSeleccionada(event)">
-                    <input type="file" id="inputFotoNP_archivo" accept="image/*"
-                           style="display:none" onchange="onFotoNPSeleccionada(event)">
-                    <div id="previewFotoNP" style="margin-top:8px; display:none">
-                        <img id="imgPreviewNP" style="width:100%;max-height:160px;object-fit:cover;
-                                                      border-radius:10px;border:1px solid var(--border)">
-                        <button onclick="quitarFotoNP()"
-                                style="width:100%;margin-top:6px;background:transparent;
-                                       border:1px solid var(--border);color:var(--muted);
-                                       padding:8px;border-radius:8px;font-size:0.8rem;cursor:pointer">
-                            ✕ Quitar foto
-                        </button>
-                    </div>
-                </div>
-
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px">
-                    <button class="btn-save" onclick="guardarNuevoProducto()">💾 GUARDAR</button>
-                    <button onclick="ocultarFormNuevoProducto()"
-                            style="background:transparent;border:1px solid var(--border);
-                                   color:var(--muted);padding:14px;border-radius:12px;cursor:pointer">
-                        Cancelar
-                    </button>
-                </div>
+    <!-- ── MODAL EDITAR PRODUCTO ─────────────── -->
+    <div id="modalEditarProducto" class="modal-overlay">
+        <div class="modal-box">
+            <h2 class="modal-title">✏️ EDITAR PRODUCTO</h2>
+            <input type="hidden" id="epNombreOriginal">
+            <input type="text"   id="epNombre"    placeholder="Nombre del producto">
+            <input type="text"   id="epUnidad"    placeholder="Unidad (kg, ud...)">
+            <select id="epProveedor">
+                <option value="">Proveedor...</option>
+                <option value="Matteo Comit">Matteo Comit</option>
+                <option value="Tías Fruit">Tías Fruit</option>
+                <option value="Chacon">Chacon</option>
+                <option value="ReyesyBouzon">Reyes y Bouzon</option>
+                <option value="Canarymeat">Canarymeat</option>
+                <option value="Pescasol">Pescasol</option>
+                <option value="Roper">Roper</option>
+                <option value="Ortidal">Ortidal</option>
+                <option value="Otro">Otro</option>
+            </select>
+            <input type="text" id="epCodigo" placeholder="Código (opcional)">
+            <div class="modal-buttons">
+                <button class="btn-cancelar" onclick="cerrarModalEditarProducto()">
+                    CANCELAR
+                </button>
+                <button id="btnGuardarEdicionProducto" class="btn-save"
+                        onclick="guardarEdicionProducto()">
+                    GUARDAR
+                </button>
             </div>
+        </div>
+    </div>
 
-            <div id="listaProductos" aria-live="polite"></div>
+    <!-- ── MODAL EDITAR STOCK ITEM ───────────── -->
+    <div id="modalEditarStockItem" class="modal-overlay">
+        <div class="modal-box">
+            <h2 class="modal-title">✏️ EDITAR ELABORACIÓN</h2>
+            <input type="hidden" id="eiNombreOriginal">
+            <input type="text"   id="eiNombre" placeholder="Nombre de la elaboración">
+            <select id="eiCategoria">
+                <option value="">Categoría...</option>
+                <option value="Salsas">Salsas</option>
+                <option value="Raviolis">Raviolis</option>
+                <option value="Salsas Raviolis">Salsas Raviolis</option>
+                <option value="Pastas">Pastas</option>
+                <option value="Carnes">Carnes</option>
+                <option value="Postres">Postres</option>
+                <option value="General">General</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="btn-cancelar" onclick="cerrarModalEditarStockItem()">
+                    CANCELAR
+                </button>
+                <button id="btnGuardarEdicionStockItem" class="btn-save"
+                        onclick="guardarEdicionStockItem()">
+                    GUARDAR
+                </button>
+            </div>
         </div>
     </div>
 
@@ -339,8 +456,6 @@
                 .then(() => console.log('✅ Service Worker registrado'))
                 .catch(err => console.error('❌ Error registrando SW:', err));
         }
-        // Estado inicial del historial para que el botón atrás funcione en PWA
-        history.replaceState({ screen: 'screenHome' }, '', '#screenHome');
     </script>
 </body>
 </html>
