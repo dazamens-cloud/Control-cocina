@@ -520,6 +520,61 @@ function inicializarSelectStock() {
     });
     sel.appendChild(group);
   });
+  // ── RENDER LISTA STOCK ITEMS ─────────────────
+
+function renderListaStockItems() {
+  const cont = document.getElementById('listaStockItems');
+  if (!cont) return;
+
+  if (STOCK_ITEMS.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem">Sin elaboraciones</p>';
+    return;
+  }
+
+  // Agrupar por categoría
+  const categorias = {};
+  STOCK_ITEMS.forEach(item => {
+    const cat = item.categoria || 'General';
+    if (!categorias[cat]) categorias[cat] = [];
+    categorias[cat].push(item);
+  });
+
+  cont.innerHTML = Object.entries(categorias).map(([cat, items]) => `
+    <div style="margin-bottom:12px">
+
+      <!-- Cabecera categoría -->
+      <div style="font-family:'Bebas Neue';color:var(--gold);
+                  font-size:1rem;letter-spacing:1px;
+                  padding:6px 0;border-bottom:1px solid var(--border);
+                  margin-bottom:6px">
+        ${cat}
+      </div>
+
+      <!-- Items de la categoría -->
+      ${items.map(item => `
+        <div style="display:flex;justify-content:space-between;
+                    align-items:center;padding:8px 0;
+                    border-bottom:1px solid var(--border)">
+          <span style="color:var(--text);font-size:0.9rem">
+            ${item.nombre}
+          </span>
+          <div style="display:flex;gap:6px">
+            <button onclick="editarStockItem('${item.nombre.replace(/'/g, "\\'")}')"
+                    style="background:transparent;border:1px solid var(--border);
+                           color:var(--gold);padding:5px 10px;border-radius:8px;
+                           font-size:0.8rem;cursor:pointer">
+              ✏️
+            </button>
+            <button onclick="confirmarEliminarStockItem('${item.nombre.replace(/'/g, "\\'")}')"
+                    style="background:transparent;border:none;
+                           color:var(--muted);font-size:1rem;
+                           cursor:pointer;padding:5px 8px">
+              🗑️
+            </button>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
 }
 
 // ── AÑADIR STOCK ITEM ────────────────────────
