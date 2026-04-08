@@ -1,9 +1,9 @@
 // =============================================
 // script.js COMPLETO - Divina Italia El Charco
-// v2.1 — Fix CORS/JSONP + ISO week + cola POST
+// v3.0 — Stock Items dinámicos + editar/eliminar productos
 // =============================================
 
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbz0umwR8SfmIotgI76Qu2VuaQkY2vT8fGmIUgn7bE5Y6x4VIsTGDzGxo9vGbFCdFAKanw/exec";
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbypRh56UKX2M49ehR74T8K2zb1fGyntOzj17EjmpxeuxHDqkEzfzxOaMIE0jeFSDLHq2g/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
@@ -15,6 +15,7 @@ let productosEnPedido = [];
 let ingredientesFotoTarget = -1;
 let cargandoProductos = false;
 let WHATSAPP_PROVEEDORES = {};
+let STOCK_ITEMS = []; // ✅ Se carga dinámicamente desde Sheets
 
 // ── CONSTANTES ──────────────────────────────
 const RECETAS = {
@@ -36,44 +37,6 @@ const RECETAS = {
   "Relleno Porcini": [{nombre:"Champiñones",cantidad:"1 caja"},{nombre:"Porcini seco",cantidad:"1 bolsa 200gr"},{nombre:"Rabo de buey",cantidad:"30gr"},{nombre:"Mantequilla",cantidad:"200gr"},{nombre:"Ricotta",cantidad:"3 ud 250gr"}],
   "Relleno Pescado": [{nombre:"Fogonero",cantidad:"1 caja"},{nombre:"Zanahoria",cantidad:"6 ud"},{nombre:"Cebolla",cantidad:"4 ud"},{nombre:"Tomate",cantidad:"6 ud"},{nombre:"Papas folio",cantidad:"6 ud"}]
 };
-const STOCK_ITEMS = [
-  "Salsa Boloñesa",
-  "Salsa Tomate",
-  "Salsa Porcini",
-  "Salsa Gorgonzola",
-  "Salsa Champiñones",
-  "Salsa Americana",
-  "Salsa S.B.Q.",
-
-  "Raviolis R. Carne",
-  "Raviolis R. Pescado",
-  "Raviolis R. Espinacas",
-  "Raviolis R. Queso",
-  "Raviolis R. Porcini",
-
-  "Salsa Raviolis R.R. Carne",
-  "Salsa Raviolis R.R. Pescado",
-  "Salsa Raviolis R.R. Espinacas",
-  "Salsa Raviolis R.R. Queso",
-  "Salsa Raviolis R.R. Porcini",
-
-  "Lasaña",
-  "Berenjena",
-  "Caneloni",
-  "Pasta para lasaña",
-
-  "Ossobuco",
-  "Pollo champi",
-  "Burger Milanesa",
-  "Peceto",
-  "Solomillo",
-  "Pollo Milanesa",
-  "Secreto",
-  "Burger Chuletón",
-  "Burger Mixta",
-
-  "Profiteroles"
-];
 
 const EMOJI_MAP = {
   "ajo": "🧄", "cebolla": "🧅", "tomate": "🍅",
@@ -136,7 +99,6 @@ function irA(screenId, pushState = true) {
   target.style.display = 'flex';
   window.scrollTo(0, 0);
 
-  // Gestión del historial para que el botón atrás funcione dentro de la app
   if (pushState) {
     history.pushState({ screen: screenId }, '', '#' + screenId);
   }
@@ -160,16 +122,13 @@ function irA(screenId, pushState = true) {
   }
 }
 
-// Botón atrás del móvil navega al home en vez de salir de la app
 window.addEventListener('popstate', (e) => {
   const screen = e.state?.screen || 'screenHome';
-  irA(screen, false); // false = no volver a hacer pushState
+  irA(screen, false);
 });
 
 // ── COMUNICACIÓN CON SERVER ─────────────────
 
-// FIX 1: postToScript — añadido Content-Type para que Apps Script
-// pueda parsear e.postData.contents correctamente.
 async function postToScript(payload) {
   payload.token = WEB_APP_TOKEN;
 
@@ -183,13 +142,11 @@ async function postToScript(payload) {
     const response = await fetch(URL_SCRIPT, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' }, // ← FIX: evita preflight CORS sin perder el body
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(payload)
     });
     return response;
   } catch (err) {
-    // FIX 2: TypeError con no-cors no significa fallo real — el POST llegó.
-    // Solo guardamos en cola si es un error de red real (offline).
     if (!navigator.onLine) {
       guardarEnCola(payload);
       showError("Error al enviar datos. Se guardaron localmente.");
@@ -198,9 +155,6 @@ async function postToScript(payload) {
   }
 }
 
-// FIX 3: getFromScript — reemplazado JSONP por fetch normal.
-// Apps Script con access:ANYONE_ANONYMOUS devuelve CORS headers correctos.
-// JSONP fallaba porque Chrome no sigue redirects cross-origin en <script src>.
 async function getFromScript(params = {}) {
   params.token = WEB_APP_TOKEN;
   const query = new URLSearchParams(params).toString();
@@ -240,7 +194,6 @@ function enviarPedidoWhatsApp(proveedor, lineas) {
     showError(`No hay número de WhatsApp para ${proveedor}`);
     return;
   }
-  // Formato natural tipo mensaje real de restaurante
   const lineasTexto = lineas.map(l => {
     const unidad = l.unidad ? ` ${l.unidad}` : '';
     return `${l.producto} ${l.cantidad}${unidad}`;
@@ -254,10 +207,8 @@ function enviarPedidoWhatsApp(proveedor, lineas) {
   window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 
-
 // ── COMPRESIÓN DE IMÁGENES ───────────────────
-// Reduce la imagen a max 800px y calidad 0.75 antes de enviarla al servidor.
-// Evita subir fotos de 5-10MB innecesariamente.
+
 function comprimirImagen(file, maxPx = 800, calidad = 0.75) {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -284,7 +235,6 @@ function comprimirImagen(file, maxPx = 800, calidad = 0.75) {
 
 // ── COCINA ──────────────────────────────────
 
-// Fotos por ingrediente: { indice: base64 }
 const fotosIngredientes = {};
 let fotoIngTarget = -1;
 
@@ -298,7 +248,7 @@ function cargarElaboraciones() {
 
 function seleccionarElab(nombre, btnEl) {
   currentElabSelected = nombre;
-  Object.keys(fotosIngredientes).forEach(k => delete fotosIngredientes[k]); // limpiar fotos
+  Object.keys(fotosIngredientes).forEach(k => delete fotosIngredientes[k]);
   document.querySelectorAll('.btn-elab').forEach(b => b.classList.remove('selected'));
   if (btnEl) btnEl.classList.add('selected');
 
@@ -318,7 +268,8 @@ function renderIngredienteRow(nombre, cantidadDefault, i) {
   const nombreSeguro = nombre.replace(/"/g, '&quot;');
   return `
     <div class="ingrediente-row" id="ing-row-${i}">
-      <div class="ingrediente-top">
+      <div class="ingrediente
+            <div class="ingrediente-top">
         <input type="checkbox" id="ing-check-${i}" checked>
         <span>${getEmoji(nombre)}</span>
         <span class="ingrediente-nombre">${nombreSeguro}</span>
@@ -352,7 +303,7 @@ function pedirFotoCocina(idx, modo) {
   } else {
     input.removeAttribute('capture');
   }
-  input.value = ''; // reset para poder seleccionar la misma foto dos veces
+  input.value = '';
   input.click();
 }
 
@@ -381,10 +332,10 @@ async function guardarSesion() {
     const check = document.getElementById(`ing-check-${id}`);
     if (check && check.checked) {
       ingredientes.push({
-        nombre: row.querySelector('.ingrediente-nombre')?.textContent || '',
-        lote: document.getElementById(`ing-lote-${id}`)?.value || 'N/A',
+        nombre:   row.querySelector('.ingrediente-nombre')?.textContent || '',
+        lote:     document.getElementById(`ing-lote-${id}`)?.value || 'N/A',
         cantidad: document.getElementById(`ing-cant-${id}`)?.value || '',
-        imagen: fotosIngredientes[id] || ''   // foto comprimida si existe
+        imagen:   fotosIngredientes[id] || ''
       });
     }
   });
@@ -445,9 +396,22 @@ function renderListaProductos(filtro = "") {
 
   lista.innerHTML = filtrados.length ? filtrados.map(p => `
     <div class="card" style="margin-bottom:10px">
-      <b>${getEmoji(p.nombre)} ${p.nombre}</b><br>
-      <small style="color:var(--muted)">${p.proveedor || 'Sin proveedor'}</small>
-      ${p.unidad ? `<small style="color:var(--muted)"> · ${p.unidad}</small>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <b>${getEmoji(p.nombre)} ${p.nombre}</b><br>
+          <small style="color:var(--muted)">${p.proveedor || 'Sin proveedor'}</small>
+          ${p.unidad ? `<small style="color:var(--muted)"> · ${p.unidad}</small>` : ''}
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="editarProducto('${p.nombre.replace(/'/g, "\\'")}')"
+                  style="background:transparent;border:1px solid var(--border);
+                         color:var(--gold);padding:6px 10px;border-radius:8px;
+                         font-size:0.85rem;cursor:pointer">✏️</button>
+          <button onclick="confirmarEliminarProducto('${p.nombre.replace(/'/g, "\\'")}')"
+                  style="background:transparent;border:none;color:var(--muted);
+                         font-size:1.1rem;cursor:pointer;padding:6px 8px">🗑️</button>
+        </div>
+      </div>
     </div>`).join('')
   : '<p style="color:var(--muted);text-align:center">No se encontraron productos</p>';
 }
@@ -457,29 +421,207 @@ function filtrarProductos() {
   renderListaProductos(filtro);
 }
 
-// ── STOCK ────────────────────────────────────
+// ── EDITAR PRODUCTO ──────────────────────────
 
-// Lista local de items de stock (pendientes de guardar o ya cargados esta semana)
-let stockActual = [];        // [{elaboracion, cantidad, unidad, notas, guardado:bool, rowIdx}]
-let stockEditIdx = -1;       // índice del item en edición (-1 = ninguno)
+function editarProducto(nombre) {
+  const producto = productosLibreria.find(p => p.nombre === nombre);
+  if (!producto) return;
+
+  document.getElementById('epNombreOriginal').value = producto.nombre;
+  document.getElementById('epNombre').value         = producto.nombre;
+  document.getElementById('epUnidad').value         = producto.unidad    || '';
+  document.getElementById('epProveedor').value      = producto.proveedor || '';
+  document.getElementById('epCodigo').value         = producto.codigo    || '';
+
+  document.getElementById('modalEditarProducto').style.display = 'flex';
+}
+
+function cerrarModalEditarProducto() {
+  document.getElementById('modalEditarProducto').style.display = 'none';
+}
+
+async function guardarEdicionProducto() {
+  const nombreOriginal = document.getElementById('epNombreOriginal').value;
+  const nombre         = (document.getElementById('epNombre')?.value    || '').trim();
+  const unidad         = (document.getElementById('epUnidad')?.value    || '').trim();
+  const proveedor      = (document.getElementById('epProveedor')?.value || '').trim();
+  const codigo         = (document.getElementById('epCodigo')?.value    || '').trim();
+
+  if (!nombre) { showError('El nombre es obligatorio.'); return; }
+
+  const btn = document.getElementById('btnGuardarEdicionProducto');
+  if (btn) btn.disabled = true;
+
+  await postToScript({
+    modo: 'editarProducto',
+    nombreOriginal,
+    nombre,
+    unidad,
+    proveedor,
+    codigo
+  });
+
+  showSuccess('PRODUCTO ACTUALIZADO', nombre, '✏️');
+  cerrarModalEditarProducto();
+  productosLibreria = [];
+  await cargarProductos();
+  if (btn) btn.disabled = false;
+}
+
+// ── ELIMINAR PRODUCTO ────────────────────────
+
+async function confirmarEliminarProducto(nombre) {
+  if (!confirm(`¿Eliminar el producto "${nombre}"?`)) return;
+
+  await postToScript({
+    modo: 'eliminarProducto',
+    nombre
+  });
+
+  showSuccess('PRODUCTO ELIMINADO', nombre, '🗑️');
+  productosLibreria = [];
+  await cargarProductos();
+}
+
+// ── STOCK ITEMS ──────────────────────────────
+
+async function cargarStockItems() {
+  const data = await getFromScript({ accion: 'listarStockItems' });
+  if (data && data.items) {
+    STOCK_ITEMS = data.items;
+    console.log(`✅ Stock Items cargados: ${STOCK_ITEMS.length}`);
+  } else {
+    console.warn('⚠️ No se pudieron cargar los Stock Items');
+  }
+}
 
 function inicializarSelectStock() {
   const sel = document.getElementById('selectStockElab');
   if (!sel) return;
 
-  // Limpiar opciones previas excepto la primera
   sel.innerHTML = '<option value="">Selecciona elaboración...</option>';
 
+  // Agrupar por categoría
+  const categorias = {};
   STOCK_ITEMS.forEach(item => {
-    const opt = document.createElement('option');
-    opt.value = item;
-    opt.textContent = item;
-    sel.appendChild(opt);
+    const cat = item.categoria || 'General';
+    if (!categorias[cat]) categorias[cat] = [];
+    categorias[cat].push(item);
+  });
+
+  Object.entries(categorias).forEach(([cat, items]) => {
+    const group = document.createElement('optgroup');
+    group.label = cat;
+    items.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.nombre;
+      opt.textContent = item.nombre;
+      group.appendChild(opt);
+    });
+    sel.appendChild(group);
   });
 }
+
+// ── AÑADIR STOCK ITEM ────────────────────────
+
+function mostrarFormNuevoStockItem() {
+  document.getElementById('formNuevoStockItem').style.display = 'block';
+  document.getElementById('niNombre').focus();
 }
 
-// ── Añadir o actualizar línea en la lista local ──
+function ocultarFormNuevoStockItem() {
+  document.getElementById('formNuevoStockItem').style.display = 'none';
+  document.getElementById('niNombre').value     = '';
+  document.getElementById('niCategoria').value  = '';
+}
+
+async function guardarNuevoStockItem() {
+  const nombre    = (document.getElementById('niNombre')?.value    || '').trim();
+  const categoria = (document.getElementById('niCategoria')?.value || '').trim();
+
+  if (!nombre) { showError('El nombre es obligatorio.'); return; }
+
+  const btn = document.getElementById('btnGuardarNuevoStockItem');
+  if (btn) btn.disabled = true;
+
+  await postToScript({
+    modo: 'añadirStockItem',
+    nombre,
+    categoria: categoria || 'General'
+  });
+
+  showSuccess('ELABORACIÓN AÑADIDA', nombre, '✅');
+  ocultarFormNuevoStockItem();
+  await cargarStockItems();
+  inicializarSelectStock();
+  if (btn) btn.disabled = false;
+}
+
+// ── EDITAR STOCK ITEM ────────────────────────
+
+let stockItemEditando = null;
+
+function editarStockItem(nombre) {
+  const item = STOCK_ITEMS.find(i => i.nombre === nombre);
+  if (!item) return;
+  stockItemEditando = item;
+
+  document.getElementById('eiNombreOriginal').value = item.nombre;
+  document.getElementById('eiNombre').value         = item.nombre;
+  document.getElementById('eiCategoria').value      = item.categoria || '';
+
+  document.getElementById('modalEditarStockItem').style.display = 'flex';
+}
+
+function cerrarModalEditarStockItem() {
+  document.getElementById('modalEditarStockItem').style.display = 'none';
+  stockItemEditando = null;
+}
+
+async function guardarEdicionStockItem() {
+  const nombreOriginal = document.getElementById('eiNombreOriginal').value;
+  const nombre         = (document.getElementById('eiNombre')?.value    || '').trim();
+  const categoria      = (document.getElementById('eiCategoria')?.value || '').trim();
+
+  if (!nombre) { showError('El nombre es obligatorio.'); return; }
+
+  const btn = document.getElementById('btnGuardarEdicionStockItem');
+  if (btn) btn.disabled = true;
+
+  await postToScript({
+    modo: 'editarStockItem',
+    nombreOriginal,
+    nombre,
+    categoria: categoria || 'General'
+  });
+
+  showSuccess('ELABORACIÓN ACTUALIZADA', nombre, '✏️');
+  cerrarModalEditarStockItem();
+  await cargarStockItems();
+  inicializarSelectStock();
+  if (btn) btn.disabled = false;
+}
+
+// ── ELIMINAR STOCK ITEM ──────────────────────
+
+async function confirmarEliminarStockItem(nombre) {
+  if (!confirm(`¿Eliminar la elaboración "${nombre}" de la lista?`)) return;
+
+  await postToScript({
+    modo: 'eliminarStockItem',
+    nombre
+  });
+
+  showSuccess('ELABORACIÓN ELIMINADA', nombre, '🗑️');
+  await cargarStockItems();
+  inicializarSelectStock();
+}
+
+// ── STOCK SEMANAL ────────────────────────────
+
+let stockActual  = [];
+let stockEditIdx = -1;
+
 function agregarLineaStock() {
   const elaboracion = (document.getElementById('selectStockElab')?.value   || '').trim();
   const cantidad    = (document.getElementById('inputStockCantidad')?.value || '').trim();
@@ -490,7 +632,6 @@ function agregarLineaStock() {
   if (!cantidad)    { showError('Indica la cantidad.'); return; }
 
   if (stockEditIdx >= 0) {
-    // Edición de item existente
     stockActual[stockEditIdx] = { ...stockActual[stockEditIdx], elaboracion, cantidad, unidad, notas };
     stockEditIdx = -1;
     document.getElementById('btnAddStock').textContent = '+ AÑADIR A LA LISTA';
@@ -498,17 +639,17 @@ function agregarLineaStock() {
     stockActual.push({ elaboracion, cantidad, unidad, notas, guardado: false });
   }
 
-  // Limpiar campos
-  document.getElementById('selectStockElab').value      = '';
-  document.getElementById('inputStockCantidad').value   = '';
-  document.getElementById('inputStockUnidad').value     = '';
-  document.getElementById('inputStockNotas').value      = '';
+  document.getElementById('selectStockElab').value    = '';
+  document.getElementById('inputStockCantidad').value = '';
+  document.getElementById('inputStockUnidad').value   = '';
+  document.getElementById('inputStockNotas').value    = '';
 
   renderListaStock();
 }
 
-// ── Editar item: carga sus datos en el formulario ──
 function editarItemStock(idx) {
+  const item = stockActual
+  function editarItemStock(idx) {
   const item = stockActual[idx];
   if (!item) return;
   stockEditIdx = idx;
@@ -521,7 +662,6 @@ function editarItemStock(idx) {
   window.scrollTo(0, 0);
 }
 
-// ── Borrar item de la lista local ──
 function borrarItemStock(idx) {
   stockActual.splice(idx, 1);
   if (stockEditIdx === idx) {
@@ -535,9 +675,8 @@ function borrarItemStock(idx) {
   renderListaStock();
 }
 
-// ── Renderiza la tabla de items ──
 function renderListaStock() {
-  const cont   = document.getElementById('stockContainer');
+  const cont    = document.getElementById('stockContainer');
   const btnSave = document.getElementById('btnGuardarTodoStock');
   if (!cont) return;
 
@@ -551,30 +690,32 @@ function renderListaStock() {
 
   const semana = obtenerSemanaActual();
   cont.innerHTML = `
-    <div style="color:var(--muted);font-size:0.75rem;margin-bottom:10px">Semana ${semana}</div>
+    <div style="color:var(--muted);font-size:0.75rem;margin-bottom:10px">
+      Semana ${semana}
+    </div>
     ${stockActual.map((s, i) => `
       <div style="display:flex;align-items:center;gap:8px;
                   padding:10px 0;border-bottom:1px solid var(--border)">
         <div style="flex:1">
           <b style="color:${s.guardado ? 'var(--gold)' : 'var(--text)'}">${s.elaboracion}</b>
-          ${s.guardado ? '<span style="font-size:0.7rem;color:var(--muted)"> ✅</span>' : '<span style="font-size:0.7rem;color:var(--atlantico)"> ●nuevo</span>'}
+          ${s.guardado
+            ? '<span style="font-size:0.7rem;color:var(--muted)"> ✅</span>'
+            : '<span style="font-size:0.7rem;color:var(--atlantico)"> ●nuevo</span>'}
           <br>
-          <small style="color:var(--muted)">${s.cantidad} ${s.unidad}${s.notas ? ' · ' + s.notas : ''}</small>
+          <small style="color:var(--muted)">
+            ${s.cantidad} ${s.unidad}${s.notas ? ' · ' + s.notas : ''}
+          </small>
         </div>
         <button onclick="editarItemStock(${i})"
-                style="background:transparent;border:1px solid var(--border);color:var(--gold);
-                       padding:6px 10px;border-radius:8px;font-size:0.85rem;cursor:pointer">
-          ✏️
-        </button>
+                style="background:transparent;border:1px solid var(--border);
+                       color:var(--gold);padding:6px 10px;border-radius:8px;
+                       font-size:0.85rem;cursor:pointer">✏️</button>
         <button onclick="borrarItemStock(${i})"
                 style="background:transparent;border:none;color:var(--muted);
-                       font-size:1.1rem;cursor:pointer;padding:6px 8px">
-          ✕
-        </button>
+                       font-size:1.1rem;cursor:pointer;padding:6px 8px">✕</button>
       </div>`).join('')}`;
 }
 
-// ── Guardar en Sheets todos los items no guardados aún ──
 async function guardarTodoStock() {
   const pendientes = stockActual.filter(s => !s.guardado);
   if (pendientes.length === 0) {
@@ -588,7 +729,7 @@ async function guardarTodoStock() {
   const semana = obtenerSemanaActual();
   for (const item of pendientes) {
     await postToScript({
-      modo: 'stock',
+      modo:        'stock',
       semana,
       elaboracion: item.elaboracion,
       cantidad:    item.cantidad,
@@ -603,17 +744,19 @@ async function guardarTodoStock() {
   if (btn) btn.disabled = false;
 }
 
-// ── Cargar stock de esta semana desde Sheets al entrar en la pantalla ──
 async function cargarStock() {
   const cont = document.getElementById('stockContainer');
   if (!cont) return;
+
+  // ✅ Cargar Stock Items si no están cargados
+  if (STOCK_ITEMS.length === 0) await cargarStockItems();
   inicializarSelectStock();
+
   cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando stock...</p>';
 
   const semana = obtenerSemanaActual();
-  const data = await getFromScript({ accion: 'listarStock', semana });
+  const data   = await getFromScript({ accion: 'listarStock', semana });
 
-  // Combinar los ya guardados en Sheets con los pendientes locales no guardados
   const pendientesLocales = stockActual.filter(s => !s.guardado);
   if (data && data.stock) {
     stockActual = [
@@ -627,11 +770,8 @@ async function cargarStock() {
   renderListaStock();
 }
 
-// FIX 4: obtenerSemanaActual — cálculo ISO 8601 correcto.
-// El cálculo anterior podía dar semana errónea en la primera semana de enero.
 function obtenerSemanaActual() {
-  const now = new Date();
-  // Ir al jueves de la semana actual (ISO: la semana pertenece al año del jueves)
+  const now      = new Date();
   const thursday = new Date(now);
   thursday.setDate(now.getDate() - ((now.getDay() + 6) % 7) + 3);
   const yearStart = new Date(thursday.getFullYear(), 0, 1);
@@ -641,36 +781,27 @@ function obtenerSemanaActual() {
 
 // ── COMPRAS ──────────────────────────────────
 
-// Estado local del pedido en curso
-let pedidoActual = [];   // [{producto, cantidad, unidad}]
+let pedidoActual    = [];
 let proveedorActual = "";
 
 function onProveedorChange() {
   const sel = document.getElementById('selectProveedor');
   proveedorActual = sel.value;
   const mostrar = !!proveedorActual;
-  document.getElementById('formPedidoContainer').style.display  = mostrar ? 'block' : 'none';
+  document.getElementById('formPedidoContainer').style.display    = mostrar ? 'block' : 'none';
   document.getElementById('resumenPedidoContainer').style.display = pedidoActual.length > 0 ? 'block' : 'none';
 }
 
-// Filtra la biblioteca de productos mientras el usuario escribe
-// Robusto para móvil: también carga productos si aún no están en memoria
 async function filtrarProductosPedido() {
-  const q = (document.getElementById('busquedaProdPedido')?.value || '').toLowerCase().trim();
+  const q    = (document.getElementById('busquedaProdPedido')?.value || '').toLowerCase().trim();
   const cont = document.getElementById('sugerenciasPedido');
   if (!cont) return;
 
   if (!q) { cont.innerHTML = ''; return; }
 
-  // Si la biblioteca no está cargada aún, cargarla primero
   if (productosLibreria.length === 0 && !cargandoProductos) {
-    cont.innerHTML = '<div class="sugerencia-item" style="color:var(--muted)">Cargando productos...</div>';
+    cont.innerHTML = '<div style="color:var(--muted);padding:8px">Cargando productos...</div>';
     await cargarProductos();
-  }
-
-  if (productosLibreria.length === 0) {
-    cont.innerHTML = '<div class="sugerencia-item" style="color:var(--muted)">Sin productos en biblioteca</div>';
-    return;
   }
 
   const matches = productosLibreria
@@ -678,12 +809,13 @@ async function filtrarProductosPedido() {
     .slice(0, 8);
 
   if (matches.length === 0) {
-    cont.innerHTML = '<div class="sugerencia-item" style="color:var(--muted)">Sin resultados</div>';
+    cont.innerHTML = '<div style="color:var(--muted);padding:8px">Sin resultados</div>';
     return;
   }
 
   cont.innerHTML = matches.map(p => `
-    <div class="sugerencia-item" onclick="seleccionarProductoPedido('${p.nombre.replace(/'/g,"\\'")}','${(p.unidad||'').replace(/'/g,"\\'")}')">
+    <div onclick="seleccionarProductoPedido('${p.nombre.replace(/'/g,"\\'")}','${(p.unidad||'').replace(/'/g,"\\'")}')"
+         style="padding:10px;border-bottom:1px solid var(--border);cursor:pointer">
       ${getEmoji(p.nombre)} <b>${p.nombre}</b>
       <small style="color:var(--muted)"> · ${p.unidad || ''} · ${p.proveedor || ''}</small>
     </div>`).join('');
@@ -698,20 +830,19 @@ function seleccionarProductoPedido(nombre, unidad) {
 }
 
 function agregarLineaPedido() {
-  const producto  = (document.getElementById('inputProductoPedido')?.value || '').trim();
-  const cantidad  = (document.getElementById('inputCantidadPedido')?.value || '').trim();
-  const unidad    = (document.getElementById('inputUnidadPedido')?.value   || '').trim();
+  const producto = (document.getElementById('inputProductoPedido')?.value || '').trim();
+  const cantidad = (document.getElementById('inputCantidadPedido')?.value || '').trim();
+  const unidad   = (document.getElementById('inputUnidadPedido')?.value   || '').trim();
 
   if (!producto) { showError('Escribe el nombre del producto.'); return; }
   if (!cantidad) { showError('Indica la cantidad.'); return; }
 
   pedidoActual.push({ producto, cantidad, unidad });
 
-  // Limpiar campos
-  document.getElementById('inputProductoPedido').value = '';
-  document.getElementById('inputCantidadPedido').value = '';
-  document.getElementById('inputUnidadPedido').value   = '';
-  document.getElementById('busquedaProdPedido').value  = '';
+  document.getElementById('inputProductoPedido').value  = '';
+  document.getElementById('inputCantidadPedido').value  = '';
+  document.getElementById('inputUnidadPedido').value    = '';
+  document.getElementById('busquedaProdPedido').value   = '';
   document.getElementById('sugerenciasPedido').innerHTML = '';
 
   renderLineasPedido();
@@ -723,7 +854,7 @@ function eliminarLineaPedido(idx) {
 }
 
 function renderLineasPedido() {
-  const cont = document.getElementById('lineasPedido');
+  const cont    = document.getElementById('lineasPedido');
   const resCont = document.getElementById('resumenPedidoContainer');
   if (!cont || !resCont) return;
 
@@ -743,39 +874,38 @@ function renderLineasPedido() {
       </div>
       <button onclick="eliminarLineaPedido(${i})"
               style="background:transparent;border:none;color:var(--muted);
-                     font-size:1.2rem;cursor:pointer;padding:4px 8px"
-              aria-label="Eliminar ${l.producto}">✕</button>
+                     font-size:1.2rem;cursor:pointer;padding:4px 8px">✕</button>
     </div>`).join('');
 }
 
 async function guardarPedido() {
-  if (!proveedorActual) { showError('Selecciona un proveedor.'); return; }
+  if (!proveedorActual)        { showError('Selecciona un proveedor.'); return; }
   if (pedidoActual.length === 0) { showError('Añade al menos un producto.'); return; }
 
-  const payload = {
-    modo: 'compra',
+  await postToScript({
+    modo:      'compra',
     proveedor: proveedorActual,
-    lineas: pedidoActual
-  };
+    lineas:    pedidoActual
+  });
 
-  await postToScript(payload);
   showSuccess('PEDIDO GUARDADO', proveedorActual, '🛒');
   limpiarPedido();
-  cargarResumenDia(); // refresca "registrado hoy"
+  cargarResumenDia();
 }
 
 function enviarPedidoActualWhatsApp() {
-  if (!proveedorActual) { showError('Selecciona un proveedor.'); return; }
+  if (!proveedorActual)          { showError('Selecciona un proveedor.'); return; }
   if (pedidoActual.length === 0) { showError('Añade al menos un producto.'); return; }
   enviarPedidoWhatsApp(proveedorActual, pedidoActual);
 }
 
 function limpiarPedido() {
   pedidoActual = [];
-  document.getElementById('inputProductoPedido').value = '';
-  document.getElementById('inputCantidadPedido').value = '';
-  document.getElementById('inputUnidadPedido').value   = '';
-  document.getElementById('busquedaProdPedido').value  = '';
+  ['inputProductoPedido','inputCantidadPedido',
+   'inputUnidadPedido','busquedaProdPedido'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   document.getElementById('sugerenciasPedido').innerHTML = '';
   renderLineasPedido();
 }
@@ -788,7 +918,6 @@ async function cargarResumenDia() {
   const data = await getFromScript({ accion: 'pedidosHoy' });
 
   if (data && data.pedidos && data.pedidos.length > 0) {
-    // Agrupar por proveedor para mejor lectura
     const porProveedor = {};
     data.pedidos.forEach(p => {
       if (!porProveedor[p.proveedor]) porProveedor[p.proveedor] = [];
@@ -830,93 +959,6 @@ async function cargarDashboard() {
   }
 }
 
-
-// ── BIBLIOTECA — NUEVO PRODUCTO ──────────────
-
-let fotoNPBase64 = '';
-
-function mostrarFormNuevoProducto() {
-  document.getElementById('formNuevoProducto').style.display = 'block';
-  document.getElementById('npNombre').focus();
-}
-
-function ocultarFormNuevoProducto() {
-  document.getElementById('formNuevoProducto').style.display = 'none';
-  limpiarFormNP();
-}
-
-function limpiarFormNP() {
-  ['npNombre','npUnidad','npCodigo'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  const sel = document.getElementById('npProveedor');
-  if (sel) sel.value = '';
-  quitarFotoNP();
-}
-
-function abrirCamaraNP() {
-  const input = document.getElementById('inputFotoNP_camara');
-  if (input) { input.value = ''; input.click(); }
-}
-
-function abrirArchivosNP() {
-  const input = document.getElementById('inputFotoNP_archivo');
-  if (input) { input.value = ''; input.click(); }
-}
-
-async function onFotoNPSeleccionada(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  fotoNPBase64 = await comprimirImagen(file, 800, 0.75);
-  const preview = document.getElementById('previewFotoNP');
-  const img     = document.getElementById('imgPreviewNP');
-  if (preview && img) {
-    img.src = fotoNPBase64;
-    preview.style.display = 'block';
-  }
-}
-
-function quitarFotoNP() {
-  fotoNPBase64 = '';
-  const preview = document.getElementById('previewFotoNP');
-  if (preview) preview.style.display = 'none';
-  ['inputFotoNP_camara','inputFotoNP_archivo'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-}
-
-async function guardarNuevoProducto() {
-  const nombre    = (document.getElementById('npNombre')?.value || '').trim();
-  const unidad    = (document.getElementById('npUnidad')?.value || '').trim();
-  const proveedor = (document.getElementById('npProveedor')?.value || '').trim();
-  const codigo    = (document.getElementById('npCodigo')?.value || '').trim();
-
-  if (!nombre) { showError('El nombre del producto es obligatorio.'); return; }
-
-  const btn = document.querySelector('#formNuevoProducto .btn-save');
-  if (btn) btn.disabled = true;
-
-  await postToScript({
-    modo: 'inventario',
-    producto:  nombre,
-    unidad:    unidad,
-    proveedor: proveedor,
-    codigo:    codigo,
-    imagen:    fotoNPBase64
-  });
-
-  showSuccess('PRODUCTO AÑADIDO', nombre, '📚');
-  ocultarFormNuevoProducto();
-
-  // Refrescar la biblioteca
-  productosLibreria = [];
-  await cargarProductos();
-
-  if (btn) btn.disabled = false;
-}
-
 // ── OFFLINE ──────────────────────────────────
 
 function guardarEnCola(datos) {
@@ -925,7 +967,6 @@ function guardarEnCola(datos) {
   localStorage.setItem('cola_registros', JSON.stringify(cola));
 }
 
-// FIX 5: procesarColaPendiente — añadido Content-Type igual que postToScript.
 async function procesarColaPendiente() {
   if (!navigator.onLine) return;
   let cola = JSON.parse(localStorage.getItem('cola_registros') || "[]");
@@ -934,10 +975,11 @@ async function procesarColaPendiente() {
   const exitosos = [];
   for (let item of cola) {
     try {
-      await fetch(URL_SCRIPT, {
+      await fetch(
+              URL_SCRIPT, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' }, // ← FIX: consistente con postToScript
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(item.cuerpo)
       });
       exitosos.push(item.id);
@@ -946,7 +988,6 @@ async function procesarColaPendiente() {
     }
   }
 
-  // Solo eliminar los que se enviaron correctamente
   const pendientes = cola.filter(i => !exitosos.includes(i.id));
   localStorage.setItem('cola_registros', JSON.stringify(pendientes));
 
@@ -961,5 +1002,6 @@ window.addEventListener('online', procesarColaPendiente);
 
 document.addEventListener('DOMContentLoaded', () => {
   cargarProveedores();
+  cargarStockItems();
   procesarColaPendiente();
 });
