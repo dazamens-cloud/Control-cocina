@@ -3,7 +3,7 @@
 // v2.1 — Fix CORS/JSONP + ISO week + cola POST
 // =============================================
 
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbz0umwR8SfmIotgI76Qu2VuaQkY2vT8fGmIUgn7bE5Y6x4VIsTGDzGxo9vGbFCdFAKanw/exec";
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbypRh56UKX2M49ehR74T8K2zb1fGyntOzj17EjmpxeuxHDqkEzfzxOaMIE0jeFSDLHq2g/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
@@ -421,10 +421,13 @@ function filtrarProductos() {
 
 // ── STOCK ────────────────────────────────────
 
-// Rellena el selector de elaboraciones del formulario de stock
+// Lista local de items de stock (pendientes de guardar o ya cargados esta semana)
+let stockActual = [];        // [{elaboracion, cantidad, unidad, notas, guardado:bool, rowIdx}]
+let stockEditIdx = -1;       // índice del item en edición (-1 = ninguno)
+
 function inicializarSelectStock() {
   const sel = document.getElementById('selectStockElab');
-  if (!sel || sel.options.length > 1) return; // ya inicializado
+  if (!sel || sel.options.length > 1) return;
   Object.keys(RECETAS).forEach(elab => {
     const opt = document.createElement('option');
     opt.value = elab;
@@ -433,39 +436,131 @@ function inicializarSelectStock() {
   });
 }
 
-async function guardarStock() {
-  const elaboracion = document.getElementById('selectStockElab')?.value || '';
-  const cantidad    = document.getElementById('inputStockCantidad')?.value || '';
-  const unidad      = document.getElementById('inputStockUnidad')?.value.trim() || '';
-  const notas       = document.getElementById('inputStockNotas')?.value.trim() || '';
+// ── Añadir o actualizar línea en la lista local ──
+function agregarLineaStock() {
+  const elaboracion = (document.getElementById('selectStockElab')?.value   || '').trim();
+  const cantidad    = (document.getElementById('inputStockCantidad')?.value || '').trim();
+  const unidad      = (document.getElementById('inputStockUnidad')?.value   || '').trim();
+  const notas       = (document.getElementById('inputStockNotas')?.value    || '').trim();
 
   if (!elaboracion) { showError('Selecciona una elaboración.'); return; }
   if (!cantidad)    { showError('Indica la cantidad.'); return; }
 
-  const btn = document.querySelector('#screenStock .btn-save');
-  if (btn) btn.disabled = true;
-
-  await postToScript({
-    modo: 'stock',
-    semana: obtenerSemanaActual(),
-    elaboracion,
-    cantidad,
-    unidad,
-    notas
-  });
-
-  showSuccess('STOCK GUARDADO', elaboracion, '📦');
+  if (stockEditIdx >= 0) {
+    // Edición de item existente
+    stockActual[stockEditIdx] = { ...stockActual[stockEditIdx], elaboracion, cantidad, unidad, notas };
+    stockEditIdx = -1;
+    document.getElementById('btnAddStock').textContent = '+ AÑADIR A LA LISTA';
+  } else {
+    stockActual.push({ elaboracion, cantidad, unidad, notas, guardado: false });
+  }
 
   // Limpiar campos
-  document.getElementById('selectStockElab').value = '';
-  document.getElementById('inputStockCantidad').value = '';
-  document.getElementById('inputStockUnidad').value = '';
-  document.getElementById('inputStockNotas').value = '';
-  if (btn) btn.disabled = false;
+  document.getElementById('selectStockElab').value      = '';
+  document.getElementById('inputStockCantidad').value   = '';
+  document.getElementById('inputStockUnidad').value     = '';
+  document.getElementById('inputStockNotas').value      = '';
 
-  cargarStock(); // refresca la lista
+  renderListaStock();
 }
 
+// ── Editar item: carga sus datos en el formulario ──
+function editarItemStock(idx) {
+  const item = stockActual[idx];
+  if (!item) return;
+  stockEditIdx = idx;
+  document.getElementById('selectStockElab').value    = item.elaboracion;
+  document.getElementById('inputStockCantidad').value = item.cantidad;
+  document.getElementById('inputStockUnidad').value   = item.unidad;
+  document.getElementById('inputStockNotas').value    = item.notas;
+  document.getElementById('btnAddStock').textContent  = '✏️ ACTUALIZAR';
+  document.getElementById('selectStockElab').focus();
+  window.scrollTo(0, 0);
+}
+
+// ── Borrar item de la lista local ──
+function borrarItemStock(idx) {
+  stockActual.splice(idx, 1);
+  if (stockEditIdx === idx) {
+    stockEditIdx = -1;
+    document.getElementById('btnAddStock').textContent = '+ AÑADIR A LA LISTA';
+    ['selectStockElab','inputStockCantidad','inputStockUnidad','inputStockNotas'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
+  renderListaStock();
+}
+
+// ── Renderiza la tabla de items ──
+function renderListaStock() {
+  const cont   = document.getElementById('stockContainer');
+  const btnSave = document.getElementById('btnGuardarTodoStock');
+  if (!cont) return;
+
+  if (stockActual.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Sin items esta semana</p>';
+    if (btnSave) btnSave.style.display = 'none';
+    return;
+  }
+
+  if (btnSave) btnSave.style.display = 'block';
+
+  const semana = obtenerSemanaActual();
+  cont.innerHTML = `
+    <div style="color:var(--muted);font-size:0.75rem;margin-bottom:10px">Semana ${semana}</div>
+    ${stockActual.map((s, i) => `
+      <div style="display:flex;align-items:center;gap:8px;
+                  padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1">
+          <b style="color:${s.guardado ? 'var(--gold)' : 'var(--text)'}">${s.elaboracion}</b>
+          ${s.guardado ? '<span style="font-size:0.7rem;color:var(--muted)"> ✅</span>' : '<span style="font-size:0.7rem;color:var(--atlantico)"> ●nuevo</span>'}
+          <br>
+          <small style="color:var(--muted)">${s.cantidad} ${s.unidad}${s.notas ? ' · ' + s.notas : ''}</small>
+        </div>
+        <button onclick="editarItemStock(${i})"
+                style="background:transparent;border:1px solid var(--border);color:var(--gold);
+                       padding:6px 10px;border-radius:8px;font-size:0.85rem;cursor:pointer">
+          ✏️
+        </button>
+        <button onclick="borrarItemStock(${i})"
+                style="background:transparent;border:none;color:var(--muted);
+                       font-size:1.1rem;cursor:pointer;padding:6px 8px">
+          ✕
+        </button>
+      </div>`).join('')}`;
+}
+
+// ── Guardar en Sheets todos los items no guardados aún ──
+async function guardarTodoStock() {
+  const pendientes = stockActual.filter(s => !s.guardado);
+  if (pendientes.length === 0) {
+    showError('No hay items nuevos que guardar.');
+    return;
+  }
+
+  const btn = document.getElementById('btnGuardarTodoStock');
+  if (btn) btn.disabled = true;
+
+  const semana = obtenerSemanaActual();
+  for (const item of pendientes) {
+    await postToScript({
+      modo: 'stock',
+      semana,
+      elaboracion: item.elaboracion,
+      cantidad:    item.cantidad,
+      unidad:      item.unidad,
+      notas:       item.notas
+    });
+    item.guardado = true;
+  }
+
+  showSuccess('STOCK GUARDADO', `${pendientes.length} item${pendientes.length > 1 ? 's' : ''}`, '📦');
+  renderListaStock();
+  if (btn) btn.disabled = false;
+}
+
+// ── Cargar stock de esta semana desde Sheets al entrar en la pantalla ──
 async function cargarStock() {
   const cont = document.getElementById('stockContainer');
   if (!cont) return;
@@ -473,19 +568,20 @@ async function cargarStock() {
   cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando stock...</p>';
 
   const semana = obtenerSemanaActual();
-  const data = await getFromScript({ accion: 'listarStock', semana: semana });
+  const data = await getFromScript({ accion: 'listarStock', semana });
 
-  if (data && data.stock && data.stock.length > 0) {
-    cont.innerHTML = `
-      <div style="color:var(--muted);font-size:0.8rem;margin-bottom:10px">Semana ${semana}</div>
-      ${data.stock.map(s => `
-        <div style="padding:10px;border-bottom:1px solid var(--border)">
-          <b style="color:var(--gold)">${s.elaboracion}</b><br>
-          <small style="color:var(--muted)">${s.cantidad} ${s.unidad}${s.notas ? ' · ' + s.notas : ''}</small>
-        </div>`).join('')}`;
+  // Combinar los ya guardados en Sheets con los pendientes locales no guardados
+  const pendientesLocales = stockActual.filter(s => !s.guardado);
+  if (data && data.stock) {
+    stockActual = [
+      ...data.stock.map(s => ({ ...s, guardado: true })),
+      ...pendientesLocales
+    ];
   } else {
-    cont.innerHTML = '<p style="color:var(--muted);text-align:center">No hay stock registrado esta semana</p>';
+    stockActual = [...pendientesLocales];
   }
+
+  renderListaStock();
 }
 
 // FIX 4: obtenerSemanaActual — cálculo ISO 8601 correcto.
