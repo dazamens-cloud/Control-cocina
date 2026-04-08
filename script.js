@@ -1034,8 +1034,7 @@ async function procesarColaPendiente() {
   const exitosos = [];
   for (let item of cola) {
     try {
-      await fetch(
-              URL_SCRIPT, {
+      await fetch(URL_SCRIPT, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
