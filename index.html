@@ -112,44 +112,44 @@
 <body>
 
     <!-- ── PANTALLA HOME ─────────────────────── -->
-    <div id="screenHome" class="screen active">
-        <div class="hero-canario">
-            <div class="hero-overlay"></div>
-            <img src="icons/logo-hero.png" alt="Divina Italia El Charco" class="logo-principal">
+<div id="screenHome" class="screen active">
+    <div class="hero-canario">
+        <div class="hero-overlay"></div>
+        <img src="icons/logo-hero.png" alt="Divina Italia El Charco" class="logo-principal">
+    </div>
+
+    <div class="grid-stats">
+        <div class="stat-card" onclick="irA('screenCocina')" role="button" aria-label="Ir a Cocina">
+            <div class="stat-icon">🍳</div>
+            <div class="stat-label">Cocina</div>
+            <div class="stat-desc">REGISTRO</div>
         </div>
 
-        <div class="grid-stats">
-            <div class="stat-card" onclick="irA('screenCocina')" role="button" aria-label="Ir a Cocina">
-                <div class="stat-icon">🍳</div>
-                <div class="stat-label">Cocina</div>
-                <div class="stat-desc">REGISTRO</div>
-            </div>
+        <div class="stat-card" onclick="irA('screenStock')" role="button" aria-label="Ir a Almacén">
+            <div class="stat-icon">📦</div>
+            <div class="stat-label">Almacén</div>
+            <div class="stat-desc">STOCK</div>
+        </div>
 
-            <div class="stat-card" onclick="irA('screenProductos')" role="button" aria-label="Ir a Productos">
-                <div class="stat-icon">📚</div>
-                <div class="stat-label">Productos</div>
-                <div class="stat-desc">BIBLIOTECA</div>
-            </div>
+        <div class="stat-card" onclick="irA('screenCompras')" role="button" aria-label="Ir a Compras">
+            <div class="stat-icon">🛒</div>
+            <div class="stat-label">Compras</div>
+            <div class="stat-desc">PEDIDOS</div>
+        </div>
 
-            <div class="stat-card" onclick="irA('screenStock')" role="button" aria-label="Ir a Almacén">
-                <div class="stat-icon">📦</div>
-                <div class="stat-label">Almacén</div>
-                <div class="stat-desc">STOCK</div>
-            </div>
+        <div class="stat-card" onclick="irA('screenDashboard')" role="button" aria-label="Ir a Resumen">
+            <div class="stat-icon">📊</div>
+            <div class="stat-label">Resumen</div>
+            <div class="stat-desc">SEMANAL</div>
+        </div>
 
-            <div class="stat-card" onclick="irA('screenCompras')" role="button" aria-label="Ir a Compras">
-                <div class="stat-icon">🛒</div>
-                <div class="stat-label">Compras</div>
-                <div class="stat-desc">PEDIDOS</div>
-            </div>
-
-            <div class="stat-card" onclick="irA('screenDashboard')" role="button" aria-label="Ir a Resumen">
-                <div class="stat-icon">📊</div>
-                <div class="stat-label">Resumen</div>
-                <div class="stat-desc">SEMANAL</div>
-            </div>
+        <div class="stat-card" onclick="irA('screenProductos')" role="button" aria-label="Ir a Productos">
+            <div class="stat-icon">📚</div>
+            <div class="stat-label">Productos</div>
+            <div class="stat-desc">BIBLIOTECA</div>
         </div>
     </div>
+</div>
 
     <!-- ── PANTALLA COCINA ───────────────────── -->
     <div id="screenCocina" class="screen">
