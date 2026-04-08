@@ -3,7 +3,7 @@
 // v3.0 — Stock Items dinámicos + editar/eliminar productos
 // =============================================
 
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbypRh56UKX2M49ehR74T8K2zb1fGyntOzj17EjmpxeuxHDqkEzfzxOaMIE0jeFSDLHq2g/exec";
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxUTTV6s1xkpssLifMWaVloWWRXXOqFdZss2WW_41XO7N1ZDtw3E-Fv7yFnPY864kt6ZA/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
