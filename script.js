@@ -36,6 +36,44 @@ const RECETAS = {
   "Relleno Porcini": [{nombre:"Champiñones",cantidad:"1 caja"},{nombre:"Porcini seco",cantidad:"1 bolsa 200gr"},{nombre:"Rabo de buey",cantidad:"30gr"},{nombre:"Mantequilla",cantidad:"200gr"},{nombre:"Ricotta",cantidad:"3 ud 250gr"}],
   "Relleno Pescado": [{nombre:"Fogonero",cantidad:"1 caja"},{nombre:"Zanahoria",cantidad:"6 ud"},{nombre:"Cebolla",cantidad:"4 ud"},{nombre:"Tomate",cantidad:"6 ud"},{nombre:"Papas folio",cantidad:"6 ud"}]
 };
+const STOCK_ITEMS = [
+  "Salsa Boloñesa",
+  "Salsa Tomate",
+  "Salsa Porcini",
+  "Salsa Gorgonzola",
+  "Salsa Champiñones",
+  "Salsa Americana",
+  "Salsa S.B.Q.",
+
+  "Raviolis R. Carne",
+  "Raviolis R. Pescado",
+  "Raviolis R. Espinacas",
+  "Raviolis R. Queso",
+  "Raviolis R. Porcini",
+
+  "Salsa Raviolis R.R. Carne",
+  "Salsa Raviolis R.R. Pescado",
+  "Salsa Raviolis R.R. Espinacas",
+  "Salsa Raviolis R.R. Queso",
+  "Salsa Raviolis R.R. Porcini",
+
+  "Lasaña",
+  "Berenjena",
+  "Caneloni",
+  "Pasta para lasaña",
+
+  "Ossobuco",
+  "Pollo champi",
+  "Burger Milanesa",
+  "Peceto",
+  "Solomillo",
+  "Pollo Milanesa",
+  "Secreto",
+  "Burger Chuletón",
+  "Burger Mixta",
+
+  "Profiteroles"
+];
 
 const EMOJI_MAP = {
   "ajo": "🧄", "cebolla": "🧅", "tomate": "🍅",
