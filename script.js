@@ -465,13 +465,18 @@ let stockEditIdx = -1;       // índice del item en edición (-1 = ninguno)
 
 function inicializarSelectStock() {
   const sel = document.getElementById('selectStockElab');
-  if (!sel || sel.options.length > 1) return;
-  Object.keys(RECETAS).forEach(elab => {
+  if (!sel) return;
+
+  // Limpiar opciones previas excepto la primera
+  sel.innerHTML = '<option value="">Selecciona elaboración...</option>';
+
+  STOCK_ITEMS.forEach(item => {
     const opt = document.createElement('option');
-    opt.value = elab;
-    opt.textContent = elab;
+    opt.value = item;
+    opt.textContent = item;
     sel.appendChild(opt);
   });
+}
 }
 
 // ── Añadir o actualizar línea en la lista local ──
