@@ -610,6 +610,7 @@ async function guardarNuevoStockItem() {
   ocultarFormNuevoStockItem();
   await cargarStockItems();
   inicializarSelectStock();
+  renderListaStockItems(); // ✅ Añadido
   if (btn) btn.disabled = false;
 }
 
@@ -655,6 +656,7 @@ async function guardarEdicionStockItem() {
   cerrarModalEditarStockItem();
   await cargarStockItems();
   inicializarSelectStock();
+  renderListaStockItems(); // ✅ Añadido
   if (btn) btn.disabled = false;
 }
 
@@ -671,6 +673,7 @@ async function confirmarEliminarStockItem(nombre) {
   showSuccess('ELABORACIÓN ELIMINADA', nombre, '🗑️');
   await cargarStockItems();
   inicializarSelectStock();
+  renderListaStockItems(); // ✅ Añadido
 }
 
 // ── STOCK SEMANAL ────────────────────────────
