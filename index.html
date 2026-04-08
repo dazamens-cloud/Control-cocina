@@ -109,8 +109,12 @@
             <p style="color: var(--muted)">Stock de la semana actual</p>
         </div>
         <div class="screen-content">
+
+            <!-- Formulario de entrada -->
             <div class="card">
-                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">➕ Registrar stock</label>
+                <label style="color:var(--gold); font-weight:700; display:block; margin-bottom:10px">
+                    ➕ Añadir a la lista
+                </label>
                 <select id="selectStockElab" aria-label="Elaboración">
                     <option value="">— Selecciona elaboración —</option>
                 </select>
@@ -119,14 +123,28 @@
                            placeholder="Cantidad" aria-label="Cantidad">
                     <input id="inputStockUnidad" placeholder="Unidad (kg, ud...)" aria-label="Unidad">
                 </div>
-                <input id="inputStockNotas" placeholder="Notas (opcional)" style="margin-top:8px">
-                <button class="btn-save" style="margin-top:12px; font-size:1.1rem" onclick="guardarStock()">
-                    💾 GUARDAR STOCK
+                <input id="inputStockNotas" placeholder="Notas (opcional)" style="margin-top:8px"
+                       aria-label="Notas">
+                <button id="btnAddStock" class="btn-save"
+                        style="margin-top:12px; font-size:1rem; background:var(--surface2);
+                               color:var(--gold); border:1px solid var(--gold)"
+                        onclick="agregarLineaStock()">
+                    + AÑADIR A LA LISTA
                 </button>
             </div>
+
+            <!-- Lista de items + botón guardar todo -->
             <div class="card" id="stockContainer">
-                <p style="color: var(--muted); text-align: center">Cargando stock...</p>
+                <p style="color:var(--muted); text-align:center">Cargando stock...</p>
             </div>
+
+            <div class="action-buttons">
+                <button id="btnGuardarTodoStock" class="btn-save" style="display:none"
+                        onclick="guardarTodoStock()">
+                    💾 GUARDAR EN SHEETS
+                </button>
+            </div>
+
         </div>
     </div>
 
