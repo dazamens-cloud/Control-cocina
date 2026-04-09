@@ -1,62 +1,130 @@
-const CACHE_NAME = 'divina-italia-v7';
-const ASSETS = [
+// ─────────────────────────────────────────────
+// sw.js - Divina Italia El Charco
+// Estrategia: Network-first para app (siempre
+// sirve la versión más reciente), cache-first
+// solo para imágenes y fuentes.
+// Incrementa CACHE_VERSION con cada deploy.
+// ─────────────────────────────────────────────
+
+const CACHE_VERSION = 'v10';
+const CACHE_APP     = 'divina-app-'   + CACHE_VERSION;
+const CACHE_STATIC  = 'divina-static-' + CACHE_VERSION;
+
+// Archivos de la app (se sirven siempre desde la red si hay conexión)
+const APP_SHELL = [
   './',
   './index.html',
   './style.css',
   './script.js',
   './manifest.json',
-  './offline.html',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './offline.html'
 ];
 
-self.addEventListener('install', e => {
+// Archivos estáticos pesados (cache-first, cambian poco)
+const STATIC_ASSETS = [
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/logo-hero.png'
+];
+
+// ── INSTALL: precachear todo ─────────────────
+self.addEventListener('install', function(e) {
   e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    Promise.all([
+      caches.open(CACHE_APP).then(function(cache) {
+        return cache.addAll(APP_SHELL);
+      }),
+      caches.open(CACHE_STATIC).then(function(cache) {
+        return cache.addAll(STATIC_ASSETS);
+      })
+    ])
   );
+  // Activar inmediatamente sin esperar a que cierren las pestañas
   self.skipWaiting();
 });
 
-self.addEventListener('activate', e => {
+// ── ACTIVATE: borrar caches antiguas ─────────
+self.addEventListener('activate', function(e) {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.map(k => {
-        if (k !== CACHE_NAME) return caches.delete(k);
-      })
-    ))
+    caches.keys().then(function(keys) {
+      return Promise.all(
+        keys.map(function(key) {
+          // Eliminar cualquier cache que no sea de esta versión
+          if (key !== CACHE_APP && key !== CACHE_STATIC) {
+            console.log('[SW] Borrando cache antigua:', key);
+            return caches.delete(key);
+          }
+        })
+      );
+    })
   );
+  // Tomar control de todas las pestañas abiertas inmediatamente
   self.clients.claim();
 });
 
-self.addEventListener('fetch', e => {
-  // ✅ No interceptar peticiones POST ni a Google Script
-  if (e.request.method !== 'GET') return;
-  if (e.request.url.includes('script.google.com')) return;
-  if (e.request.url.includes('fonts.googleapis.com')) return;
+// ── FETCH ─────────────────────────────────────
+self.addEventListener('fetch', function(e) {
+  var url = e.request.url;
 
-  e.respondWith(
-    caches.match(e.request).then(cachedResponse => {
-      // ✅ Si está en caché lo devolvemos directamente
-      if (cachedResponse) return cachedResponse;
+  // No interceptar POST ni llamadas externas
+  if (e.request.method !== 'GET')              return;
+  if (url.includes('script.google.com'))       return;
+  if (url.includes('fonts.googleapis.com'))    return;
+  if (url.includes('fonts.gstatic.com'))       return;
+  if (url.includes('transparenttextures.com')) return;
 
-      // ✅ Si no está en caché intentamos la red
-      return fetch(e.request)
-        .then(networkResponse => {
-          // ✅ Solo cacheamos respuestas válidas
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
-            return networkResponse;
-          }
-          // ✅ Clonamos ANTES de cachear
-          const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-          return networkResponse;
-        })
-        .catch(() => {
-          // ✅ Sin red → página offline
-          if (e.request.destination === 'document') {
-            return caches.match('./offline.html');
-          }
-        });
-    })
-  );
+  // IMÁGENES y fuentes locales → cache-first
+  if (
+    url.match(/\.(png|jpg|jpeg|webp|gif|svg|woff2?)$/) ||
+    url.includes('/icons/')
+  ) {
+    e.respondWith(cacheFirst(e.request, CACHE_STATIC));
+    return;
+  }
+
+  // APP SHELL (html, css, js) → network-first
+  // Intenta la red; si falla usa la cache; si no hay cache usa offline.html
+  e.respondWith(networkFirst(e.request));
 });
+
+// ── ESTRATEGIA: Network-first ─────────────────
+function networkFirst(request) {
+  return fetch(request)
+    .then(function(networkResponse) {
+      // Respuesta válida → actualizar cache y devolver
+      if (networkResponse && networkResponse.status === 200) {
+        var clone = networkResponse.clone();
+        caches.open(CACHE_APP).then(function(cache) {
+          cache.put(request, clone);
+        });
+      }
+      return networkResponse;
+    })
+    .catch(function() {
+      // Sin red → usar cache
+      return caches.match(request).then(function(cached) {
+        if (cached) return cached;
+        // Sin cache y sin red → página offline
+        if (request.destination === 'document') {
+          return caches.match('./offline.html');
+        }
+      });
+    });
+}
+
+// ── ESTRATEGIA: Cache-first ───────────────────
+function cacheFirst(request, cacheName) {
+  return caches.match(request).then(function(cached) {
+    if (cached) return cached;
+    // No está en cache → buscar en red y guardar
+    return fetch(request).then(function(networkResponse) {
+      if (networkResponse && networkResponse.status === 200) {
+        var clone = networkResponse.clone();
+        caches.open(cacheName).then(function(cache) {
+          cache.put(request, clone);
+        });
+      }
+      return networkResponse;
+    });
+  });
+}
