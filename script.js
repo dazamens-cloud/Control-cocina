@@ -892,6 +892,93 @@ async function cargarDashboard() {
   cont.innerHTML = html;
 }
 
+
+// ── BIBLIOTECA — NUEVO PRODUCTO ──────────────
+
+var fotoNPBase64 = '';
+
+function mostrarFormNuevoProducto() {
+  var form = document.getElementById('formNuevoProducto');
+  if (form) form.style.display = 'block';
+  var n = document.getElementById('npNombre');
+  if (n) n.focus();
+}
+
+function ocultarFormNuevoProducto() {
+  var form = document.getElementById('formNuevoProducto');
+  if (form) form.style.display = 'none';
+  limpiarFormNP();
+}
+
+function limpiarFormNP() {
+  ['npNombre','npUnidad','npCodigo'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  var sel = document.getElementById('npProveedor'); if (sel) sel.value = '';
+  quitarFotoNP();
+}
+
+function abrirCamaraNP() {
+  var input = document.getElementById('inputFotoNP_camara');
+  if (input) { input.value = ''; input.click(); }
+}
+
+function abrirArchivosNP() {
+  var input = document.getElementById('inputFotoNP_archivo');
+  if (input) { input.value = ''; input.click(); }
+}
+
+async function onFotoNPSeleccionada(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  fotoNPBase64 = await comprimirImagen(file, 800, 0.75);
+  var preview = document.getElementById('previewFotoNP');
+  var img     = document.getElementById('imgPreviewNP');
+  if (preview && img) {
+    img.src = fotoNPBase64;
+    preview.style.display = 'block';
+  }
+}
+
+function quitarFotoNP() {
+  fotoNPBase64 = '';
+  var preview = document.getElementById('previewFotoNP');
+  if (preview) preview.style.display = 'none';
+  ['inputFotoNP_camara','inputFotoNP_archivo'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+}
+
+async function guardarNuevoProducto() {
+  var nombre    = ((document.getElementById('npNombre')    || {}).value || '').trim();
+  var unidad    = ((document.getElementById('npUnidad')    || {}).value || '').trim();
+  var proveedor = ((document.getElementById('npProveedor') || {}).value || '').trim();
+  var codigo    = ((document.getElementById('npCodigo')    || {}).value || '').trim();
+
+  if (!nombre) { showError('El nombre del producto es obligatorio.'); return; }
+
+  var btn = document.querySelector('#formNuevoProducto .btn-save');
+  if (btn) btn.disabled = true;
+
+  await postToScript({
+    modo:      'inventario',
+    producto:  nombre,
+    unidad:    unidad,
+    proveedor: proveedor,
+    codigo:    codigo,
+    imagen:    fotoNPBase64
+  });
+
+  showSuccess('PRODUCTO AÑADIDO', nombre, '📚');
+  ocultarFormNuevoProducto();
+
+  // Refrescar biblioteca
+  productosLibreria = [];
+  await cargarProductos();
+
+  if (btn) btn.disabled = false;
+}
+
 // ── OFFLINE ───────────────────────────────────
 
 function guardarEnCola(datos) {
