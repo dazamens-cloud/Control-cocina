@@ -470,6 +470,16 @@ function renderListaStockItems() {
   }).join('');
 }
 
+// Mostrar/ocultar la lista de elaboraciones como acordeón
+function toggleGestionElaboraciones() {
+  var panel  = document.getElementById('panelGestionElaboraciones');
+  var btn    = document.getElementById('btnToggleGestion');
+  if (!panel) return;
+  var visible = panel.style.display !== 'none';
+  panel.style.display = visible ? 'none' : 'block';
+  if (btn) btn.textContent = visible ? '⚙️ Gestionar' : '✕ Cerrar';
+}
+
 function mostrarFormNuevoStockItem() {
   var form = document.getElementById('formNuevoStockItem');
   if (form) form.style.display = 'flex';
@@ -762,12 +772,23 @@ function renderLineasPedido() {
 async function guardarPedido() {
   if (!proveedorActual)          { showError('Selecciona un proveedor.'); return; }
   if (pedidoActual.length === 0) { showError('Añade al menos un producto.'); return; }
-  await postToScript({ modo: 'compra', proveedor: proveedorActual, lineas: pedidoActual });
-  showSuccess('PEDIDO GUARDADO', proveedorActual, '🛒');
+
+  // Guardar una copia del pedido antes de limpiar, para el WhatsApp
+  var proveedorCopia = proveedorActual;
+  var pedidoCopia    = pedidoActual.slice();
+
+  await postToScript({ modo: 'compra', proveedor: proveedorCopia, lineas: pedidoCopia });
+  showSuccess('PEDIDO GUARDADO', proveedorCopia, '🛒');
   limpiarPedido();
   cargarResumenDia();
+
+  // Abrir WhatsApp automáticamente tras guardar
+  setTimeout(function() {
+    enviarPedidoWhatsApp(proveedorCopia, pedidoCopia);
+  }, 800); // pequeño delay para que el overlay de éxito se vea
 }
 
+// Mantenemos la función por si se llama desde otro sitio
 function enviarPedidoActualWhatsApp() {
   if (!proveedorActual)          { showError('Selecciona un proveedor.'); return; }
   if (pedidoActual.length === 0) { showError('Añade al menos un producto.'); return; }
@@ -817,59 +838,55 @@ async function cargarResumenDia() {
 async function cargarDashboard() {
   var cont = document.getElementById('dashContent');
   if (!cont) return;
-  cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando analíticas semanales...</p>';
+  cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando analíticas...</p>';
 
-  // Llamamos al script pidiendo los registros de la semana
-  var data = await getFromScript({ accion: 'registrosSemana' });
+  // Cargar registros de cocina y compras de la semana en paralelo
+  var results = await Promise.all([
+    getFromScript({ accion: 'registrosSemana' }),
+    getFromScript({ accion: 'comprasSemana' })
+  ]);
+  var dataCocina  = results[0];
+  var dataCompras = results[1];
 
-  if (!data) {
-    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Error al conectar con el servidor</p>';
-    return;
-  }
+  var html = '';
 
-  let html = "";
-
-  // --- SECCIÓN 1: ELABORACIONES DE COCINA ---
-  html += '<div style="font-family:\'Bebas Neue\'; color:var(--gold); font-size:1.4rem; margin-bottom:10px; border-bottom:1px solid var(--gold)">🍳 ELABORACIONES SEMANALES</div>';
-  
-  if (data.sesiones && data.sesiones.length > 0) {
-    html += data.sesiones.map(function(s) {
-      return '<div style="padding:10px; border-bottom:1px solid var(--border); background:rgba(255,255,255,0.03); margin-bottom:5px; border-radius:8px">' +
-        '<div style="display:flex; justify-content:space-between">' +
-          '<b style="color:var(--text)">' + s.elaboracion + '</b>' +
-          '<small style="color:var(--muted)">' + s.fecha + '</small>' +
-        '</div>' +
-        '<small style="color:var(--gold)">' + s.ingredientes.length + ' ingredientes registrados</small></div>';
+  // ── Sección Cocina ──
+  html += '<div style="font-family:Bebas Neue,serif;color:var(--gold);font-size:1.3rem;letter-spacing:1px;margin-bottom:8px">🍳 PRODUCCIÓN</div>';
+  if (dataCocina && dataCocina.sesiones && dataCocina.sesiones.length > 0) {
+    html += dataCocina.sesiones.map(function(s) {
+      return '<div style="padding:10px;border-bottom:1px solid var(--border)">' +
+        '<b style="color:var(--text)">' + s.elaboracion + '</b>' +
+        '<small style="color:var(--muted)"> · ' + s.fecha + '</small><br>' +
+        '<small style="color:var(--muted)">' + s.ingredientes.length + ' ingredientes</small></div>';
     }).join('');
   } else {
-    html += '<p style="color:var(--muted); font-size:0.9rem; padding-left:10px">No hay elaboraciones esta semana.</p>';
+    html += '<p style="color:var(--muted);text-align:center;padding:10px">Sin registros esta semana</p>';
   }
 
-  html += '<div style="margin-top:25px"></div>'; // Espaciador
-
-  // --- SECCIÓN 2: PEDIDOS A PROVEEDORES ---
-  html += '<div style="font-family:\'Bebas Neue\'; color:var(--atlantico); font-size:1.4rem; margin-bottom:10px; border-bottom:1px solid var(--atlantico)">🛒 COMPRAS DE LA SEMANA</div>';
-  
-  if (data.compras && data.compras.length > 0) {
-    // Agrupamos por fecha para que sea más fácil de leer
-    let comprasPorDia = {};
-    data.compras.forEach(c => {
-      if (!comprasPorDia[c.fecha]) comprasPorDia[c.fecha] = [];
-      comprasPorDia[c.fecha].push(c);
+  // ── Sección Compras ──
+  html += '<div style="font-family:Bebas Neue,serif;color:var(--gold);font-size:1.3rem;letter-spacing:1px;margin:18px 0 8px">🛒 COMPRAS</div>';
+  if (dataCompras && dataCompras.compras && dataCompras.compras.length > 0) {
+    // Agrupar por proveedor
+    var porProveedor = {};
+    dataCompras.compras.forEach(function(c) {
+      if (!porProveedor[c.proveedor]) porProveedor[c.proveedor] = [];
+      porProveedor[c.proveedor].push(c);
     });
-
-    html += Object.entries(comprasPorDia).map(([fecha, pedidos]) => {
-      return '<div style="margin-bottom:15px">' +
-        '<div style="background:var(--surface2); padding:4px 10px; border-radius:4px; font-size:0.8rem; color:var(--muted); margin-bottom:5px">' + fecha + '</div>' +
-        pedidos.map(p => {
-          return '<div style="padding:4px 10px; border-left:2px solid var(--atlantico); margin-left:5px">' +
-            '<span style="color:var(--text); font-size:0.9rem"><b>' + p.proveedor + '</b>: ' + p.producto + '</span>' +
-            '<small style="color:var(--muted)"> (' + p.cantidad + ' ' + p.unidad + ')</small></div>';
-        }).join('') +
-      '</div>';
+    html += Object.entries(porProveedor).map(function(entry) {
+      var prov  = entry[0];
+      var items = entry[1];
+      return '<div style="margin-bottom:12px">' +
+        '<div style="color:var(--muted);font-weight:700;font-size:0.85rem;margin-bottom:4px">🏪 ' + prov + '</div>' +
+        items.map(function(c) {
+          return '<div style="padding:4px 0 4px 10px;border-left:2px solid var(--border)">' +
+            getEmoji(c.producto) + ' <span style="color:var(--text)">' + c.producto + '</span>' +
+            '<small style="color:var(--muted)"> · ' + c.cantidad + ' ' + c.unidad + '</small>' +
+            '<small style="color:var(--muted);display:block">' + (c.fecha || '') + '</small>' +
+            '</div>';
+        }).join('') + '</div>';
     }).join('');
   } else {
-    html += '<p style="color:var(--muted); font-size:0.9rem; padding-left:10px">No hay pedidos registrados esta semana.</p>';
+    html += '<p style="color:var(--muted);text-align:center;padding:10px">Sin compras esta semana</p>';
   }
 
   cont.innerHTML = html;
