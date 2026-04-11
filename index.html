@@ -148,9 +148,20 @@
                 </button>
             </div>
 
-            <!-- Lista semanal + guardar -->
-            <div class="card" id="stockContainer">
-                <p style="color:var(--muted);text-align:center">Cargando stock...</p>
+            <!-- Selector de semana + lista -->
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <label style="margin:0;color:var(--gold);font-weight:700">📅 Semana</label>
+                    <select id="selectorSemanasStock"
+                            onchange="cambiarSemanaStock(this.value)"
+                            style="width:auto;min-width:140px;padding:8px 12px !important;
+                                   font-size:0.9rem;margin-bottom:0">
+                        <option>Cargando...</option>
+                    </select>
+                </div>
+                <div id="stockContainer">
+                    <p style="color:var(--muted);text-align:center">Cargando stock...</p>
+                </div>
             </div>
             <div class="action-buttons">
                 <button id="btnGuardarTodoStock" class="btn-save" style="display:none" onclick="guardarTodoStock()">
