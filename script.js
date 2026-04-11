@@ -553,8 +553,91 @@ async function confirmarEliminarStockItem(nombre) {
 
 // ── STOCK SEMANAL ─────────────────────────────
 
-var stockActual  = [];
-var stockEditIdx = -1;
+var stockActual    = [];
+var stockEditIdx   = -1;
+var semanaVista    = obtenerSemanaActual(); // semana que se está mostrando
+var stockHistorico = {};                    // cache: { "2026-W15": [...] }
+
+// Genera lista de semanas del año actual para el selector
+function obtenerSemanasDelAnio() {
+  var now    = new Date();
+  var anio   = now.getFullYear();
+  var actual = obtenerSemanaActual();
+  var semanas = [];
+  // Desde semana 1 hasta la actual
+  for (var w = 1; w <= 53; w++) {
+    var key = anio + '-W' + String(w).padStart(2, '0');
+    if (key > actual) break;
+    semanas.push(key);
+  }
+  return semanas.reverse(); // más reciente primero
+}
+
+function renderSelectorSemanas() {
+  var sel = document.getElementById('selectorSemanasStock');
+  if (!sel) return;
+  var semanas = obtenerSemanasDelAnio();
+  sel.innerHTML = semanas.map(function(s) {
+    return '<option value="' + s + '"' + (s === semanaVista ? ' selected' : '') + '>' + s + '</option>';
+  }).join('');
+}
+
+async function cambiarSemanaStock(semana) {
+  semanaVista = semana;
+  var cont = document.getElementById('stockContainer');
+  if (cont) cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando...</p>';
+
+  // Si es la semana actual, usamos stockActual (puede tener pendientes locales)
+  if (semana === obtenerSemanaActual()) {
+    renderListaStock();
+    return;
+  }
+
+  // Si ya lo tenemos en caché, mostrarlo directamente
+  if (stockHistorico[semana]) {
+    renderListaStockHistorico(semana, stockHistorico[semana]);
+    return;
+  }
+
+  // Cargar desde Sheets
+  var data = await getFromScript({ accion: 'listarStock', semana: semana });
+  var items = (data && data.stock) ? data.stock : [];
+  stockHistorico[semana] = items;
+  renderListaStockHistorico(semana, items);
+}
+
+function renderListaStockHistorico(semana, items) {
+  var cont    = document.getElementById('stockContainer');
+  var btnSave = document.getElementById('btnGuardarTodoStock');
+  if (!cont) return;
+
+  // Ocultar botón guardar en semanas históricas
+  if (btnSave) btnSave.style.display = semana === obtenerSemanaActual() ? 'block' : 'none';
+
+  if (items.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Sin stock registrado en ' + semana + '</p>';
+    return;
+  }
+
+  // Calcular resumen (suma por elaboración)
+  var resumen = {};
+  items.forEach(function(s) {
+    var key = s.elaboracion;
+    if (!resumen[key]) resumen[key] = { elaboracion: key, unidad: s.unidad, total: 0, registros: [] };
+    resumen[key].total += parseFloat(s.cantidad) || 0;
+    resumen[key].registros.push(s);
+  });
+
+  cont.innerHTML =
+    '<div style="color:var(--muted);font-size:0.75rem;margin-bottom:10px">Semana ' + semana + ' · ' + items.length + ' registros</div>' +
+    items.map(function(s, i) {
+      return '<div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border)">' +
+        '<div style="flex:1">' +
+        '<b style="color:var(--gold)">' + s.elaboracion + '</b> <span style="font-size:0.7rem;color:var(--muted)">✅</span><br>' +
+        '<small style="color:var(--muted)">' + s.cantidad + ' ' + s.unidad + (s.notas ? ' · ' + s.notas : '') + '</small>' +
+        '</div></div>';
+    }).join('');
+}
 
 function agregarLineaStock() {
   var elaboracion = ((document.getElementById('selectStockElab')    || {}).value || '').trim();
@@ -577,10 +660,15 @@ function agregarLineaStock() {
   ['selectStockElab','inputStockCantidad','inputStockUnidad','inputStockNotas'].forEach(function(id) {
     var el = document.getElementById(id); if (el) el.value = '';
   });
+
+  // Volver a semana actual si estamos viendo una histórica
+  semanaVista = obtenerSemanaActual();
+  var sel = document.getElementById('selectorSemanasStock');
+  if (sel) sel.value = semanaVista;
+
   renderListaStock();
 }
 
-// BUG 3 CORREGIDO: función duplicada eliminada
 function editarItemStock(idx) {
   var item = stockActual[idx];
   if (!item) return;
@@ -653,6 +741,8 @@ async function guardarTodoStock() {
   }
 
   showSuccess('STOCK GUARDADO', pendientes.length + ' item' + (pendientes.length > 1 ? 's' : ''), '📦');
+  // Invalidar cache de la semana actual para forzar recarga
+  delete stockHistorico[semana];
   renderListaStock();
   if (btn) btn.disabled = false;
 }
@@ -664,17 +754,18 @@ async function cargarStock() {
   if (STOCK_ITEMS.length === 0) await cargarStockItems();
   else inicializarSelectStock();
 
+  // Inicializar selector de semanas
+  semanaVista = obtenerSemanaActual();
+  renderSelectorSemanas();
+
   cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando stock...</p>';
 
-  var semana = obtenerSemanaActual();
-  var data   = await getFromScript({ accion: 'listarStock', semana: semana });
-
+  var data = await getFromScript({ accion: 'listarStock', semana: semanaVista });
   var pendientesLocales = stockActual.filter(function(s) { return !s.guardado; });
   stockActual = (data && data.stock ? data.stock.map(function(s) { return Object.assign({}, s, { guardado: true }); }) : []).concat(pendientesLocales);
 
   renderListaStock();
 }
-
 function obtenerSemanaActual() {
   var now      = new Date();
   var thursday = new Date(now);
