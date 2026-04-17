@@ -1722,3 +1722,617 @@ function escHtml(str) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
+// ─────────────────────────────────────────────
+// ESTADO GLOBAL NUEVO
+// ─────────────────────────────────────────────
+let preciosLibreria  = [];
+let platosLibreria   = [];
+let albaranLineasIA  = [];
+let escandalloLineas = [];
+ 
+// ─────────────────────────────────────────────
+// NAVEGACIÓN — añadir al switch de irA():
+// case 'screenPrecios': cargarPrecios(); break;
+// case 'screenCarta':   cargarCarta();   break;
+// ─────────────────────────────────────────────
+ 
+ 
+// ══════════════════════════════════════════════
+// MÓDULO A — PRECIOS Y ALBARANES (sin API)
+// ══════════════════════════════════════════════
+ 
+async function cargarPrecios() {
+  var cont = document.getElementById('listaPreciosContainer');
+  if (!cont) return;
+  cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando...</p>';
+  var data = await getFromScript({ accion: 'listarPrecios' });
+  if (data && data.precios) {
+    preciosLibreria = data.precios;
+    filtrarPrecios();
+  } else {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Error cargando precios</p>';
+  }
+}
+ 
+function filtrarPrecios() {
+  var q    = ((document.getElementById('busquedaPrecios') || {}).value || '').toLowerCase();
+  var cont = document.getElementById('listaPreciosContainer');
+  if (!cont) return;
+ 
+  var lista = preciosLibreria.filter(function(p) {
+    return p.producto.toLowerCase().includes(q);
+  });
+ 
+  if (lista.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">' +
+      (preciosLibreria.length === 0
+        ? 'Sin precios registrados aún.'
+        : 'Sin resultados') +
+      '</p>';
+    return;
+  }
+ 
+  cont.innerHTML = lista.map(function(p) {
+    var fuenteColor = p.fuente === 'Albarán' ? 'var(--gold)' : 'var(--muted)';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;' +
+           'padding:10px 0;border-bottom:1px solid var(--border)">' +
+      '<div style="flex:1">' +
+        '<span style="color:var(--text)">' + getEmoji(p.producto) + ' ' + p.producto + '</span><br>' +
+        '<small style="color:var(--muted)">' + (p.proveedor || '—') +
+        ' · <span style="color:' + fuenteColor + '">' + (p.fuente || 'Manual') + '</span></small>' +
+      '</div>' +
+      '<div style="text-align:right;margin-left:10px">' +
+        '<b style="color:var(--gold)">' + parseFloat(p.precio).toFixed(2) + '€</b>' +
+        '<small style="color:var(--muted);display:block">/' + (p.unidad || 'ud') + '</small>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+ 
+ 
+// ── FLUJO ALBARÁN: texto pegado desde IA externa ──
+ 
+function mostrarPromptAlbaran() {
+  var panel = document.getElementById('panelPromptAlbaran');
+  if (!panel) return;
+  var abierto = panel.style.display !== 'none';
+  panel.style.display = abierto ? 'none' : 'block';
+ 
+  if (!abierto) {
+    var prods = productosLibreria.map(function(p) { return p.nombre; }).join(', ');
+    var prompt =
+      'Analiza esta imagen de albarán de restaurante.\n' +
+      'Extrae todos los productos con cantidad y precio unitario.\n\n' +
+      'Mis productos actuales (intenta mapear nombres similares):\n' +
+      (prods || '(sin productos previos)') + '\n\n' +
+      'Devuelve SOLO este JSON, sin texto adicional:\n' +
+      '{\n' +
+      '  "proveedor": "nombre del proveedor o cadena vacía",\n' +
+      '  "lineas": [\n' +
+      '    { "producto": "nombre", "cantidad": 5, "unidad": "kg", "precioUnit": 3.50 }\n' +
+      '  ]\n' +
+      '}\n\n' +
+      'Si no aparece precio unitario, calcula: precio total ÷ cantidad.\n' +
+      'Unidades posibles: kg, g, ud, lt, ml, caja.\n' +
+      'Dato no visible → null.';
+ 
+    var ta = document.getElementById('textareaPrompt');
+    if (ta) ta.value = prompt;
+  }
+}
+ 
+function copiarPrompt() {
+  var ta = document.getElementById('textareaPrompt');
+  if (!ta) return;
+  navigator.clipboard.writeText(ta.value).then(function() {
+    var btn = document.getElementById('btnCopiarPrompt');
+    if (btn) {
+      btn.textContent = '✅ Copiado';
+      setTimeout(function() { btn.textContent = '📋 Copiar prompt'; }, 2000);
+    }
+  });
+}
+ 
+function procesarTextoAlbaran() {
+  var texto = ((document.getElementById('inputTextoAlbaran') || {}).value || '').trim();
+  if (!texto) {
+    showError('Pega el JSON que te ha devuelto la IA.');
+    return;
+  }
+ 
+  try {
+    var limpio = texto
+      .replace(/```json\n?/gi, '')
+      .replace(/```\n?/g, '')
+      .trim();
+ 
+    var parsed = JSON.parse(limpio);
+ 
+    // Pre-rellenar proveedor si la IA lo detectó
+    if (parsed.proveedor) {
+      var sel = document.getElementById('albaranProveedor');
+      if (sel) {
+        Array.from(sel.options).forEach(function(opt) {
+          if (opt.value && parsed.proveedor.toLowerCase().includes(opt.value.toLowerCase())) {
+            sel.value = opt.value;
+          }
+        });
+      }
+    }
+ 
+    albaranLineasIA = (parsed.lineas || []).map(function(l) {
+      return {
+        producto:   l.producto   || '',
+        cantidad:   l.cantidad   || '',
+        unidad:     l.unidad     || 'kg',
+        precioUnit: l.precioUnit || '',
+        activo:     true
+      };
+    });
+ 
+    if (albaranLineasIA.length === 0) {
+      showError('El JSON no tiene líneas. Revisa el formato.');
+      return;
+    }
+ 
+    renderLineasAlbaran();
+ 
+    var resultCont = document.getElementById('albaranResultContainer');
+    if (resultCont) resultCont.style.display = 'block';
+ 
+    // Limpiar textarea y cerrar panel de instrucciones
+    var ta = document.getElementById('inputTextoAlbaran');
+    if (ta) ta.value = '';
+    var panelPrompt = document.getElementById('panelPromptAlbaran');
+    if (panelPrompt) panelPrompt.style.display = 'none';
+ 
+  } catch(err) {
+    showError('El texto no es un JSON válido. Copia solo el bloque JSON.\n\nError: ' + err.message);
+  }
+}
+ 
+// ── Render de líneas del albarán (editables) ──
+ 
+function renderLineasAlbaran() {
+  var cont = document.getElementById('albaranLineas');
+  if (!cont) return;
+ 
+  if (albaranLineasIA.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem">Sin líneas</p>';
+    return;
+  }
+ 
+  cont.innerHTML = albaranLineasIA.map(function(linea, i) {
+    var tienePrice = linea.precioUnit !== '' && linea.precioUnit !== null;
+    return '<div id="albaran-linea-' + i + '" style="background:var(--surface2);' +
+           'border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;' +
+           'opacity:' + (linea.activo ? '1' : '0.4') + '">' +
+ 
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">' +
+        '<input type="checkbox" id="alb-check-' + i + '"' + (linea.activo ? ' checked' : '') +
+               ' onchange="toggleLineaAlbaran(' + i + ')" style="width:auto;margin:0;flex-shrink:0">' +
+        '<input id="alb-prod-' + i + '" value="' + escHtml(linea.producto) + '" ' +
+               'placeholder="Producto" style="flex:1;margin:0;padding:8px !important;font-size:0.85rem">' +
+      '</div>' +
+ 
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">' +
+        '<input id="alb-cant-' + i + '" value="' + (linea.cantidad || '') + '" ' +
+               'placeholder="Cant." type="number" step="0.001" ' +
+               'style="margin:0;padding:8px !important;font-size:0.85rem">' +
+        '<input id="alb-uni-' + i + '" value="' + escHtml(linea.unidad || 'kg') + '" ' +
+               'placeholder="Unidad" style="margin:0;padding:8px !important;font-size:0.85rem">' +
+        '<input id="alb-precio-' + i + '" value="' + (tienePrice ? parseFloat(linea.precioUnit).toFixed(3) : '') + '" ' +
+               'placeholder="€/ud" type="number" step="0.001" ' +
+               'style="margin:0;padding:8px !important;font-size:0.85rem;' +
+               (tienePrice ? 'border-color:var(--gold)!important' : '') + '">' +
+      '</div>' +
+ 
+      '<div style="text-align:right;margin-top:4px">' +
+        '<button onclick="eliminarLineaAlbaran(' + i + ')" ' +
+                'style="background:transparent;border:none;color:var(--muted);' +
+                       'cursor:pointer;font-size:0.8rem">✕ quitar</button>' +
+      '</div>' +
+ 
+    '</div>';
+  }).join('');
+}
+ 
+function toggleLineaAlbaran(i) {
+  var check = document.getElementById('alb-check-' + i);
+  if (albaranLineasIA[i]) albaranLineasIA[i].activo = !!(check && check.checked);
+  var div = document.getElementById('albaran-linea-' + i);
+  if (div) div.style.opacity = (albaranLineasIA[i] && albaranLineasIA[i].activo) ? '1' : '0.4';
+}
+ 
+function eliminarLineaAlbaran(i) {
+  albaranLineasIA.splice(i, 1);
+  renderLineasAlbaran();
+}
+ 
+function añadirLineaAlbaranManual() {
+  albaranLineasIA.push({ producto: '', cantidad: '', unidad: 'kg', precioUnit: '', activo: true });
+  renderLineasAlbaran();
+  setTimeout(function() {
+    var idx = albaranLineasIA.length - 1;
+    var inp = document.getElementById('alb-prod-' + idx);
+    if (inp) inp.focus();
+  }, 100);
+}
+ 
+function leerLineasAlbaranDesdeDom() {
+  return albaranLineasIA.map(function(linea, i) {
+    var check  = document.getElementById('alb-check-'  + i);
+    var prod   = document.getElementById('alb-prod-'   + i);
+    var cant   = document.getElementById('alb-cant-'   + i);
+    var uni    = document.getElementById('alb-uni-'    + i);
+    var precio = document.getElementById('alb-precio-' + i);
+    return {
+      activo:     check  ? check.checked                     : linea.activo,
+      producto:   prod   ? prod.value.trim()                 : linea.producto,
+      cantidad:   cant   ? parseFloat(cant.value)  || 0      : linea.cantidad,
+      unidad:     uni    ? uni.value.trim()                  : linea.unidad,
+      precioUnit: precio ? parseFloat(precio.value) || null  : linea.precioUnit
+    };
+  }).filter(function(l) { return l.activo && l.producto; });
+}
+ 
+async function confirmarAlbaran() {
+  var lineas    = leerLineasAlbaranDesdeDom();
+  var proveedor = ((document.getElementById('albaranProveedor') || {}).value || '').trim();
+ 
+  if (lineas.length === 0) {
+    showError('No hay líneas activas para guardar.');
+    return;
+  }
+ 
+  var btn = document.getElementById('btnConfirmarAlbaran');
+  if (btn) btn.disabled = true;
+ 
+  // 1. Guardar como compra en Sheets
+  await postToScript({
+    modo:      'compra',
+    proveedor: proveedor || 'Otro',
+    lineas:    lineas.map(function(l) {
+      return { producto: l.producto, cantidad: l.cantidad, unidad: l.unidad };
+    })
+  });
+ 
+  // 2. Actualizar precios de los que tienen precio unitario
+  var conPrecio = lineas.filter(function(l) { return l.precioUnit && l.precioUnit > 0; });
+  if (conPrecio.length > 0) {
+    await postToScript({
+      modo:      'actualizarPreciosMasivo',
+      proveedor: proveedor || 'Otro',
+      lineas:    conPrecio.map(function(l) {
+        return { producto: l.producto, precio: l.precioUnit, unidad: l.unidad };
+      })
+    });
+  }
+ 
+  showSuccess('ALBARÁN GUARDADO', conPrecio.length + ' precios actualizados', '💰');
+  descartarAlbaran();
+  platosLibreria = [];
+  await cargarPrecios();
+  if (btn) btn.disabled = false;
+}
+ 
+function descartarAlbaran() {
+  albaranLineasIA = [];
+  ['albaranResultContainer', 'panelPromptAlbaran'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  var sel = document.getElementById('albaranProveedor');
+  if (sel) sel.value = '';
+  var ta = document.getElementById('inputTextoAlbaran');
+  if (ta) ta.value = '';
+}
+ 
+ 
+// ══════════════════════════════════════════════
+// MÓDULO C — CARTA Y ESCANDALLOS
+// ══════════════════════════════════════════════
+ 
+async function cargarCarta() {
+  var cont = document.getElementById('listaPlatos');
+  if (!cont) return;
+  cont.innerHTML = '<p style="color:var(--muted);text-align:center">Cargando carta...</p>';
+  var data = await getFromScript({ accion: 'listarPlatos' });
+  if (data && data.platos) {
+    platosLibreria = data.platos;
+    filtrarPlatos();
+  } else {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Error cargando la carta</p>';
+  }
+}
+ 
+function filtrarPlatos() {
+  var q    = ((document.getElementById('busquedaPlatos')       || {}).value || '').toLowerCase();
+  var cat  = ((document.getElementById('filtroCategoriaCarta') || {}).value || '');
+  var cont = document.getElementById('listaPlatos');
+  if (!cont) return;
+ 
+  var lista = platosLibreria.filter(function(p) {
+    return (!q   || p.nombre.toLowerCase().includes(q)) &&
+           (!cat || p.categoria === cat);
+  });
+ 
+  if (lista.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">' +
+      (platosLibreria.length === 0
+        ? 'Sin platos. Añade el primero arriba.'
+        : 'Sin resultados') + '</p>';
+    return;
+  }
+ 
+  var categorias = {};
+  lista.forEach(function(p) {
+    var c = p.categoria || 'General';
+    if (!categorias[c]) categorias[c] = [];
+    categorias[c].push(p);
+  });
+ 
+  cont.innerHTML = Object.entries(categorias).map(function(entry) {
+    return '<div style="margin-bottom:20px">' +
+      '<div style="font-family:\'Bebas Neue\';color:var(--gold);font-size:1.2rem;' +
+           'letter-spacing:1px;padding:8px 0;border-bottom:2px solid var(--gold-dim);' +
+           'margin-bottom:10px">' + escHtml(entry[0]) + '</div>' +
+      entry[1].map(renderTarjetaPlato).join('') +
+      '</div>';
+  }).join('');
+}
+ 
+function renderTarjetaPlato(plato) {
+  var tieneCoste = plato.coste && plato.coste > 0;
+  var tienePVP   = plato.pvp  && plato.pvp   > 0;
+ 
+  var fcColor = 'var(--muted)';
+  if (plato.foodCost !== null && plato.foodCost !== undefined) {
+    if      (plato.foodCost < 28) fcColor = '#4caf50';
+    else if (plato.foodCost < 35) fcColor = 'var(--gold)';
+    else if (plato.foodCost < 42) fcColor = '#ff9800';
+    else                          fcColor = '#f44336';
+  }
+ 
+  var nombreEsc = plato.nombre.replace(/'/g, "\\'");
+ 
+  return '<div class="card" style="margin-bottom:10px">' +
+ 
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
+      '<div style="flex:1;min-width:0">' +
+        '<b style="color:var(--text)">' + escHtml(plato.nombre) + '</b><br>' +
+        '<small style="color:var(--muted)">' +
+          (plato.lineas && plato.lineas.length > 0
+            ? plato.lineas.length + ' ingrediente' + (plato.lineas.length !== 1 ? 's' : '')
+            : '<span style="color:#ff9800">Sin escandallo</span>') +
+        '</small>' +
+      '</div>' +
+      '<div style="text-align:right;margin-left:12px;flex-shrink:0">' +
+        (tienePVP   ? '<div style="color:var(--text);font-weight:700">' + plato.pvp.toFixed(2) + '€</div>'   : '') +
+        (tieneCoste ? '<div style="color:var(--muted);font-size:0.8rem">coste ' + plato.coste.toFixed(2) + '€</div>' : '') +
+        (plato.foodCost !== null && plato.foodCost !== undefined
+          ? '<div style="color:' + fcColor + ';font-size:0.8rem;font-weight:700">FC ' + plato.foodCost + '%</div>' : '') +
+      '</div>' +
+    '</div>' +
+ 
+    (plato.lineas && plato.lineas.length > 0
+      ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">' +
+        plato.lineas.map(function(ing) {
+          var costeStr = (ing.coste !== null && ing.coste !== undefined)
+            ? ' <b style="color:var(--gold)">' + ing.coste.toFixed(3) + '€</b>'
+            : ' <span style="color:var(--muted);font-size:0.75rem">sin precio</span>';
+          return '<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:0.82rem">' +
+            '<span style="color:var(--text)">' +
+              (ing.esElaboracion ? '🍳 ' : getEmoji(ing.ingrediente) + ' ') + escHtml(ing.ingrediente) +
+            '</span>' +
+            '<span style="color:var(--muted)">' + ing.cantidad + ing.unidad + costeStr + '</span>' +
+          '</div>';
+        }).join('') + '</div>'
+      : '') +
+ 
+    '<div style="display:flex;gap:8px;margin-top:12px">' +
+      '<button onclick="abrirModalEscandallo(\'' + nombreEsc + '\')" ' +
+              'style="flex:1;background:var(--surface2);border:1px solid var(--gold);color:var(--gold);' +
+                     'padding:8px;border-radius:8px;font-size:0.85rem;cursor:pointer">✏️ Escandallo</button>' +
+      '<button onclick="confirmarEliminarPlato(\'' + nombreEsc + '\')" ' +
+              'style="background:transparent;border:1px solid var(--border);color:var(--muted);' +
+                     'padding:8px 12px;border-radius:8px;font-size:0.85rem;cursor:pointer">🗑️</button>' +
+    '</div>' +
+  '</div>';
+}
+ 
+function mostrarFormNuevoPlato() {
+  var form = document.getElementById('formNuevoPlato');
+  if (form) form.style.display = 'block';
+  var n = document.getElementById('npNombrePlato');
+  if (n) n.focus();
+}
+ 
+function ocultarFormNuevoPlato() {
+  var form = document.getElementById('formNuevoPlato');
+  if (form) form.style.display = 'none';
+  ['npNombrePlato', 'npPVP'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  var s = document.getElementById('npCategoriaplato');
+  if (s) s.value = '';
+}
+ 
+async function guardarNuevoPlato() {
+  var nombre    = ((document.getElementById('npNombrePlato')    || {}).value || '').trim();
+  var categoria = ((document.getElementById('npCategoriaplato') || {}).value || '').trim();
+  var pvp       =  (document.getElementById('npPVP')            || {}).value || '';
+ 
+  if (!nombre) { showError('El nombre del plato es obligatorio.'); return; }
+ 
+  var btn = document.querySelector('#formNuevoPlato .btn-save');
+  if (btn) btn.disabled = true;
+ 
+  await postToScript({
+    modo:      'guardarPlato',
+    nombre:    nombre,
+    categoria: categoria || 'General',
+    pvp:       pvp !== '' ? parseFloat(pvp) : undefined
+  });
+ 
+  showSuccess('PLATO AÑADIDO', nombre, '🍽️');
+  ocultarFormNuevoPlato();
+  platosLibreria = [];
+  await cargarCarta();
+  if (btn) btn.disabled = false;
+}
+ 
+async function confirmarEliminarPlato(nombre) {
+  if (!confirm('¿Eliminar "' + nombre + '"?')) return;
+  await postToScript({ modo: 'eliminarPlato', nombre: nombre });
+  showSuccess('ELIMINADO', '', '🗑️');
+  platosLibreria = [];
+  await cargarCarta();
+}
+ 
+// ── Modal Escandallo ──────────────────────────
+ 
+async function abrirModalEscandallo(nombrePlato) {
+  var modal = document.getElementById('modalEscandallo');
+  if (!modal) return;
+ 
+  var tituloEl = document.getElementById('modalEscNombre');
+  var keyEl    = document.getElementById('modalEscPlatoKey');
+  if (tituloEl) tituloEl.textContent = nombrePlato.toUpperCase();
+  if (keyEl)    keyEl.value          = nombrePlato;
+ 
+  escandalloLineas = [];
+  var enCache = platosLibreria.find(function(p) { return p.nombre === nombrePlato; });
+  if (enCache && enCache.lineas && enCache.lineas.length > 0) {
+    escandalloLineas = enCache.lineas.map(function(l) {
+      return { ingrediente: l.ingrediente, cantidad: l.cantidad, unidad: l.unidad || 'g', esElaboracion: l.esElaboracion || false };
+    });
+  }
+ 
+  renderLineasEscandallo();
+  modal.style.display = 'flex';
+  var busq = document.getElementById('busqIngEsc');
+  if (busq) busq.value = '';
+  var sug = document.getElementById('sugIngEsc');
+  if (sug) { sug.style.display = 'none'; sug.innerHTML = ''; }
+}
+ 
+function cerrarModalEscandallo() {
+  var modal = document.getElementById('modalEscandallo');
+  if (modal) modal.style.display = 'none';
+  escandalloLineas = [];
+}
+ 
+function renderLineasEscandallo() {
+  var cont = document.getElementById('lineasEscandallo');
+  if (!cont) return;
+ 
+  if (escandalloLineas.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem;padding:12px">Sin ingredientes aún.</p>';
+    return;
+  }
+ 
+  cont.innerHTML = escandalloLineas.map(function(ing, i) {
+    var badge = ing.esElaboracion
+      ? '<span style="background:var(--surface2);border:1px solid var(--gold);color:var(--gold);' +
+        'font-size:0.65rem;padding:2px 5px;border-radius:5px;margin-left:4px">ELAB</span>' : '';
+    return '<div style="display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--border)">' +
+      '<div style="flex:1;min-width:0;font-size:0.85rem;color:var(--text)">' +
+        (ing.esElaboracion ? '🍳' : getEmoji(ing.ingrediente)) + ' ' + escHtml(ing.ingrediente) + badge +
+      '</div>' +
+      '<input id="esc-cant-' + i + '" value="' + ing.cantidad + '" type="number" step="0.1" ' +
+             'style="width:65px;padding:6px !important;font-size:0.8rem;margin:0;text-align:right">' +
+      '<input id="esc-uni-' + i + '" value="' + escHtml(ing.unidad || 'g') + '" ' +
+             'style="width:48px;padding:6px !important;font-size:0.8rem;margin:0">' +
+      '<button onclick="eliminarLineaEscandallo(' + i + ')" ' +
+              'style="background:transparent;border:none;color:var(--muted);cursor:pointer;' +
+                     'font-size:1rem;padding:4px 6px;flex-shrink:0">✕</button>' +
+    '</div>';
+  }).join('');
+}
+ 
+function eliminarLineaEscandallo(i) {
+  escandalloLineas.splice(i, 1);
+  renderLineasEscandallo();
+}
+ 
+function filtrarIngEscandallo() {
+  var q   = ((document.getElementById('busqIngEsc') || {}).value || '').toLowerCase().trim();
+  var sug = document.getElementById('sugIngEsc');
+  if (!sug) return;
+ 
+  if (!q) { sug.style.display = 'none'; return; }
+ 
+  var resultsProd = productosLibreria
+    .filter(function(p) { return p.nombre.toLowerCase().includes(q); })
+    .slice(0, 6).map(function(p) { return { nombre: p.nombre, tipo: 'producto' }; });
+ 
+  var resultsElab = STOCK_ITEMS
+    .filter(function(s) { return s.nombre.toLowerCase().includes(q); })
+    .slice(0, 4).map(function(s) { return { nombre: s.nombre, tipo: 'elaboracion' }; });
+ 
+  var todos = resultsProd.concat(resultsElab).slice(0, 8);
+ 
+  if (todos.length === 0) {
+    sug.innerHTML = '<div style="padding:10px;color:var(--muted);font-size:0.85rem">Sin resultados</div>';
+    sug.style.display = 'block';
+    return;
+  }
+ 
+  sug.innerHTML = todos.map(function(item) {
+    var badge = item.tipo === 'elaboracion'
+      ? ' <span style="color:var(--gold);font-size:0.75rem">· ELAB</span>' : '';
+    return '<div onclick="seleccionarIngEscandallo(\'' + item.nombre.replace(/'/g, "\\'") + '\',' +
+                 (item.tipo === 'elaboracion') + ')" ' +
+           'style="padding:10px;border-bottom:1px solid var(--border);cursor:pointer;font-size:0.9rem">' +
+      getEmoji(item.nombre) + ' ' + escHtml(item.nombre) + badge + '</div>';
+  }).join('');
+  sug.style.display = 'block';
+}
+ 
+function seleccionarIngEscandallo(nombre, esElaboracion) {
+  escandalloLineas.push({ ingrediente: nombre, cantidad: 100, unidad: 'g', esElaboracion: esElaboracion });
+  renderLineasEscandallo();
+  var busq = document.getElementById('busqIngEsc');
+  if (busq) busq.value = '';
+  var sug = document.getElementById('sugIngEsc');
+  if (sug) { sug.style.display = 'none'; sug.innerHTML = ''; }
+}
+ 
+async function guardarEscandalloModal() {
+  var nombrePlato = ((document.getElementById('modalEscPlatoKey') || {}).value || '').trim();
+  if (!nombrePlato) { showError('Error: no hay plato seleccionado.'); return; }
+ 
+  var lineasFinales = escandalloLineas.map(function(ing, i) {
+    var cantEl = document.getElementById('esc-cant-' + i);
+    var uniEl  = document.getElementById('esc-uni-'  + i);
+    return {
+      ingrediente:   ing.ingrediente,
+      cantidad:      cantEl ? parseFloat(cantEl.value) || 0 : ing.cantidad,
+      unidad:        uniEl  ? uniEl.value.trim()            : ing.unidad,
+      esElaboracion: ing.esElaboracion
+    };
+  });
+ 
+  var btn = document.getElementById('btnGuardarEsc');
+  if (btn) btn.disabled = true;
+ 
+  await postToScript({ modo: 'guardarEscandallo', plato: nombrePlato, lineas: lineasFinales });
+ 
+  showSuccess('ESCANDALLO GUARDADO', nombrePlato, '✅');
+  cerrarModalEscandallo();
+  platosLibreria = [];
+  await cargarCarta();
+  if (btn) btn.disabled = false;
+}
+ 
+ 
+// ══════════════════════════════════════════════
+// UTILIDAD
+// ══════════════════════════════════════════════
+function escHtml(str) {
+  if (!str) return '';
+  return str.toString()
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
