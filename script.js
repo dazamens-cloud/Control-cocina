@@ -3,7 +3,7 @@
 // v3.1 — Bugs de sintaxis corregidos
 // =============================================
 
-const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbxUTTV6s1xkpssLifMWaVloWWRXXOqFdZss2WW_41XO7N1ZDtw3E-Fv7yFnPY864kt6ZA/exec";
+const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbybrFFcwNOSn7X1r4lSt0VMAADBbLtkdOr4EFS5iTrN4ByA8zW8hqoBSIb3LMDtC5pzkA/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
@@ -91,7 +91,8 @@ function irA(screenId, pushState) {
     case 'screenProductos': if (productosLibreria.length === 0) cargarProductos(); break;
     case 'screenStock':     cargarStock(); break;
     case 'screenCompras':   cargarResumenDia(); break;
-    case 'screenDashboard': cargarDashboard(); break;
+    case 'screenDashboard': cargarDashboard(); break;case 'screenPrecios': cargarPrecios(); break;
+    case 'screenCarta':   cargarCarta();   break;
   }
 }
 
