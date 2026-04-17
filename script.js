@@ -91,7 +91,8 @@ function irA(screenId, pushState) {
     case 'screenProductos': if (productosLibreria.length === 0) cargarProductos(); break;
     case 'screenStock':     cargarStock(); break;
     case 'screenCompras':   cargarResumenDia(); break;
-    case 'screenDashboard': cargarDashboard(); break;case 'screenPrecios': cargarPrecios(); break;
+    case 'screenDashboard': cargarDashboard(); break;
+    case 'screenPrecios': cargarPrecios(); break;
     case 'screenCarta':   cargarCarta();   break;
   }
 }
