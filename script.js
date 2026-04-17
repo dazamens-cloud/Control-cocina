@@ -3,7 +3,7 @@
 // v3.1 — Bugs de sintaxis corregidos
 // =============================================
 
-const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbybrFFcwNOSn7X1r4lSt0VMAADBbLtkdOr4EFS5iTrN4ByA8zW8hqoBSIb3LMDtC5pzkA/exec";
+const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbxh36B6DJVtHo_WEueQWZYzRg7Z14OdwSNbpz9NiMDmbCLGeJP3FvDuhItCBRq_E63PyA/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
@@ -1479,6 +1479,7 @@ function filtrarPlatos() {
 function renderTarjetaPlato(plato) {
   var tieneCoste = plato.coste && plato.coste > 0;
   var tienePVP   = plato.pvp  && plato.pvp   > 0;
+  var tieneFoto  = plato.foto && plato.foto !== '';
 
   var fcColor = 'var(--muted)';
   if (plato.foodCost !== null && plato.foodCost !== undefined) {
@@ -1492,6 +1493,13 @@ function renderTarjetaPlato(plato) {
 
   return '<div class="card" style="margin-bottom:10px">' +
 
+    // Foto del plato (si existe)
+    (tieneFoto
+      ? '<img src="' + escHtml(plato.foto) + '" ' +
+          'style="width:100%;height:160px;object-fit:cover;border-radius:10px;' +
+                 'margin-bottom:12px;border:1px solid var(--border)">'
+      : '') +
+
     '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
       '<div style="flex:1;min-width:0">' +
         '<b style="color:var(--text)">' + escHtml(plato.nombre) + '</b><br>' +
@@ -1502,13 +1510,14 @@ function renderTarjetaPlato(plato) {
         '</small>' +
       '</div>' +
       '<div style="text-align:right;margin-left:12px;flex-shrink:0">' +
-        (tienePVP   ? '<div style="color:var(--text);font-weight:700">' + plato.pvp.toFixed(2) + '€</div>'   : '') +
+        (tienePVP   ? '<div style="color:var(--text);font-weight:700">' + plato.pvp.toFixed(2) + '€</div>' : '') +
         (tieneCoste ? '<div style="color:var(--muted);font-size:0.8rem">coste ' + plato.coste.toFixed(2) + '€</div>' : '') +
         (plato.foodCost !== null && plato.foodCost !== undefined
           ? '<div style="color:' + fcColor + ';font-size:0.8rem;font-weight:700">FC ' + plato.foodCost + '%</div>' : '') +
       '</div>' +
     '</div>' +
 
+    // Desglose ingredientes
     (plato.lineas && plato.lineas.length > 0
       ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">' +
         plato.lineas.map(function(ing) {
@@ -1524,15 +1533,63 @@ function renderTarjetaPlato(plato) {
         }).join('') + '</div>'
       : '') +
 
+    // Botones: Escandallo · Foto · Eliminar
     '<div style="display:flex;gap:8px;margin-top:12px">' +
       '<button onclick="abrirModalEscandallo(\'' + nombreEsc + '\')" ' +
               'style="flex:1;background:var(--surface2);border:1px solid var(--gold);color:var(--gold);' +
                      'padding:8px;border-radius:8px;font-size:0.85rem;cursor:pointer">✏️ Escandallo</button>' +
+      '<button onclick="subirFotoPlato(\'' + nombreEsc + '\')" ' +
+              'style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);' +
+                     'padding:8px 10px;border-radius:8px;font-size:0.9rem;cursor:pointer" ' +
+              'title="' + (tieneFoto ? 'Cambiar foto' : 'Añadir foto') + '">' +
+        (tieneFoto ? '📷' : '📷') +
+      '</button>' +
       '<button onclick="confirmarEliminarPlato(\'' + nombreEsc + '\')" ' +
               'style="background:transparent;border:1px solid var(--border);color:var(--muted);' +
-                     'padding:8px 12px;border-radius:8px;font-size:0.85rem;cursor:pointer">🗑️</button>' +
+                     'padding:8px 10px;border-radius:8px;font-size:0.85rem;cursor:pointer">🗑️</button>' +
     '</div>' +
+
   '</div>';
+}
+
+// ── Foto por plato ──────────────────────────────
+
+var _fotoPlatoNombre = '';
+
+function subirFotoPlato(nombrePlato) {
+  _fotoPlatoNombre = nombrePlato;
+  var input = document.getElementById('inputFotoPlato');
+  if (!input) {
+    // Crear el input dinámicamente si no existe
+    input = document.createElement('input');
+    input.type    = 'file';
+    input.accept  = 'image/*';
+    input.id      = 'inputFotoPlato';
+    input.style.display = 'none';
+    input.onchange = onFotoPlatoSeleccionada;
+    document.body.appendChild(input);
+  }
+  input.value = '';
+  input.click();
+}
+
+async function onFotoPlatoSeleccionada(event) {
+  var file = event.target.files[0];
+  if (!file || !_fotoPlatoNombre) return;
+
+  var base64 = await comprimirImagen(file, 900, 0.80);
+  var btn = document.querySelector('[onclick*="subirFotoPlato(\\\'' + _fotoPlatoNombre.replace(/'/g, "\\'") + '\\\')"]');
+
+  await postToScript({
+    modo:    'guardarPlato',
+    nombre:  _fotoPlatoNombre,
+    imagen:  base64
+  });
+
+  showSuccess('FOTO GUARDADA', _fotoPlatoNombre, '📷');
+  platosLibreria = [];
+  await cargarCarta();
+  _fotoPlatoNombre = '';
 }
 
 function mostrarFormNuevoPlato() {
