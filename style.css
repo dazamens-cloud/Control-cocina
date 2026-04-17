@@ -422,3 +422,124 @@ input:focus, select:focus {
 .text-center { text-align: center; }
 .mt-10 { margin-top: 10px; }
 .mb-10 { margin-bottom: 10px; }
+/* ── TARJETAS DE PLATO ───────────────────────── */
+.plato-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+ 
+/* ── BADGE DE FOOD COST ──────────────────────── */
+.badge-fc {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+ 
+.badge-fc-bueno     { background: rgba(76, 175, 80, 0.15);  color: #4caf50; }
+.badge-fc-bien      { background: rgba(201, 169, 110, 0.15); color: var(--gold); }
+.badge-fc-ajustado  { background: rgba(255, 152, 0, 0.15);  color: #ff9800; }
+.badge-fc-revisar   { background: rgba(244, 67, 54, 0.15);  color: #f44336; }
+ 
+/* ── LÍNEAS DE ALBARÁN ───────────────────────── */
+.albaran-linea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+    transition: opacity 0.2s;
+}
+ 
+.albaran-linea.inactiva {
+    opacity: 0.4;
+}
+ 
+/* ── BUSCADOR DE INGREDIENTES (ESCANDALLO) ────── */
+#sugIngEsc div:active,
+#sugIngEsc div:hover {
+    background: var(--surface2);
+}
+ 
+/* ── INPUT SIN PRECIO (alerta visual) ────────── */
+input.sin-precio {
+    border-color: var(--muted) !important;
+    background: var(--surface) !important;
+}
+ 
+input.con-precio {
+    border-color: var(--gold) !important;
+}
+ 
+/* ── GRID HOME — con 6 botones en lugar de 5 ─── */
+/* Reemplaza el grid-stats existente si quieres 3 columnas */
+.grid-stats-6 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 20px 15px;
+}
+ 
+/* El último si es impar ocupa toda la fila */
+.grid-stats-6 .stat-card:last-child:nth-child(odd) {
+    grid-column: span 2;
+}
+ 
+/* ── DESGLOSE DE INGREDIENTES EN TARJETA ─────── */
+.ingrediente-desglose {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+ 
+.ingrediente-desglose-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 0.82rem;
+}
+ 
+/* ── MODAL MÁS ALTO (escandallo tiene muchos items) */
+#modalEscandallo .modal-box {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+ 
+/* ── CATEGORÍA HEADER EN CARTA ───────────────── */
+.carta-categoria-header {
+    font-family: 'Bebas Neue';
+    color: var(--gold);
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    padding: 8px 0;
+    border-bottom: 2px solid var(--gold-dim);
+    margin-bottom: 10px;
+    margin-top: 4px;
+}
+ 
+/* ── ESTADO ANÁLISIS ALBARÁN ─────────────────── */
+#albaranStatus {
+    padding: 10px;
+    border-radius: 8px;
+    background: var(--surface2);
+    font-size: 0.85rem;
+    text-align: center;
+    transition: color 0.3s;
+}
+ 
+/* ── RESPONSIVE extra para modal escandallo ─── */
+@media (max-width: 480px) {
+    #modalEscandallo .modal-box {
+        padding: 16px;
+    }
+    
+    #lineasEscandallo input {
+        font-size: 0.75rem !important;
+    }
+}
+ 
