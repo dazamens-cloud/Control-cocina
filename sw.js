@@ -6,7 +6,7 @@
 // Incrementa CACHE_VERSION con cada deploy.
 // ─────────────────────────────────────────────
 
-const CACHE_VERSION = 'v10';
+const CACHE_VERSION = 'v11';
 const CACHE_APP     = 'divina-app-'   + CACHE_VERSION;
 const CACHE_STATIC  = 'divina-static-' + CACHE_VERSION;
 
