@@ -3,7 +3,7 @@
 // v3.1 — Bugs de sintaxis corregidos
 // =============================================
 
-const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbxh36B6DJVtHo_WEueQWZYzRg7Z14OdwSNbpz9NiMDmbCLGeJP3FvDuhItCBRq_E63PyA/exec";
+const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbybrFFcwNOSn7X1r4lSt0VMAADBbLtkdOr4EFS5iTrN4ByA8zW8hqoBSIb3LMDtC5pzkA/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
@@ -1641,8 +1641,6 @@ async function confirmarEliminarPlato(nombre) {
   await cargarCarta();
 }
 
-// ── Modal Escandallo ──────────────────────────
-
 async function abrirModalEscandallo(nombrePlato) {
   var modal = document.getElementById('modalEscandallo');
   if (!modal) return;
@@ -1651,6 +1649,14 @@ async function abrirModalEscandallo(nombrePlato) {
   var keyEl    = document.getElementById('modalEscPlatoKey');
   if (tituloEl) tituloEl.textContent = nombrePlato.toUpperCase();
   if (keyEl)    keyEl.value          = nombrePlato;
+
+  // FIX: asegurar que productos Y stock items están cargados antes de buscar
+  if (productosLibreria.length === 0 && !cargandoProductos) {
+    await cargarProductos();
+  }
+  if (STOCK_ITEMS.length === 0) {
+    await cargarStockItems();
+  }
 
   escandalloLineas = [];
   var enCache = platosLibreria.find(function(p) { return p.nombre === nombrePlato; });
@@ -1663,7 +1669,7 @@ async function abrirModalEscandallo(nombrePlato) {
   renderLineasEscandallo();
   modal.style.display = 'flex';
   var busq = document.getElementById('busqIngEsc');
-  if (busq) busq.value = '';
+  if (busq) { busq.value = ''; busq.focus(); }
   var sug = document.getElementById('sugIngEsc');
   if (sug) { sug.style.display = 'none'; sug.innerHTML = ''; }
 }
