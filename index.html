@@ -56,248 +56,12 @@
             display: none; flex-direction: column; gap: 10px;
         }
     </style>
-    <!-- ══════════════════════════════════════════════════════════════ -->
-<!-- ── PANTALLA: PRECIOS / ALBARANES ───────────────────────────── -->
-<!-- ══════════════════════════════════════════════════════════════ -->
-<div id="screenPrecios" class="screen">
-    <div class="app-header">
-        <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
-             alt="Volver" role="button">
-    </div>
-    <div class="section-header">
-        <h2 class="section-title">PRECIOS</h2>
-        <p style="color:var(--muted)">Albaranes · Food cost</p>
-    </div>
-    <div class="screen-content">
- 
-        <!-- Instrucciones + prompt -->
-        <div class="card">
-            <label style="color:var(--gold);font-weight:700;display:block;margin-bottom:10px">
-                📋 Registrar albarán
-            </label>
- 
-            <div style="background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:12px">
-                <p style="color:var(--text);font-size:0.9rem;margin-bottom:10px;line-height:1.5">
-                    <b>Paso 1 —</b> Copia el prompt, ve a Claude.ai o ChatGPT,
-                    sube la foto del albarán junto al prompt y copia el JSON que te devuelva.
-                </p>
-                <button id="btnVerPrompt" onclick="mostrarPromptAlbaran()"
-                        style="width:100%;background:transparent;border:1px solid var(--gold);
-                               color:var(--gold);padding:10px;border-radius:10px;
-                               font-size:0.9rem;cursor:pointer">
-                    👁 Ver prompt para la IA
-                </button>
-            </div>
- 
-            <!-- Prompt (oculto por defecto) -->
-            <div id="panelPromptAlbaran" style="display:none;margin-bottom:12px">
-                <textarea id="textareaPrompt" readonly
-                          style="width:100%;height:180px;background:var(--surface);
-                                 border:1px solid var(--border);color:var(--muted);
-                                 padding:10px;border-radius:10px;font-size:0.75rem;
-                                 font-family:monospace;resize:none;line-height:1.4"></textarea>
-                <button id="btnCopiarPrompt" onclick="copiarPrompt()"
-                        style="width:100%;margin-top:6px;background:var(--surface2);
-                               border:1px solid var(--border);color:var(--text);
-                               padding:10px;border-radius:10px;font-size:0.9rem;cursor:pointer">
-                    📋 Copiar prompt
-                </button>
-            </div>
- 
-            <!-- Paso 2: pegar JSON -->
-            <div style="background:var(--surface2);border-radius:10px;padding:12px">
-                <p style="color:var(--text);font-size:0.9rem;margin-bottom:10px;line-height:1.5">
-                    <b>Paso 2 —</b> Pega aquí el JSON que te ha devuelto la IA:
-                </p>
-                <textarea id="inputTextoAlbaran"
-                          placeholder='Pega el JSON aquí. Ejemplo:&#10;{&#10;  "proveedor": "Matteo Comit",&#10;  "lineas": [&#10;    { "producto": "Carne picada", "cantidad": 5, "unidad": "kg", "precioUnit": 4.20 }&#10;  ]&#10;}'
-                          style="width:100%;height:160px;background:var(--surface);
-                                 border:1px solid var(--border);color:var(--text);
-                                 padding:12px;border-radius:10px;font-size:0.8rem;
-                                 font-family:monospace;resize:none;line-height:1.4;margin-bottom:8px"></textarea>
-                <button class="btn-save" onclick="procesarTextoAlbaran()" style="font-size:1rem">
-                    ▶ PROCESAR ALBARÁN
-                </button>
-            </div>
-        </div>
- 
-        <!-- Líneas editables antes de confirmar -->
-        <div id="albaranResultContainer" style="display:none" class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-                <label style="color:var(--gold);font-weight:700;margin:0">✅ Líneas detectadas</label>
-                <button onclick="añadirLineaAlbaranManual()"
-                        style="background:transparent;border:1px dashed var(--border);
-                               color:var(--muted);padding:5px 10px;border-radius:8px;
-                               font-size:0.8rem;cursor:pointer">➕ Añadir</button>
-             <div style="margin-bottom:10px">
-                  <label style="color:var(--muted);font-size:0.8rem;display:block;margin-bottom:6px">
-                📅 Fecha de entrega del albarán:
-                </label>
-                <input type="date" id="albaranFechaEntrega"
-                   style="width:100%;padding:10px !important;font-size:0.9rem;margin:0">
-            </div>
- 
-            <select id="albaranProveedor" style="margin-bottom:12px">
-                <option value="">— Confirma el proveedor —</option>
-                <option value="Matteo Comit">Matteo Comit</option>
-                <option value="Tías Fruit">Tías Fruit</option>
-                <option value="Chacon">Chacon</option>
-                <option value="ReyesyBouzon">Reyes y Bouzon</option>
-                <option value="Canarymeat">Canarymeat</option>
-                <option value="Pescasol">Pescasol</option>
-                <option value="Roper">Roper</option>
-                <option value="Ortidal">Ortidal</option>
-                <option value="Otro">Otro</option>
-            </select>
- 
-            <p style="color:var(--muted);font-size:0.8rem;margin-bottom:10px;line-height:1.4">
-                Revisa y edita. El campo <b style="color:var(--gold)">€/ud</b> actualiza
-                los precios para el food cost. Si no lo sabes, déjalo vacío.
-            </p>
- 
-            <div id="albaranLineas"></div>
- 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
-                <button onclick="descartarAlbaran()"
-                        style="background:transparent;border:1px solid var(--border);
-                               color:var(--muted);padding:14px;border-radius:12px;cursor:pointer;
-                               font-family:'Bebas Neue';font-size:1rem;letter-spacing:1px">
-                    DESCARTAR
-                </button>
-                <button id="btnConfirmarAlbaran" class="btn-save" onclick="confirmarAlbaran()">
-                    GUARDAR
-                </button>
-            </div>
-        </div>
- 
-        <!-- Lista precios -->
-        <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-                <label style="margin:0;color:var(--gold);font-weight:700">📋 Precios actuales</label>
-                <button onclick="cargarPrecios()"
-                        style="background:transparent;border:1px solid var(--border);
-                               color:var(--muted);padding:6px 12px;border-radius:8px;
-                               font-size:0.8rem;cursor:pointer">🔄</button>
-            </div>
-            <input type="search" id="busquedaPrecios" placeholder="🔍 Buscar producto..."
-                   oninput="filtrarPrecios()" style="margin-bottom:10px">
-            <div id="listaPreciosContainer">
-                <p style="color:var(--muted);text-align:center">Cargando...</p>
-            </div>
-        </div>
- 
-    </div>
-</div>
- 
- 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<!-- ── PANTALLA: CARTA / ESCANDALLOS ───────────────────────────── -->
-<!-- ══════════════════════════════════════════════════════════════ -->
-<div id="screenCarta" class="screen">
-    <div class="app-header">
-        <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
-             alt="Volver" role="button">
-    </div>
-    <div class="section-header">
-        <h2 class="section-title">CARTA</h2>
-        <p style="color:var(--muted)">Escandallos · Food cost · Margen</p>
-    </div>
-    <div class="screen-content">
- 
-        <button class="btn-save"
-                style="font-size:1rem;background:var(--surface2);color:var(--gold);border:1px solid var(--gold)"
-                onclick="mostrarFormNuevoPlato()">
-            🍽️ NUEVO PLATO
-        </button>
- 
-        <div class="card" id="formNuevoPlato" style="display:none">
-            <label style="color:var(--gold);font-weight:700;display:block;margin-bottom:12px">🆕 Añadir plato</label>
-            <input id="npNombrePlato" placeholder="Nombre del plato *">
-            <select id="npCategoriaplato" style="margin-top:8px">
-                <option value="">Categoría...</option>
-                <option value="Entrantes">Entrantes</option>
-                <option value="Pastas">Pastas</option>
-                <option value="Raviolis">Raviolis</option>
-                <option value="Carnes">Carnes</option>
-                <option value="Pescados">Pescados</option>
-                <option value="Postres">Postres</option>
-                <option value="Pizzas">Pizzas</option>
-                <option value="Ensaladas">Ensaladas</option>
-            </select>
-            <input id="npPVP" type="number" step="0.01"
-                   placeholder="PVP (€ con IVA, opcional)" style="margin-top:8px">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
-                <button class="btn-save" onclick="guardarNuevoPlato()">💾 GUARDAR</button>
-                <button onclick="ocultarFormNuevoPlato()"
-                        style="background:transparent;border:1px solid var(--border);
-                               color:var(--muted);padding:14px;border-radius:12px;cursor:pointer">
-                    Cancelar
-                </button>
-            </div>
-        </div>
- 
-        <div style="display:flex;gap:8px">
-            <input type="search" id="busquedaPlatos" placeholder="🔍 Buscar plato..."
-                   oninput="filtrarPlatos()" style="flex:1;margin-bottom:0">
-            <select id="filtroCategoriaCarta" onchange="filtrarPlatos()"
-                    style="width:auto;min-width:110px;padding:10px !important;
-                           font-size:0.85rem;margin-bottom:0">
-                <option value="">Todas</option>
-                <option value="Entrantes">Entrantes</option>
-                <option value="Pastas">Pastas</option>
-                <option value="Raviolis">Raviolis</option>
-                <option value="Carnes">Carnes</option>
-                <option value="Pescados">Pescados</option>
-                <option value="Postres">Postres</option>
-                <option value="Pizzas">Pizzas</option>
-                <option value="Ensaladas">Ensaladas</option>
-            </select>
-        </div>
- 
-        <div id="listaPlatos">
-            <p style="color:var(--muted);text-align:center">Cargando carta...</p>
-        </div>
- 
-    </div>
-</div>
- 
- 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<!-- ── MODAL: EDITOR DE ESCANDALLO ─────────────────────────────── -->
-<!-- ══════════════════════════════════════════════════════════════ -->
-<div id="modalEscandallo" class="modal-overlay">
-    <div class="modal-box" style="max-width:500px;max-height:90vh;overflow-y:auto">
-        <h2 class="modal-title">🍽️ <span id="modalEscNombre">ESCANDALLO</span></h2>
-        <input type="hidden" id="modalEscPlatoKey">
- 
-        <p style="color:var(--muted);font-size:0.8rem;margin-bottom:8px;line-height:1.4">
-            Busca ingredientes (productos de la biblioteca) o elaboraciones (salsas, masas...)
-            y ajusta los gramajes.
-        </p>
- 
-        <div style="position:relative">
-            <input type="search" id="busqIngEsc"
-                   placeholder="🔍 Buscar ingrediente o elaboración..."
-                   oninput="filtrarIngEscandallo()"
-                   autocomplete="off" autocorrect="off">
-            <div id="sugIngEsc"
-                 style="display:none;background:var(--surface);border:1px solid var(--border);
-                        border-radius:10px;overflow:hidden;max-height:200px;overflow-y:auto;
-                        margin-top:-8px"></div>
-        </div>
- 
-        <div id="lineasEscandallo" style="margin-top:8px;max-height:320px;overflow-y:auto"></div>
- 
-        <div class="modal-buttons" style="margin-top:12px">
-            <button class="btn-cancelar" onclick="cerrarModalEscandallo()">CANCELAR</button>
-            <button id="btnGuardarEsc" class="btn-save" onclick="guardarEscandalloModal()">GUARDAR</button>
-        </div>
-    </div>
-</div>
 </head>
 <body>
 
-    <!-- ── HOME ─────────────────────── -->
+    <!-- ══════════════════════════════════════════
+         HOME
+         ══════════════════════════════════════════ -->
     <div id="screenHome" class="screen active">
         <div class="hero-canario">
             <div class="hero-overlay"></div>
@@ -342,11 +106,12 @@
         </div>
     </div>
 
-    <!-- ── COCINA ───────────────────── -->
+    <!-- ══════════════════════════════════════════
+         COCINA
+         ══════════════════════════════════════════ -->
     <div id="screenCocina" class="screen">
         <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
-                 alt="Volver" role="button">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')" alt="Volver" role="button">
         </div>
         <div class="section-header">
             <h2 class="section-title">REGISTRO DE COCINA</h2>
@@ -368,11 +133,12 @@
         </div>
     </div>
 
-    <!-- ── STOCK ────────────────────── -->
+    <!-- ══════════════════════════════════════════
+         STOCK
+         ══════════════════════════════════════════ -->
     <div id="screenStock" class="screen">
         <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
-                 alt="Volver" role="button">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')" alt="Volver" role="button">
         </div>
         <div class="section-header">
             <h2 class="section-title">CONTROL STOCK</h2>
@@ -380,7 +146,6 @@
         </div>
         <div class="screen-content">
 
-            <!-- Formulario añadir línea -->
             <div class="card">
                 <label>📦 Elaboración:</label>
                 <select id="selectStockElab">
@@ -396,14 +161,12 @@
                 </button>
             </div>
 
-            <!-- Selector de semana + lista -->
             <div class="card">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
                     <label style="margin:0;color:var(--gold);font-weight:700">📅 Semana</label>
                     <select id="selectorSemanasStock"
                             onchange="cambiarSemanaStock(this.value)"
-                            style="width:auto;min-width:140px;padding:8px 12px !important;
-                                   font-size:0.9rem;margin-bottom:0">
+                            style="width:auto;min-width:140px;padding:8px 12px !important;font-size:0.9rem;margin-bottom:0">
                         <option>Cargando...</option>
                     </select>
                 </div>
@@ -411,13 +174,13 @@
                     <p style="color:var(--muted);text-align:center">Cargando stock...</p>
                 </div>
             </div>
+
             <div class="action-buttons">
                 <button id="btnGuardarTodoStock" class="btn-save" style="display:none" onclick="guardarTodoStock()">
                     💾 GUARDAR STOCK
                 </button>
             </div>
 
-            <!-- Gestionar elaboraciones (acordeón) -->
             <div class="card">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                     <label style="margin:0">⚙️ Elaboraciones</label>
@@ -428,7 +191,6 @@
                         ⚙️ Gestionar
                     </button>
                 </div>
-                <!-- Panel oculto por defecto -->
                 <div id="panelGestionElaboraciones" style="display:none;margin-top:12px">
                     <button onclick="mostrarFormNuevoStockItem()"
                             style="width:100%;background:transparent;border:1px solid var(--gold);
@@ -460,11 +222,12 @@
         </div>
     </div>
 
-    <!-- ── COMPRAS ──────────────────── -->
+    <!-- ══════════════════════════════════════════
+         COMPRAS
+         ══════════════════════════════════════════ -->
     <div id="screenCompras" class="screen">
         <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
-                 alt="Volver" role="button">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')" alt="Volver" role="button">
         </div>
         <div class="section-header">
             <h2 class="section-title">COMPRAS</h2>
@@ -472,6 +235,7 @@
         </div>
         <div class="screen-content">
 
+            <!-- Selector de proveedor -->
             <div class="card">
                 <label>🏪 Proveedor:</label>
                 <select id="selectProveedor" onchange="onProveedorChange()">
@@ -488,6 +252,7 @@
                 </select>
             </div>
 
+            <!-- Formulario añadir línea al pedido -->
             <div id="formPedidoContainer" class="card" style="display:none">
                 <label>📦 Añadir producto:</label>
                 <input type="search" id="busquedaProdPedido"
@@ -506,12 +271,12 @@
                 </button>
             </div>
 
+            <!-- Resumen del pedido actual -->
             <div id="resumenPedidoContainer" class="card" style="display:none">
                 <label>🛒 Pedido actual:</label>
                 <div id="lineasPedido">
                     <p style="color:var(--muted);text-align:center">Sin líneas añadidas</p>
                 </div>
-                <!-- UN SOLO BOTÓN: guarda y abre WhatsApp -->
                 <button class="btn-save" style="width:100%;margin-top:14px" onclick="guardarPedido()">
                     💾 GUARDAR Y ENVIAR WHATSAPP
                 </button>
@@ -523,21 +288,61 @@
                 </button>
             </div>
 
+            <!-- ── TABS: Pedidos enviados / Albaranes recibidos ── -->
             <div class="card">
-                <label>📅 Pedidos de hoy:</label>
-                <div id="resumenDiaContainer">
-                    <p style="color:var(--muted);text-align:center">Cargando...</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+                    <button class="tab-compras" data-tab="pedidos"
+                            onclick="cambiarTabCompras('pedidos')"
+                            style="padding:10px;border-radius:10px;border:1px solid var(--gold);
+                                   background:var(--gold);color:var(--bg);
+                                   font-family:'Bebas Neue';font-size:0.95rem;letter-spacing:1px;cursor:pointer">
+                        📋 PEDIDOS ENVIADOS
+                    </button>
+                    <button class="tab-compras" data-tab="albaranes"
+                            onclick="cambiarTabCompras('albaranes')"
+                            style="padding:10px;border-radius:10px;border:1px solid var(--border);
+                                   background:var(--surface2);color:var(--muted);
+                                   font-family:'Bebas Neue';font-size:0.95rem;letter-spacing:1px;cursor:pointer">
+                        📦 ALBARANES RECIBIDOS
+                    </button>
+                </div>
+
+                <!-- Panel pedidos enviados -->
+                <div id="panelPedidosRealizados">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                        <label style="margin:0;color:var(--gold);font-weight:700">Últimos 7 días</label>
+                        <button onclick="cargarPedidosRealizados()"
+                                style="background:transparent;border:1px solid var(--border);color:var(--muted);
+                                       padding:5px 10px;border-radius:8px;font-size:0.8rem;cursor:pointer">🔄</button>
+                    </div>
+                    <div id="listaPedidosRealizados">
+                        <p style="color:var(--muted);text-align:center;font-size:0.85rem">Cargando...</p>
+                    </div>
+                </div>
+
+                <!-- Panel albaranes recibidos -->
+                <div id="panelAlbaranesRecibidos" style="display:none">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                        <label style="margin:0;color:var(--gold);font-weight:700">Albaranes registrados</label>
+                        <button onclick="cargarAlbaranesRecibidos()"
+                                style="background:transparent;border:1px solid var(--border);color:var(--muted);
+                                       padding:5px 10px;border-radius:8px;font-size:0.8rem;cursor:pointer">🔄</button>
+                    </div>
+                    <div id="listaAlbaranesRecibidos">
+                        <p style="color:var(--muted);text-align:center;font-size:0.85rem">Cargando...</p>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- ── DASHBOARD ────────────────── -->
+    <!-- ══════════════════════════════════════════
+         DASHBOARD
+         ══════════════════════════════════════════ -->
     <div id="screenDashboard" class="screen">
         <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
-                 alt="Volver" role="button">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')" alt="Volver" role="button">
         </div>
         <div class="section-header">
             <h2 class="section-title">RESUMEN SEMANAL</h2>
@@ -546,40 +351,45 @@
             <div class="card" id="dashContent">
                 <p style="color:var(--muted);text-align:center">Cargando analíticas...</p>
             </div>
+            <!-- Alertas de precio -->
+            <div class="card">
+                <label style="color:var(--gold);font-weight:700;display:block;margin-bottom:10px">
+                    💰 Alertas de cambio de precio
+                </label>
+                <div id="alertasPreciosContainer">
+                    <p style="color:var(--muted);text-align:center;font-size:0.85rem">Cargando...</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- ── BIBLIOTECA ────────────────── -->
+    <!-- ══════════════════════════════════════════
+         BIBLIOTECA
+         ══════════════════════════════════════════ -->
     <div id="screenProductos" class="screen">
         <div class="app-header">
-            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')"
-                 alt="Volver" role="button">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')" alt="Volver" role="button">
         </div>
         <div class="section-header">
             <h2 class="section-title">BIBLIOTECA</h2>
         </div>
         <div class="screen-content">
 
-            <!-- Buscador -->
             <input type="search" id="busquedaProd" placeholder="🔍 Buscar producto..."
                    onkeyup="filtrarProductos()">
 
-            <!-- Botón nuevo producto -->
             <button class="btn-save" style="font-size:1rem;background:var(--surface2);
                     color:var(--gold);border:1px solid var(--gold)"
                     onclick="mostrarFormNuevoProducto()">
                 ➕ NUEVO PRODUCTO
             </button>
 
-            <!-- Formulario nuevo producto (oculto por defecto) -->
             <div class="card" id="formNuevoProducto" style="display:none">
                 <label style="color:var(--gold);font-weight:700;display:block;margin-bottom:12px">
                     🆕 Añadir producto
                 </label>
-
                 <input id="npNombre"    placeholder="Nombre del producto *" aria-label="Nombre">
                 <input id="npUnidad"    placeholder="Unidad (kg, ud, lt...)" style="margin-top:8px" aria-label="Unidad">
-
                 <select id="npProveedor" style="margin-top:8px" aria-label="Proveedor">
                     <option value="">— Proveedor (opcional) —</option>
                     <option value="Matteo Comit">Matteo Comit</option>
@@ -592,11 +402,8 @@
                     <option value="Ortidal">Ortidal</option>
                     <option value="Otro">Otro</option>
                 </select>
-
                 <input id="npCodigo" placeholder="Código de barras (opcional)"
                        style="margin-top:8px" aria-label="Código">
-
-                <!-- Foto del producto -->
                 <div style="margin-top:12px">
                     <label style="color:var(--muted);font-size:0.85rem;display:block;margin-bottom:8px">
                         📸 Foto del producto (opcional)
@@ -604,14 +411,12 @@
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                         <button onclick="abrirCamaraNP()"
                                 style="background:var(--surface2);border:1px solid var(--border);
-                                       color:var(--text);padding:12px;border-radius:10px;
-                                       cursor:pointer;font-size:0.9rem">
+                                       color:var(--text);padding:12px;border-radius:10px;cursor:pointer;font-size:0.9rem">
                             📷 Cámara
                         </button>
                         <button onclick="abrirArchivosNP()"
                                 style="background:var(--surface2);border:1px solid var(--border);
-                                       color:var(--text);padding:12px;border-radius:10px;
-                                       cursor:pointer;font-size:0.9rem">
+                                       color:var(--text);padding:12px;border-radius:10px;cursor:pointer;font-size:0.9rem">
                             🖼 Archivo
                         </button>
                     </div>
@@ -630,7 +435,6 @@
                         </button>
                     </div>
                 </div>
-
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
                     <button class="btn-save" onclick="guardarNuevoProducto()">💾 GUARDAR</button>
                     <button onclick="ocultarFormNuevoProducto()"
@@ -645,7 +449,237 @@
         </div>
     </div>
 
-    <!-- ── MODAL EDITAR PRODUCTO ─────── -->
+    <!-- ══════════════════════════════════════════
+         PRECIOS / ALBARANES
+         ══════════════════════════════════════════ -->
+    <div id="screenPrecios" class="screen">
+        <div class="app-header">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')" alt="Volver" role="button">
+        </div>
+        <div class="section-header">
+            <h2 class="section-title">PRECIOS</h2>
+            <p style="color:var(--muted)">Albaranes · Food cost</p>
+        </div>
+        <div class="screen-content">
+
+            <!-- Instrucciones + prompt -->
+            <div class="card">
+                <label style="color:var(--gold);font-weight:700;display:block;margin-bottom:10px">
+                    📋 Registrar albarán
+                </label>
+
+                <div style="background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:12px">
+                    <p style="color:var(--text);font-size:0.9rem;margin-bottom:10px;line-height:1.5">
+                        <b>Paso 1 —</b> Copia el prompt, ve a Claude.ai o ChatGPT,
+                        sube la foto del albarán junto al prompt y copia el JSON que te devuelva.
+                    </p>
+                    <button id="btnVerPrompt" onclick="mostrarPromptAlbaran()"
+                            style="width:100%;background:transparent;border:1px solid var(--gold);
+                                   color:var(--gold);padding:10px;border-radius:10px;
+                                   font-size:0.9rem;cursor:pointer">
+                        👁 Ver prompt para la IA
+                    </button>
+                </div>
+
+                <!-- Prompt (oculto por defecto) -->
+                <div id="panelPromptAlbaran" style="display:none;margin-bottom:12px">
+                    <textarea id="textareaPrompt" readonly
+                              style="width:100%;height:200px;background:var(--surface);
+                                     border:1px solid var(--border);color:var(--muted);
+                                     padding:10px;border-radius:10px;font-size:0.75rem;
+                                     font-family:monospace;resize:none;line-height:1.4"></textarea>
+                    <button id="btnCopiarPrompt" onclick="copiarPrompt()"
+                            style="width:100%;margin-top:6px;background:var(--surface2);
+                                   border:1px solid var(--border);color:var(--text);
+                                   padding:10px;border-radius:10px;font-size:0.9rem;cursor:pointer">
+                        📋 Copiar prompt
+                    </button>
+                </div>
+
+                <!-- Paso 2: pegar JSON -->
+                <div style="background:var(--surface2);border-radius:10px;padding:12px">
+                    <p style="color:var(--text);font-size:0.9rem;margin-bottom:10px;line-height:1.5">
+                        <b>Paso 2 —</b> Pega aquí el JSON que te ha devuelto la IA:
+                    </p>
+                    <textarea id="inputTextoAlbaran"
+                              placeholder='Pega el JSON aquí. Ejemplo:&#10;{&#10;  "proveedor": "Matteo Comit",&#10;  "fechaEntrega": "18/04/2026",&#10;  "lineas": [&#10;    { "producto": "Carne picada", "cantidad": 5, "unidad": "kg", "precioUnit": 4.20 }&#10;  ]&#10;}'
+                              style="width:100%;height:160px;background:var(--surface);
+                                     border:1px solid var(--border);color:var(--text);
+                                     padding:12px;border-radius:10px;font-size:0.8rem;
+                                     font-family:monospace;resize:none;line-height:1.4;margin-bottom:8px"></textarea>
+                    <button class="btn-save" onclick="procesarTextoAlbaran()" style="font-size:1rem">
+                        ▶ PROCESAR ALBARÁN
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resultado: líneas editables antes de confirmar -->
+            <div id="albaranResultContainer" style="display:none" class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <label style="color:var(--gold);font-weight:700;margin:0">✅ Líneas detectadas</label>
+                    <button onclick="añadirLineaAlbaranManual()"
+                            style="background:transparent;border:1px dashed var(--border);
+                                   color:var(--muted);padding:5px 10px;border-radius:8px;
+                                   font-size:0.8rem;cursor:pointer">➕ Añadir</button>
+                </div>
+
+                <!-- Fecha de entrega -->
+                <div style="margin-bottom:10px">
+                    <label style="color:var(--muted);font-size:0.8rem;display:block;margin-bottom:6px">
+                        📅 Fecha de entrega del albarán:
+                    </label>
+                    <input type="date" id="albaranFechaEntrega"
+                           style="width:100%;padding:10px !important;font-size:0.9rem;margin:0">
+                </div>
+
+                <!-- Proveedor -->
+                <select id="albaranProveedor" style="margin-bottom:12px">
+                    <option value="">— Confirma el proveedor —</option>
+                    <option value="Matteo Comit">Matteo Comit</option>
+                    <option value="Tías Fruit">Tías Fruit</option>
+                    <option value="Chacon">Chacon</option>
+                    <option value="ReyesyBouzon">Reyes y Bouzon</option>
+                    <option value="Canarymeat">Canarymeat</option>
+                    <option value="Pescasol">Pescasol</option>
+                    <option value="Roper">Roper</option>
+                    <option value="Ortidal">Ortidal</option>
+                    <option value="Otro">Otro</option>
+                </select>
+
+                <p style="color:var(--muted);font-size:0.8rem;margin-bottom:10px;line-height:1.4">
+                    Revisa y edita. El campo <b style="color:var(--gold)">€/ud</b> actualiza
+                    los precios para el food cost. Si no lo sabes, déjalo vacío.
+                </p>
+
+                <div id="albaranLineas"></div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+                    <button onclick="descartarAlbaran()"
+                            style="background:transparent;border:1px solid var(--border);
+                                   color:var(--muted);padding:14px;border-radius:12px;cursor:pointer;
+                                   font-family:'Bebas Neue';font-size:1rem;letter-spacing:1px">
+                        DESCARTAR
+                    </button>
+                    <button id="btnConfirmarAlbaran" class="btn-save" onclick="confirmarAlbaran()">
+                        GUARDAR
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista precios actuales -->
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <label style="margin:0;color:var(--gold);font-weight:700">📋 Precios actuales</label>
+                    <button onclick="cargarPrecios()"
+                            style="background:transparent;border:1px solid var(--border);
+                                   color:var(--muted);padding:6px 12px;border-radius:8px;
+                                   font-size:0.8rem;cursor:pointer">🔄</button>
+                </div>
+                <input type="search" id="busquedaPrecios" placeholder="🔍 Buscar producto..."
+                       oninput="filtrarPrecios()" style="margin-bottom:10px">
+                <div id="listaPreciosContainer">
+                    <p style="color:var(--muted);text-align:center">Cargando...</p>
+                </div>
+            </div>
+
+            <!-- Gestión de alias -->
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                    <label style="margin:0;color:var(--gold);font-weight:700">🔗 Alias de productos</label>
+                    <button onclick="cargarGestionAlias()"
+                            style="background:transparent;border:1px solid var(--border);color:var(--muted);
+                                   padding:5px 10px;border-radius:8px;font-size:0.8rem;cursor:pointer">🔄</button>
+                </div>
+                <p style="color:var(--muted);font-size:0.8rem;margin-bottom:10px;line-height:1.5">
+                    Vincula nombres del albarán con los de tu biblioteca. Se crean solos al confirmar un albarán.
+                </p>
+                <div id="listaAliasGestion">
+                    <p style="color:var(--muted);text-align:center;font-size:0.85rem">Pulsa 🔄 para cargar</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         CARTA / ESCANDALLOS
+         ══════════════════════════════════════════ -->
+    <div id="screenCarta" class="screen">
+        <div class="app-header">
+            <img src="icons/logo-hero.png" class="logo-small" onclick="irA('screenHome')" alt="Volver" role="button">
+        </div>
+        <div class="section-header">
+            <h2 class="section-title">CARTA</h2>
+            <p style="color:var(--muted)">Escandallos · Food cost · Margen</p>
+        </div>
+        <div class="screen-content">
+
+            <button class="btn-save"
+                    style="font-size:1rem;background:var(--surface2);color:var(--gold);border:1px solid var(--gold)"
+                    onclick="mostrarFormNuevoPlato()">
+                🍽️ NUEVO PLATO
+            </button>
+
+            <div class="card" id="formNuevoPlato" style="display:none">
+                <label style="color:var(--gold);font-weight:700;display:block;margin-bottom:12px">🆕 Añadir plato</label>
+                <input id="npNombrePlato" placeholder="Nombre del plato *">
+                <select id="npCategoriaplato" style="margin-top:8px">
+                    <option value="">Categoría...</option>
+                    <option value="Entrantes">Entrantes</option>
+                    <option value="Para Picar">Para Picar</option>
+                    <option value="Ensaladas">Ensaladas</option>
+                    <option value="Pastas">Pastas</option>
+                    <option value="Raviolis">Raviolis</option>
+                    <option value="Carnes">Carnes</option>
+                    <option value="Pescados">Pescados</option>
+                    <option value="Hamburguesas">Hamburguesas</option>
+                    <option value="Pizzas">Pizzas</option>
+                    <option value="Postres">Postres</option>
+                </select>
+                <input id="npPVP" type="number" step="0.01"
+                       placeholder="PVP (€ con IVA, opcional)" style="margin-top:8px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+                    <button class="btn-save" onclick="guardarNuevoPlato()">💾 GUARDAR</button>
+                    <button onclick="ocultarFormNuevoPlato()"
+                            style="background:transparent;border:1px solid var(--border);
+                                   color:var(--muted);padding:14px;border-radius:12px;cursor:pointer">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:8px">
+                <input type="search" id="busquedaPlatos" placeholder="🔍 Buscar plato..."
+                       oninput="filtrarPlatos()" style="flex:1;margin-bottom:0">
+                <select id="filtroCategoriaCarta" onchange="filtrarPlatos()"
+                        style="width:auto;min-width:110px;padding:10px !important;
+                               font-size:0.85rem;margin-bottom:0">
+                    <option value="">Todas</option>
+                    <option value="Para Picar">Para Picar</option>
+                    <option value="Entrantes">Entrantes</option>
+                    <option value="Ensaladas">Ensaladas</option>
+                    <option value="Pastas">Pastas</option>
+                    <option value="Raviolis">Raviolis</option>
+                    <option value="Carnes">Carnes</option>
+                    <option value="Pescados">Pescados</option>
+                    <option value="Hamburguesas">Hamburguesas</option>
+                    <option value="Pizzas">Pizzas</option>
+                    <option value="Postres">Postres</option>
+                </select>
+            </div>
+
+            <div id="listaPlatos">
+                <p style="color:var(--muted);text-align:center">Cargando carta...</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         MODALES
+         ══════════════════════════════════════════ -->
+
+    <!-- Editar Producto -->
     <div id="modalEditarProducto" class="modal-overlay">
         <div class="modal-box">
             <h2 class="modal-title">✏️ EDITAR PRODUCTO</h2>
@@ -672,7 +706,7 @@
         </div>
     </div>
 
-    <!-- ── MODAL EDITAR STOCK ITEM ───── -->
+    <!-- Editar Stock Item -->
     <div id="modalEditarStockItem" class="modal-overlay">
         <div class="modal-box">
             <h2 class="modal-title">✏️ EDITAR ELABORACIÓN</h2>
@@ -695,7 +729,85 @@
         </div>
     </div>
 
-    <!-- ── OVERLAY ÉXITO ──────────────── -->
+    <!-- Editor de Escandallo -->
+    <div id="modalEscandallo" class="modal-overlay">
+        <div class="modal-box" style="max-width:500px;max-height:90vh;overflow-y:auto">
+            <h2 class="modal-title">🍽️ <span id="modalEscNombre">ESCANDALLO</span></h2>
+            <input type="hidden" id="modalEscPlatoKey">
+            <p style="color:var(--muted);font-size:0.8rem;margin-bottom:8px;line-height:1.4">
+                Busca ingredientes (productos de la biblioteca) o elaboraciones (salsas, masas...)
+                y ajusta los gramajes.
+            </p>
+            <div style="position:relative">
+                <input type="search" id="busqIngEsc"
+                       placeholder="🔍 Buscar ingrediente o elaboración..."
+                       oninput="filtrarIngEscandallo()"
+                       autocomplete="off" autocorrect="off">
+                <div id="sugIngEsc"
+                     style="display:none;background:var(--surface);border:1px solid var(--border);
+                            border-radius:10px;overflow:hidden;max-height:200px;overflow-y:auto;
+                            margin-top:-8px"></div>
+            </div>
+            <div id="lineasEscandallo" style="margin-top:8px;max-height:320px;overflow-y:auto"></div>
+            <div class="modal-buttons" style="margin-top:12px">
+                <button class="btn-cancelar" onclick="cerrarModalEscandallo()">CANCELAR</button>
+                <button id="btnGuardarEsc" class="btn-save" onclick="guardarEscandalloModal()">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Alias de productos -->
+    <div id="modalAlias" class="modal-overlay">
+        <div class="modal-box" style="max-width:480px;max-height:85vh;overflow-y:auto">
+            <h2 class="modal-title">🔗 VINCULAR PRODUCTOS</h2>
+            <p style="color:var(--muted);font-size:0.85rem;line-height:1.5">
+                Estos productos del albarán no coinciden con tu biblioteca.
+                Vincúlalos para que la próxima vez se reconozcan solos.
+            </p>
+            <div id="listaAliasModal"></div>
+            <div class="modal-buttons" style="margin-top:14px">
+                <button class="btn-cancelar" onclick="cerrarModalAlias()">OMITIR</button>
+                <button class="btn-save" onclick="guardarAliasModal()">GUARDAR VÍNCULOS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Rendimiento de producción (nuevo) -->
+    <div id="modalRendimiento" class="modal-overlay">
+        <div class="modal-box">
+            <h2 class="modal-title">📊 <span id="modalRendNombre">RENDIMIENTO</span></h2>
+            <input type="hidden" id="modalRendElabKey">
+            <p style="color:var(--muted);font-size:0.85rem;line-height:1.5">
+                ¿Cuánto te ha salido de esta producción?
+                Esto actualiza el rendimiento real de la elaboración.
+            </p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div>
+                    <label style="color:var(--muted);font-size:0.8rem;display:block;margin-bottom:4px">Cantidad obtenida</label>
+                    <input type="number" id="modalRendCantidad" placeholder="Ej: 14.5" step="0.1" min="0">
+                </div>
+                <div>
+                    <label style="color:var(--muted);font-size:0.8rem;display:block;margin-bottom:4px">Unidad</label>
+                    <select id="modalRendUnidad">
+                        <option value="kg">kg</option>
+                        <option value="lt">lt</option>
+                        <option value="ud">ud (raciones)</option>
+                        <option value="g">g</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label style="color:var(--muted);font-size:0.8rem;display:block;margin-bottom:4px">Notas (opcional)</label>
+                <input type="text" id="modalRendNotas" placeholder="Ej: salió un poco más líquida">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancelar" onclick="cerrarModalRendimiento()">OMITIR</button>
+                <button class="btn-save" onclick="guardarRendimiento()">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay éxito -->
     <div id="successOverlay" class="success-overlay" role="alert" aria-live="assertive">
         <div id="successIcon">✅</div>
         <h2 id="successText">¡GUARDADO!</h2>
