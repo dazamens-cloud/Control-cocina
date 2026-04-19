@@ -517,15 +517,49 @@
                 </button>
             </div>
 
-            <div class="card">
-                <label>📅 Pedidos de hoy:</label>
-                <div id="resumenDiaContainer">
-                    <p style="color:var(--muted);text-align:center">Cargando...</p>
-                </div>
-            </div>
-
+           <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <button class="tab-compras" data-tab="pedidos"
+                onclick="cambiarTabCompras('pedidos')"
+                style="padding:10px;border-radius:10px;border:1px solid var(--gold);
+                       background:var(--gold);color:var(--bg);
+                       font-family:'Bebas Neue';font-size:1rem;letter-spacing:1px;cursor:pointer">
+            📋 PEDIDOS ENVIADOS
+        </button>
+        <button class="tab-compras" data-tab="albaranes"
+                onclick="cambiarTabCompras('albaranes')"
+                style="padding:10px;border-radius:10px;border:1px solid var(--border);
+                       background:var(--surface2);color:var(--muted);
+                       font-family:'Bebas Neue';font-size:1rem;letter-spacing:1px;cursor:pointer">
+            📦 ALBARANES RECIBIDOS
+        </button>
+    </div>
+ 
+    <div id="panelPedidosRealizados">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <label style="margin:0;color:var(--gold);font-weight:700">Últimos 7 días</label>
+            <button onclick="cargarPedidosRealizados()"
+                    style="background:transparent;border:1px solid var(--border);color:var(--muted);
+                           padding:5px 10px;border-radius:8px;font-size:0.8rem;cursor:pointer">🔄</button>
+        </div>
+        <div id="listaPedidosRealizados">
+            <p style="color:var(--muted);text-align:center;font-size:0.85rem">Cargando...</p>
         </div>
     </div>
+ 
+    <div id="panelAlbaranesRecibidos" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <label style="margin:0;color:var(--gold);font-weight:700">Albaranes registrados</label>
+            <button onclick="cargarAlbaranesRecibidos()"
+                    style="background:transparent;border:1px solid var(--border);color:var(--muted);
+                           padding:5px 10px;border-radius:8px;font-size:0.8rem;cursor:pointer">🔄</button>
+        </div>
+        <div id="listaAlbaranesRecibidos">
+            <p style="color:var(--muted);text-align:center;font-size:0.85rem">Cargando...</p>
+        </div>
+    </div>
+</div>
+-->
 
     <!-- ── DASHBOARD ────────────────── -->
     <div id="screenDashboard" class="screen">
@@ -542,7 +576,30 @@
             </div>
         </div>
     </div>
-
+<div class="card" style="margin-top:15px">
+    <label style="color:var(--gold);font-weight:700;display:block;margin-bottom:10px">
+        💰 Alertas de cambio de precio
+    </label>
+    <div id="alertasPreciosContainer">
+        <p style="color:var(--muted);text-align:center;font-size:0.85rem">Cargando...</p>
+    </div>
+</div>
+            <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <label style="margin:0;color:var(--gold);font-weight:700">🔗 Alias de productos</label>
+        <button onclick="cargarGestionAlias()"
+                style="background:transparent;border:1px solid var(--border);color:var(--muted);
+                       padding:5px 10px;border-radius:8px;font-size:0.8rem;cursor:pointer">🔄</button>
+    </div>
+    <p style="color:var(--muted);font-size:0.8rem;margin-bottom:10px;line-height:1.5">
+        Cuando confirmas un albarán, los productos que no estén en la biblioteca
+        se vinculan aquí. En el siguiente albarán, el sistema los reconocerá solo.
+    </p>
+    <div id="listaAliasGestion">
+        <p style="color:var(--muted);text-align:center;font-size:0.85rem">Pulsa 🔄 para cargar</p>
+    </div>
+</div>
+            
     <!-- ── BIBLIOTECA ────────────────── -->
     <div id="screenProductos" class="screen">
         <div class="app-header">
