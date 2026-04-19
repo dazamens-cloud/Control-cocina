@@ -289,6 +289,20 @@
     </div>
 </div>
 </head>
+<div id="modalAlias" class="modal-overlay">
+    <div class="modal-box" style="max-width:480px;max-height:85vh;overflow-y:auto">
+        <h2 class="modal-title">🔗 VINCULAR PRODUCTOS</h2>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:14px;line-height:1.5">
+            Estos productos del albarán no coinciden exactamente con tu biblioteca.
+            Vincúlalos para que la próxima vez se reconozcan solos.
+        </p>
+        <div id="listaAliasModal"></div>
+        <div class="modal-buttons" style="margin-top:14px">
+            <button class="btn-cancelar" onclick="cerrarModalAlias()">OMITIR</button>
+            <button class="btn-save" onclick="guardarAliasModal()">GUARDAR VÍNCULOS</button>
+        </div>
+    </div>
+</div>
 <body>
 
     <!-- ── HOME ─────────────────────── -->
