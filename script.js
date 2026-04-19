@@ -3,7 +3,7 @@
 // v3.1 — Bugs de sintaxis corregidos
 // =============================================
 
-const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbybrFFcwNOSn7X1r4lSt0VMAADBbLtkdOr4EFS5iTrN4ByA8zW8hqoBSIb3LMDtC5pzkA/exec";
+const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbwpQzAvdvHVPF3l4SwGTqMHvhs8payQL5FsL2u80Qm1BvG5etRJ9wB5R1pZUGcpWAiXXw/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
