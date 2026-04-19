@@ -297,6 +297,7 @@ async function guardarSesion() {
   await postToScript({ modo: 'sesion', elaboracion: currentElabSelected, ingredientes: ingredientes });
 
   showSuccess("REGISTRADO", currentElabSelected, "🍳");
+  var elaborGuardada = currentElabSelected;
   currentElabSelected = "";
   var listContainer = document.getElementById('listaIngredientes');
   if (listContainer) listContainer.innerHTML = '';
@@ -304,6 +305,8 @@ async function guardarSesion() {
   document.querySelectorAll('.btn-elab').forEach(function(b) { b.classList.remove('selected'); });
   Object.keys(fotosIngredientes).forEach(function(k) { delete fotosIngredientes[k]; });
   irA('screenHome');
+  // Preguntar rendimiento de la producción
+  setTimeout(function() { abrirModalRendimiento(elaborGuardada); }, 600);
 }
 
 // ── PRODUCTOS ────────────────────────────────
@@ -2189,3 +2192,59 @@ async function eliminarAliasItem(nombreAlbaran) {
 
 // ── Actualizar DOMContentLoaded para cargar alias al inicio ────
 // Añadir cargarAlias() a la inicialización (ver instrucciones)
+
+
+// ══════════════════════════════════════════════
+// MODAL DE RENDIMIENTO DE PRODUCCIÓN
+// Se abre al terminar guardarSesion() — pregunta
+// cuánto ha rendido la elaboración recién registrada
+// ══════════════════════════════════════════════
+
+function abrirModalRendimiento(nombreElab) {
+  var modal   = document.getElementById('modalRendimiento');
+  var tituloEl = document.getElementById('modalRendNombre');
+  var keyEl   = document.getElementById('modalRendElabKey');
+  if (!modal) return;
+
+  if (tituloEl) tituloEl.textContent = nombreElab.toUpperCase();
+  if (keyEl)    keyEl.value          = nombreElab;
+
+  // Limpiar campos
+  var cant  = document.getElementById('modalRendCantidad'); if (cant)  cant.value  = '';
+  var notas = document.getElementById('modalRendNotas');    if (notas) notas.value = '';
+  var uni   = document.getElementById('modalRendUnidad');   if (uni)   uni.value   = 'kg';
+
+  modal.style.display = 'flex';
+}
+
+function cerrarModalRendimiento() {
+  var modal = document.getElementById('modalRendimiento');
+  if (modal) modal.style.display = 'none';
+}
+
+async function guardarRendimiento() {
+  var nombreElab = ((document.getElementById('modalRendElabKey')  || {}).value || '').trim();
+  var cantidad   = ((document.getElementById('modalRendCantidad') || {}).value || '');
+  var unidad     = ((document.getElementById('modalRendUnidad')   || {}).value || 'kg');
+  var notas      = ((document.getElementById('modalRendNotas')    || {}).value || '');
+
+  if (!nombreElab || !cantidad) {
+    cerrarModalRendimiento();
+    return;
+  }
+
+  // Guardar rendimiento en Stock Items via endpoint existente de stock semanal
+  // pero con modo específico que actualiza la columna Rendimiento_kg
+  await postToScript({
+    modo:        'actualizarRendimiento',
+    elaboracion: nombreElab,
+    cantidad:    parseFloat(cantidad),
+    unidad:      unidad,
+    notas:       notas
+  });
+
+  showSuccess('RENDIMIENTO GUARDADO', parseFloat(cantidad) + ' ' + unidad + ' de ' + nombreElab, '📊');
+  cerrarModalRendimiento();
+  // Invalidar cache de platos para recalcular food costs
+  platosLibreria = [];
+}
