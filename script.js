@@ -3,7 +3,7 @@
 // v3.1 — Bugs de sintaxis corregidos
 // =============================================
 
-const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycby8VZoLQyOBo5b4CKD_Iex9G4c9sK4VvcMBES9s87ydUWuS88WWgpXABgmtLF2SH2cGrw/exec";
+const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbybrFFcwNOSn7X1r4lSt0VMAADBbLtkdOr4EFS5iTrN4ByA8zW8hqoBSIb3LMDtC5pzkA/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
@@ -983,6 +983,8 @@ async function cargarDashboard() {
   }
 
   cont.innerHTML = html;
+  // Cargar alertas de precio
+  await cargarAlertasPrecios();
 }
 
 
@@ -1108,6 +1110,7 @@ document.addEventListener('DOMContentLoaded', function() {
   history.replaceState({ screen: 'screenHome' }, '', '#screenHome');
   cargarProveedores();
   cargarStockItems();
+  cargarAlias();
   procesarColaPendiente();
 });
 // =============================================
@@ -1123,6 +1126,8 @@ let preciosLibreria  = [];
 let platosLibreria   = [];
 let albaranLineasIA  = [];
 let escandalloLineas = [];
+let ALIAS_PRODUCTOS  = [];   // [{nombreAlbaran, nombreBiblioteca}]
+let fechaAlbaran     = '';   // fecha de entrega del albarán actual
 
 // ─────────────────────────────────────────────
 // NAVEGACIÓN — añadir al switch de irA():
@@ -1194,21 +1199,27 @@ function mostrarPromptAlbaran() {
 
   if (!abierto) {
     var prods = productosLibreria.map(function(p) { return p.nombre; }).join(', ');
+    var aliasTexto = ALIAS_PRODUCTOS.length > 0
+      ? '\n\nAlias conocidos (si ves el nombre izq. usa el der.):\n' +
+        ALIAS_PRODUCTOS.map(function(a) { return '  "' + a.nombreAlbaran + '" → "' + a.nombreBiblioteca + '"'; }).join('\n')
+      : '';
+
     var prompt =
       'Analiza esta imagen de albarán de restaurante.\n' +
-      'Extrae todos los productos con cantidad y precio unitario.\n\n' +
+      'Extrae todos los productos con cantidad, precio unitario y la FECHA del albarán.\n\n' +
       'Mis productos actuales (intenta mapear nombres similares):\n' +
-      (prods || '(sin productos previos)') + '\n\n' +
+      (prods || '(sin productos previos)') +
+      aliasTexto + '\n\n' +
       'Devuelve SOLO este JSON, sin texto adicional:\n' +
       '{\n' +
       '  "proveedor": "nombre del proveedor o cadena vacía",\n' +
+      '  "fechaEntrega": "DD/MM/YYYY si aparece en el albarán, si no cadena vacía",\n' +
       '  "lineas": [\n' +
       '    { "producto": "nombre", "cantidad": 5, "unidad": "kg", "precioUnit": 3.50 }\n' +
       '  ]\n' +
       '}\n\n' +
-      'Si no aparece precio unitario, calcula: precio total ÷ cantidad.\n' +
-      'Unidades posibles: kg, g, ud, lt, ml, caja.\n' +
-      'Dato no visible → null.';
+      'Si ves nombres en los alias conocidos úsalos. Si no hay precio unitario calcula: total ÷ cantidad.\n' +
+      'Unidades: kg, g, ud, lt, ml, caja. Dato no visible → null.';
 
     var ta = document.getElementById('textareaPrompt');
     if (ta) ta.value = prompt;
@@ -1251,6 +1262,17 @@ function procesarTextoAlbaran() {
             sel.value = opt.value;
           }
         });
+      }
+    }
+
+    // Capturar fecha de entrega si la IA la detectó
+    fechaAlbaran = parsed.fechaEntrega || '';
+    var inputFecha = document.getElementById('albaranFechaEntrega');
+    if (inputFecha && parsed.fechaEntrega) {
+      // Convertir DD/MM/YYYY a YYYY-MM-DD para el input date
+      var partesFecha = parsed.fechaEntrega.split('/');
+      if (partesFecha.length === 3) {
+        inputFecha.value = partesFecha[2] + '-' + partesFecha[1] + '-' + partesFecha[0];
       }
     }
 
@@ -1374,6 +1396,21 @@ async function confirmarAlbaran() {
   var lineas    = leerLineasAlbaranDesdeDom();
   var proveedor = ((document.getElementById('albaranProveedor') || {}).value || '').trim();
 
+  // Leer fecha de entrega
+  var inputFecha = document.getElementById('albaranFechaEntrega');
+  var fechaEntrega = '';
+  if (inputFecha && inputFecha.value) {
+    // Convertir YYYY-MM-DD a DD/MM/YYYY para guardar
+    var pf = inputFecha.value.split('-');
+    if (pf.length === 3) fechaEntrega = pf[2] + '/' + pf[1] + '/' + pf[0];
+  }
+  if (!fechaEntrega) {
+    var hoy = new Date();
+    fechaEntrega = hoy.getDate().toString().padStart(2,'0') + '/' +
+                   (hoy.getMonth()+1).toString().padStart(2,'0') + '/' +
+                   hoy.getFullYear();
+  }
+
   if (lineas.length === 0) {
     showError('No hay líneas activas para guardar.');
     return;
@@ -1382,16 +1419,17 @@ async function confirmarAlbaran() {
   var btn = document.getElementById('btnConfirmarAlbaran');
   if (btn) btn.disabled = true;
 
-  // 1. Guardar como compra en Sheets
+  // 1. Guardar en hoja ALBARANES (no en Compras — mejora 5)
   await postToScript({
-    modo:      'compra',
-    proveedor: proveedor || 'Otro',
-    lineas:    lineas.map(function(l) {
-      return { producto: l.producto, cantidad: l.cantidad, unidad: l.unidad };
+    modo:         'guardarAlbaranRecibido',
+    proveedor:    proveedor || 'Otro',
+    fechaEntrega: fechaEntrega,
+    lineas:       lineas.map(function(l) {
+      return { producto: l.producto, cantidad: l.cantidad, unidad: l.unidad, precio: l.precioUnit };
     })
   });
 
-  // 2. Actualizar precios de los que tienen precio unitario
+  // 2. Actualizar precios con historial para detectar cambios
   var conPrecio = lineas.filter(function(l) { return l.precioUnit && l.precioUnit > 0; });
   if (conPrecio.length > 0) {
     await postToScript({
@@ -1403,15 +1441,31 @@ async function confirmarAlbaran() {
     });
   }
 
-  showSuccess('ALBARÁN GUARDADO', conPrecio.length + ' precios actualizados', '💰');
+  // 3. Detectar productos que no están en la biblioteca (para sugerir alias)
+  var sinCoincidencia = lineas.filter(function(l) {
+    var nombreLow = l.producto.toLowerCase();
+    var enBib = productosLibreria.some(function(p) { return p.nombre.toLowerCase() === nombreLow; });
+    var enAlias = ALIAS_PRODUCTOS.some(function(a) { return a.nombreAlbaran.toLowerCase() === nombreLow; });
+    return !enBib && !enAlias;
+  });
+
+  showSuccess('ALBARÁN GUARDADO', fechaEntrega + ' · ' + conPrecio.length + ' precios actualizados', '💰');
   descartarAlbaran();
   platosLibreria = [];
   await cargarPrecios();
   if (btn) btn.disabled = false;
+
+  // 4. Si hay productos sin coincidencia, abrir modal de alias
+  if (sinCoincidencia.length > 0 && productosLibreria.length > 0) {
+    setTimeout(function() {
+      abrirModalAlias(sinCoincidencia.map(function(l) { return l.producto; }));
+    }, 800);
+  }
 }
 
 function descartarAlbaran() {
   albaranLineasIA = [];
+  fechaAlbaran = '';
   ['albaranResultContainer', 'panelPromptAlbaran'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.style.display = 'none';
@@ -1420,6 +1474,8 @@ function descartarAlbaran() {
   if (sel) sel.value = '';
   var ta = document.getElementById('inputTextoAlbaran');
   if (ta) ta.value = '';
+  var fd = document.getElementById('albaranFechaEntrega');
+  if (fd) fd.value = '';
 }
 
 
@@ -1799,3 +1855,337 @@ function escHtml(str) {
 //   case 'screenPrecios': cargarPrecios(); break;
 //   case 'screenCarta':   cargarCarta();   break;
 // ══════════════════════════════════════════════
+
+// ══════════════════════════════════════════════
+// MEJORAS v3 — Pedidos, Albaranes, Alias, Alertas
+// ══════════════════════════════════════════════
+
+// ── Cargar alias al inicio ─────────────────────
+async function cargarAlias() {
+  var data = await getFromScript({ accion: 'listarAlias' });
+  if (data && data.alias) {
+    ALIAS_PRODUCTOS = data.alias;
+    console.log('Alias cargados: ' + ALIAS_PRODUCTOS.length);
+  }
+}
+
+// ── Modal de alias (productos sin coincidencia en biblioteca) ──
+function abrirModalAlias(productos) {
+  var modal = document.getElementById('modalAlias');
+  if (!modal) return;
+
+  var cont = document.getElementById('listaAliasModal');
+  if (!cont) return;
+
+  cont.innerHTML = productos.map(function(nombre, i) {
+    var nombreEsc = escHtml(nombre);
+    return '<div style="background:var(--surface2);border:1px solid var(--border);' +
+           'border-radius:10px;padding:12px;margin-bottom:8px">' +
+      '<div style="color:var(--gold);font-size:0.9rem;margin-bottom:8px">' +
+        '❓ <b>' + nombreEsc + '</b> no está en la biblioteca' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;align-items:center">' +
+        '<input id="alias-busq-' + i + '" data-nombre="' + nombreEsc + '" ' +
+               'placeholder="Buscar producto en biblioteca..." ' +
+               'oninput="filtrarBibliotecaAlias(' + i + ')" ' +
+               'style="flex:1;padding:8px !important;font-size:0.85rem;margin:0">' +
+      '</div>' +
+      '<div id="alias-sug-' + i + '" style="background:var(--surface);border:1px solid var(--border);' +
+           'border-radius:8px;overflow:hidden;display:none;margin-top:4px;max-height:150px;overflow-y:auto"></div>' +
+      '<div id="alias-sel-' + i + '" style="margin-top:6px;font-size:0.8rem;color:var(--muted)"></div>' +
+    '</div>';
+  }).join('');
+
+  modal.style.display = 'flex';
+}
+
+function filtrarBibliotecaAlias(idx) {
+  var inp = document.getElementById('alias-busq-' + idx);
+  var sug = document.getElementById('alias-sug-' + idx);
+  if (!inp || !sug) return;
+
+  var q = inp.value.toLowerCase().trim();
+  if (!q) { sug.style.display = 'none'; return; }
+
+  var matches = productosLibreria
+    .filter(function(p) { return p.nombre.toLowerCase().includes(q); })
+    .slice(0, 6);
+
+  if (matches.length === 0) { sug.style.display = 'none'; return; }
+
+  sug.innerHTML = matches.map(function(p) {
+    return '<div onclick="seleccionarAliasProducto(' + idx + ',\'' +
+           p.nombre.replace(/'/g, "\\'") + '\')" ' +
+           'style="padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer;font-size:0.85rem">' +
+      getEmoji(p.nombre) + ' ' + escHtml(p.nombre) + '</div>';
+  }).join('');
+  sug.style.display = 'block';
+}
+
+function seleccionarAliasProducto(idx, nombreBiblioteca) {
+  var inp = document.getElementById('alias-busq-' + idx);
+  var sug = document.getElementById('alias-sug-' + idx);
+  var sel = document.getElementById('alias-sel-' + idx);
+  if (!inp) return;
+
+  inp.dataset.seleccionado = nombreBiblioteca;
+  inp.value = nombreBiblioteca;
+  if (sug) sug.style.display = 'none';
+  if (sel) sel.innerHTML = '✅ Se vinculará a: <b style="color:var(--gold)">' + escHtml(nombreBiblioteca) + '</b>';
+}
+
+async function guardarAliasModal() {
+  var modal = document.getElementById('modalAlias');
+  var items = document.querySelectorAll('[id^="alias-busq-"]');
+  var guardados = 0;
+
+  for (var i = 0; i < items.length; i++) {
+    var inp = items[i];
+    var nombreAlbaran    = inp.dataset.nombre;
+    var nombreBiblioteca = inp.dataset.seleccionado;
+    if (nombreAlbaran && nombreBiblioteca && nombreAlbaran !== nombreBiblioteca) {
+      await postToScript({
+        modo:             'guardarAlias',
+        nombreAlbaran:    nombreAlbaran,
+        nombreBiblioteca: nombreBiblioteca
+      });
+      guardados++;
+    }
+  }
+
+  if (guardados > 0) {
+    showSuccess('ALIAS GUARDADOS', guardados + ' vinculaciones', '🔗');
+    await cargarAlias();
+  }
+  if (modal) modal.style.display = 'none';
+}
+
+function cerrarModalAlias() {
+  var modal = document.getElementById('modalAlias');
+  if (modal) modal.style.display = 'none';
+}
+
+// ── Pantalla de Compras mejorada: Pedidos vs Albaranes ─────────
+var tabComprasActiva = 'pedidos'; // 'pedidos' | 'albaranes'
+
+function cambiarTabCompras(tab) {
+  tabComprasActiva = tab;
+  var tabs = document.querySelectorAll('.tab-compras');
+  tabs.forEach(function(t) {
+    var activo = t.dataset.tab === tab;
+    t.style.background    = activo ? 'var(--gold)'    : 'var(--surface2)';
+    t.style.color         = activo ? 'var(--bg)'      : 'var(--muted)';
+    t.style.borderColor   = activo ? 'var(--gold)'    : 'var(--border)';
+  });
+  var panelPed = document.getElementById('panelPedidosRealizados');
+  var panelAlb = document.getElementById('panelAlbaranesRecibidos');
+  if (panelPed) panelPed.style.display = tab === 'pedidos'  ? 'block' : 'none';
+  if (panelAlb) panelAlb.style.display = tab === 'albaranes' ? 'block' : 'none';
+
+  if (tab === 'albaranes') cargarAlbaranesRecibidos();
+  if (tab === 'pedidos')   cargarPedidosRealizados();
+}
+
+var pedidosRealizadosCache = []; // guardamos las filas para poder borrar
+
+async function cargarPedidosRealizados() {
+  var cont = document.getElementById('listaPedidosRealizados');
+  if (!cont) return;
+  cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem">Cargando...</p>';
+
+  var data = await getFromScript({ accion: 'listarPedidos', dias: 7 });
+  if (!data || !data.pedidos) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Error al cargar</p>';
+    return;
+  }
+
+  pedidosRealizadosCache = data.pedidos;
+  renderPedidosRealizados();
+}
+
+function renderPedidosRealizados() {
+  var cont = document.getElementById('listaPedidosRealizados');
+  if (!cont) return;
+
+  if (pedidosRealizadosCache.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem">Sin pedidos en los últimos 7 días</p>';
+    return;
+  }
+
+  // Agrupar por proveedor + fecha (para poder borrar grupos)
+  var grupos = {};
+  pedidosRealizadosCache.forEach(function(p) {
+    var key = p.proveedor + '|' + p.fecha.split(' ')[0];
+    if (!grupos[key]) grupos[key] = { proveedor: p.proveedor, fecha: p.fecha.split(' ')[0], lineas: [] };
+    grupos[key].lineas.push(p);
+  });
+
+  cont.innerHTML = Object.values(grupos).map(function(g) {
+    var filas = g.lineas.map(function(l) { return l.fila; });
+    return '<div style="background:var(--surface2);border:1px solid var(--border);' +
+           'border-radius:10px;padding:12px;margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+        '<div>' +
+          '<b style="color:var(--gold)">' + escHtml(g.proveedor) + '</b>' +
+          '<small style="color:var(--muted);margin-left:8px">' + g.fecha + '</small>' +
+        '</div>' +
+        '<button onclick="borrarGrupoPedido(' + JSON.stringify(filas) + ')" ' +
+                'style="background:transparent;border:1px solid var(--border);color:var(--muted);' +
+                       'padding:5px 10px;border-radius:8px;font-size:0.8rem;cursor:pointer">' +
+          '🗑 Borrar pedido' +
+        '</button>' +
+      '</div>' +
+      g.lineas.map(function(l) {
+        return '<div style="display:flex;justify-content:space-between;padding:4px 0;' +
+               'border-top:1px solid var(--border);font-size:0.85rem">' +
+          '<span style="color:var(--text)">' + getEmoji(l.producto) + ' ' + escHtml(l.producto) + '</span>' +
+          '<span style="color:var(--muted)">' + l.cantidad + ' ' + l.unidad + '</span>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+
+async function borrarGrupoPedido(filas) {
+  if (!confirm('¿Borrar este pedido completo? (' + filas.length + ' líneas)')) return;
+  await postToScript({ modo: 'borrarLineasCompra', hoja: 'pedidos', filas: filas });
+  showSuccess('PEDIDO BORRADO', '', '🗑️');
+  await cargarPedidosRealizados();
+}
+
+var albaranesCache = [];
+
+async function cargarAlbaranesRecibidos() {
+  var cont = document.getElementById('listaAlbaranesRecibidos');
+  if (!cont) return;
+  cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem">Cargando...</p>';
+
+  var data = await getFromScript({ accion: 'listarAlbaranes' });
+  if (!data || !data.albaranes) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Error al cargar</p>';
+    return;
+  }
+
+  albaranesCache = data.albaranes;
+
+  if (albaranesCache.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem">Sin albaranes registrados</p>';
+    return;
+  }
+
+  // Agrupar por proveedor + fechaEntrega
+  var grupos = {};
+  albaranesCache.forEach(function(a) {
+    var key = a.proveedor + '|' + a.fechaEntrega;
+    if (!grupos[key]) grupos[key] = { proveedor: a.proveedor, fecha: a.fechaEntrega, lineas: [] };
+    grupos[key].lineas.push(a);
+  });
+
+  cont.innerHTML = Object.values(grupos).map(function(g) {
+    var filas = g.lineas.map(function(l) { return l.fila; });
+    return '<div style="background:var(--surface2);border:1px solid var(--border);' +
+           'border-radius:10px;padding:12px;margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+        '<div>' +
+          '<b style="color:var(--gold)">' + escHtml(g.proveedor) + '</b>' +
+          '<small style="color:var(--muted);margin-left:8px">📅 ' + g.fecha + '</small>' +
+        '</div>' +
+        '<button onclick="borrarAlbaran(' + JSON.stringify(filas) + ')" ' +
+                'style="background:transparent;border:1px solid var(--border);color:var(--muted);' +
+                       'padding:5px 10px;border-radius:8px;font-size:0.8rem;cursor:pointer">' +
+          '🗑' +
+        '</button>' +
+      '</div>' +
+      g.lineas.map(function(l) {
+        var precioStr = l.precioUnit ? ' · <b style="color:var(--gold)">' + parseFloat(l.precioUnit).toFixed(2) + '€/' + l.unidad + '</b>' : '';
+        return '<div style="display:flex;justify-content:space-between;padding:4px 0;' +
+               'border-top:1px solid var(--border);font-size:0.85rem">' +
+          '<span style="color:var(--text)">' + getEmoji(l.producto) + ' ' + escHtml(l.producto) + '</span>' +
+          '<span style="color:var(--muted)">' + l.cantidad + ' ' + l.unidad + precioStr + '</span>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+
+async function borrarAlbaran(filas) {
+  if (!confirm('¿Borrar este albarán? (' + filas.length + ' líneas)')) return;
+  await postToScript({ modo: 'borrarLineasCompra', hoja: 'albaranes', filas: filas });
+  showSuccess('ALBARÁN BORRADO', '', '🗑️');
+  await cargarAlbaranesRecibidos();
+}
+
+// ── Mejora 4: Alertas de precio en Dashboard ───────────────────
+
+async function cargarAlertasPrecios() {
+  var cont = document.getElementById('alertasPreciosContainer');
+  if (!cont) return;
+
+  var data = await getFromScript({ accion: 'alertasPrecios' });
+  if (!data || !data.alertas || data.alertas.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem">Sin cambios de precio detectados</p>';
+    return;
+  }
+
+  cont.innerHTML = data.alertas.map(function(a) {
+    var color  = a.sube ? '#f44336' : '#4caf50';
+    var signo  = a.sube ? '▲' : '▼';
+    var icono  = a.sube ? '🔴' : '🟢';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;' +
+           'padding:10px 0;border-bottom:1px solid var(--border)">' +
+      '<div style="flex:1">' +
+        '<span style="color:var(--text);font-size:0.9rem">' + getEmoji(a.producto) + ' ' + escHtml(a.producto) + '</span><br>' +
+        '<small style="color:var(--muted)">' + escHtml(a.proveedor) +
+        ' · ' + a.fechaAnterior + ' → ' + a.fechaActual + '</small>' +
+      '</div>' +
+      '<div style="text-align:right;margin-left:10px">' +
+        '<div style="color:' + color + ';font-weight:700;font-size:0.9rem">' +
+          signo + ' ' + Math.abs(a.cambio) + '%' +
+        '</div>' +
+        '<small style="color:var(--muted)">' +
+          a.precioAnterior.toFixed(2) + ' → <b style="color:' + color + '">' + a.precioActual.toFixed(2) + '€</b>' +
+        '</small>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ── Mejora 6: Pantalla de gestión de alias ─────────────────────
+
+async function cargarGestionAlias() {
+  var cont = document.getElementById('listaAliasGestion');
+  if (!cont) return;
+  var data = await getFromScript({ accion: 'listarAlias' });
+  if (!data || !data.alias) return;
+  ALIAS_PRODUCTOS = data.alias;
+
+  if (data.alias.length === 0) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem">Sin alias definidos. Se crean automáticamente al confirmar albaranes.</p>';
+    return;
+  }
+
+  cont.innerHTML = data.alias.map(function(a) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;' +
+           'padding:8px 0;border-bottom:1px solid var(--border)">' +
+      '<div style="flex:1;font-size:0.85rem">' +
+        '<span style="color:var(--muted)">' + escHtml(a.nombreAlbaran) + '</span>' +
+        '<span style="color:var(--muted);padding:0 6px">→</span>' +
+        '<span style="color:var(--gold)">' + escHtml(a.nombreBiblioteca) + '</span>' +
+        '<small style="color:var(--muted);display:block">' + escHtml(a.proveedor) + '</small>' +
+      '</div>' +
+      '<button onclick="eliminarAliasItem(\'' + a.nombreAlbaran.replace(/'/g, "\\'") + '\')" ' +
+              'style="background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:1rem">✕</button>' +
+    '</div>';
+  }).join('');
+}
+
+async function eliminarAliasItem(nombreAlbaran) {
+  if (!confirm('¿Eliminar el alias de "' + nombreAlbaran + '"?')) return;
+  await postToScript({ modo: 'eliminarAlias', nombreAlbaran: nombreAlbaran });
+  showSuccess('ALIAS ELIMINADO', '', '✕');
+  await cargarAlias();
+  await cargarGestionAlias();
+}
+
+// ── Actualizar DOMContentLoaded para cargar alias al inicio ────
+// Añadir cargarAlias() a la inicialización (ver instrucciones)
