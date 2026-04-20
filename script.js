@@ -3,7 +3,7 @@
 // v3.1 — Bugs de sintaxis corregidos
 // =============================================
 
-const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbwpQzAvdvHVPF3l4SwGTqMHvhs8payQL5FsL2u80Qm1BvG5etRJ9wB5R1pZUGcpWAiXXw/exec";
+const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbybrFFcwNOSn7X1r4lSt0VMAADBbLtkdOr4EFS5iTrN4ByA8zW8hqoBSIb3LMDtC5pzkA/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
@@ -2058,29 +2058,85 @@ async function borrarGrupoPedido(filas) {
 
 var albaranesCache = [];
 
+// ── Helpers de fecha para el selector de albaranes ─────────────
+
+function getFechaAlbaranSeleccionada() {
+  var input = document.getElementById('filtroFechaAlbaran');
+  if (!input) return null;
+  return input.value || null; // formato YYYY-MM-DD
+}
+
+function setFechaAlbaran(fechaYYYYMMDD) {
+  var input = document.getElementById('filtroFechaAlbaran');
+  if (input) input.value = fechaYYYYMMDD;
+}
+
+function irFechaAlbaranHoy() {
+  var hoy = new Date();
+  var iso = hoy.getFullYear() + '-' +
+            String(hoy.getMonth() + 1).padStart(2, '0') + '-' +
+            String(hoy.getDate()).padStart(2, '0');
+  setFechaAlbaran(iso);
+  cargarAlbaranesRecibidos();
+}
+
+function irFechaAlbaran(delta) {
+  var input = document.getElementById('filtroFechaAlbaran');
+  if (!input) return;
+  var base = input.value ? new Date(input.value + 'T12:00:00') : new Date();
+  base.setDate(base.getDate() + delta);
+  var iso = base.getFullYear() + '-' +
+            String(base.getMonth() + 1).padStart(2, '0') + '-' +
+            String(base.getDate()).padStart(2, '0');
+  setFechaAlbaran(iso);
+  cargarAlbaranesRecibidos();
+}
+
 async function cargarAlbaranesRecibidos() {
   var cont = document.getElementById('listaAlbaranesRecibidos');
   if (!cont) return;
+
+  var fecha = getFechaAlbaranSeleccionada();
+
+  // Si no hay fecha, poner hoy por defecto
+  if (!fecha) {
+    irFechaAlbaranHoy();
+    return; // irFechaAlbaranHoy llama a cargarAlbaranesRecibidos de nuevo con la fecha puesta
+  }
+
+  // Actualizar label con la fecha seleccionada
+  var label = document.getElementById('labelFechaAlbaran');
+  if (label) {
+    var partes = fecha.split('-');
+    var fechaLeible = partes[2] + '/' + partes[1] + '/' + partes[0];
+    label.textContent = 'Albaranes del ' + fechaLeible;
+  }
+
   cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem">Cargando...</p>';
 
-  var data = await getFromScript({ accion: 'listarAlbaranes' });
+  // Llamar al backend pasando la fecha en formato dd/MM/yyyy
+  var partes2 = fecha.split('-');
+  var fechaParam = partes2[2] + '/' + partes2[1] + '/' + partes2[0];
+
+  var data = await getFromScript({ accion: 'listarAlbaranes', fecha: fechaParam });
   if (!data || !data.albaranes) {
-    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Error al cargar</p>';
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Error al cargar albaranes</p>';
     return;
   }
 
   albaranesCache = data.albaranes;
 
   if (albaranesCache.length === 0) {
-    cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem">Sin albaranes registrados</p>';
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center;font-size:0.85rem;padding:16px 0">' +
+                     '📭 Sin albaranes registrados en esta fecha</p>';
     return;
   }
 
-  // Agrupar por proveedor + fechaEntrega
+  // Agrupar por proveedor
   var grupos = {};
   albaranesCache.forEach(function(a) {
-    var key = a.proveedor + '|' + a.fechaEntrega;
-    if (!grupos[key]) grupos[key] = { proveedor: a.proveedor, fecha: a.fechaEntrega, lineas: [] };
+    var key = a.proveedor + '|' + (a.fechaEntrega || fechaParam);
+    if (!grupos[key]) grupos[key] = { proveedor: a.proveedor, fecha: a.fechaEntrega || fechaParam, lineas: [] };
     grupos[key].lineas.push(a);
   });
 
@@ -2100,7 +2156,9 @@ async function cargarAlbaranesRecibidos() {
         '</button>' +
       '</div>' +
       g.lineas.map(function(l) {
-        var precioStr = l.precioUnit ? ' · <b style="color:var(--gold)">' + parseFloat(l.precioUnit).toFixed(2) + '€/' + l.unidad + '</b>' : '';
+        var precioStr = l.precioUnit
+          ? ' · <b style="color:var(--gold)">' + parseFloat(l.precioUnit).toFixed(2) + '€/' + l.unidad + '</b>'
+          : '';
         return '<div style="display:flex;justify-content:space-between;padding:4px 0;' +
                'border-top:1px solid var(--border);font-size:0.85rem">' +
           '<span style="color:var(--text)">' + getEmoji(l.producto) + ' ' + escHtml(l.producto) + '</span>' +
