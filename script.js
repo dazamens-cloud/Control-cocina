@@ -90,7 +90,7 @@ function irA(screenId, pushState) {
     case 'screenCocina':    cargarElaboraciones(); break;
     case 'screenProductos': if (productosLibreria.length === 0) cargarProductos(); break;
     case 'screenStock':     cargarStock(); break;
-    case 'screenCompras':   cargarResumenDia(); break;
+    case 'screenCompras':   cargarPedidosRealizados(); break;
     case 'screenDashboard': cargarDashboard(); break;
     case 'screenPrecios':   cargarPrecios();   break;
     case 'screenCarta':     cargarCarta();     break;
@@ -2073,7 +2073,8 @@ async function cargarPedidosRealizados() {
 
   var data = await getFromScript({ accion: 'listarPedidos', dias: 7 });
   if (!data || !data.pedidos) {
-    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Error al cargar</p>';
+    var errorDetalle = (data && data.error) ? ': ' + data.error : ' (respuesta nula — revisa el deployment del GAS)';
+    cont.innerHTML = '<p style="color:#f44336;text-align:center;font-size:0.82rem">⚠️ Error al cargar pedidos' + errorDetalle + '</p>';
     return;
   }
 
@@ -2232,7 +2233,8 @@ async function cargarAlbaranesRecibidos() {
 
   var data = await getFromScript({ accion: 'listarAlbaranes', fecha: fechaParam });
   if (!data || !data.albaranes) {
-    cont.innerHTML = '<p style="color:var(--muted);text-align:center">Error al cargar albaranes</p>';
+    var errorDetalle = (data && data.error) ? ': ' + data.error : ' (respuesta nula — revisa el deployment del GAS)';
+    cont.innerHTML = '<p style="color:#f44336;text-align:center;font-size:0.82rem">⚠️ Error al cargar albaranes' + errorDetalle + '</p>';
     return;
   }
 
