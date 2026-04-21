@@ -3,7 +3,7 @@
 // v3.1 — Bugs de sintaxis corregidos
 // =============================================
 
-const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbwgctjECOabC7xXpiR6UNd_RoHyWc9De-RWR2STZtHX9DSZijjv-tEMiwNtrD1PxZvkJQ/exec";
+const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbybrFFcwNOSn7X1r4lSt0VMAADBbLtkdOr4EFS5iTrN4ByA8zW8hqoBSIb3LMDtC5pzkA/exec";
 const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
 
 // ── ESTADO GLOBAL ───────────────────────────
@@ -788,8 +788,83 @@ var proveedorActual = "";
 function onProveedorChange() {
   var sel = document.getElementById('selectProveedor');
   proveedorActual = sel.value;
-  document.getElementById('formPedidoContainer').style.display    = proveedorActual ? 'block' : 'none';
-  document.getElementById('resumenPedidoContainer').style.display = pedidoActual.length > 0 ? 'block' : 'none';
+
+  // Mostrar/ocultar campo de nombre personalizado cuando se elige "Otro"
+  var otroContainer = document.getElementById('otroProveedorContainer');
+  if (otroContainer) {
+    otroContainer.style.display = proveedorActual === 'Otro' ? 'block' : 'none';
+    // Si cambia a otro proveedor, limpiar el campo
+    if (proveedorActual !== 'Otro') {
+      var inputOtro = document.getElementById('otroProveedorNombre');
+      if (inputOtro) inputOtro.value = '';
+    }
+  }
+
+  // Si es "Otro" pero no hay nombre todavía, no mostrar el formulario de productos aún
+  var esOtroSinNombre = proveedorActual === 'Otro' &&
+    !((document.getElementById('otroProveedorNombre') || {}).value || '').trim();
+
+  document.getElementById('formPedidoContainer').style.display =
+    (proveedorActual && !esOtroSinNombre) ? 'block' : 'none';
+  document.getElementById('resumenPedidoContainer').style.display =
+    pedidoActual.length > 0 ? 'block' : 'none';
+}
+
+function onOtroProveedorInput() {
+  var nombre = ((document.getElementById('otroProveedorNombre') || {}).value || '').trim();
+  var hint   = document.getElementById('otroProveedorHint');
+  var btnAdd = document.getElementById('btnGuardarOtroProveedor');
+
+  if (nombre.length > 0) {
+    // Usar el nombre escrito como proveedor actual
+    proveedorActual = nombre;
+    document.getElementById('formPedidoContainer').style.display = 'block';
+    document.getElementById('resumenPedidoContainer').style.display =
+      pedidoActual.length > 0 ? 'block' : 'none';
+
+    // Comprobar si ya existe en el select
+    var sel = document.getElementById('selectProveedor');
+    var yaExiste = Array.from(sel.options).some(function(o) {
+      return o.value.toLowerCase() === nombre.toLowerCase() && o.value !== 'Otro';
+    });
+
+    if (hint) hint.style.display = yaExiste ? 'none' : 'block';
+    if (btnAdd) btnAdd.style.display = yaExiste ? 'none' : 'inline-block';
+  } else {
+    proveedorActual = 'Otro';
+    document.getElementById('formPedidoContainer').style.display = 'none';
+    if (hint) hint.style.display = 'none';
+    if (btnAdd) btnAdd.style.display = 'none';
+  }
+}
+
+function guardarNuevoProveedor() {
+  var nombre = ((document.getElementById('otroProveedorNombre') || {}).value || '').trim();
+  if (!nombre) return;
+
+  var sel = document.getElementById('selectProveedor');
+
+  // Añadir al select antes de "Otro"
+  var optOtro = Array.from(sel.options).find(function(o) { return o.value === 'Otro'; });
+  var nuevaOpcion = document.createElement('option');
+  nuevaOpcion.value = nombre;
+  nuevaOpcion.textContent = nombre;
+  sel.insertBefore(nuevaOpcion, optOtro);
+
+  // Seleccionar la nueva opción
+  sel.value = nombre;
+  proveedorActual = nombre;
+
+  // Ocultar el campo auxiliar
+  var container = document.getElementById('otroProveedorContainer');
+  if (container) container.style.display = 'none';
+
+  // Mostrar formulario de productos
+  document.getElementById('formPedidoContainer').style.display = 'block';
+
+  showSuccess('PROVEEDOR AÑADIDO', nombre + ' disponible en la sesión', '🏪');
+  // Nota: se añade solo a la sesión actual. Para hacerlo permanente
+  // habría que actualizar ScriptProperties en Apps Script.
 }
 
 async function filtrarProductosPedido() {
@@ -2015,34 +2090,60 @@ function renderPedidosRealizados() {
     return;
   }
 
-  // Agrupar por proveedor + fecha (para poder borrar grupos)
+  // Agrupar por proveedor + DÍA (ignorar la hora — pedidos del mismo día y proveedor van juntos)
   var grupos = {};
   pedidosRealizadosCache.forEach(function(p) {
-    var key = p.proveedor + '|' + p.fecha.split(' ')[0];
-    if (!grupos[key]) grupos[key] = { proveedor: p.proveedor, fecha: p.fecha.split(' ')[0], lineas: [] };
+    var soloFecha = p.fecha ? p.fecha.split(' ')[0] : ''; // solo dd/MM/yyyy
+    var key = p.proveedor + '|' + soloFecha;
+    if (!grupos[key]) grupos[key] = { proveedor: p.proveedor, fecha: soloFecha, lineas: [] };
     grupos[key].lineas.push(p);
   });
 
+  // Detectar duplicados: grupos donde el mismo producto aparece más de una vez
   cont.innerHTML = Object.values(grupos).map(function(g) {
     var filas = g.lineas.map(function(l) { return l.fila; });
+
+    // Detectar si hay productos repetidos dentro del grupo
+    var cuentaProductos = {};
+    g.lineas.forEach(function(l) {
+      var k = l.producto.toLowerCase().trim();
+      cuentaProductos[k] = (cuentaProductos[k] || 0) + 1;
+    });
+    var hayDuplicados = Object.values(cuentaProductos).some(function(n) { return n > 1; });
+
+    var alertaDup = hayDuplicados
+      ? '<div style="background:rgba(232,101,10,0.15);border:1px solid var(--gold);border-radius:8px;' +
+        'padding:6px 10px;margin-bottom:8px;font-size:0.78rem;color:var(--gold)">' +
+        '⚠️ Hay productos repetidos — ¿fue enviado varias veces?' +
+        '</div>'
+      : '';
+
     return '<div style="background:var(--surface2);border:1px solid var(--border);' +
            'border-radius:10px;padding:12px;margin-bottom:10px">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
         '<div>' +
           '<b style="color:var(--gold)">' + escHtml(g.proveedor) + '</b>' +
-          '<small style="color:var(--muted);margin-left:8px">' + g.fecha + '</small>' +
+          '<small style="color:var(--muted);margin-left:8px">📅 ' + g.fecha + '</small>' +
+          '<small style="color:var(--muted);margin-left:6px">(' + g.lineas.length + ' líneas)</small>' +
         '</div>' +
         '<button onclick="borrarGrupoPedido(' + JSON.stringify(filas) + ')" ' +
                 'style="background:transparent;border:1px solid var(--border);color:var(--muted);' +
                        'padding:5px 10px;border-radius:8px;font-size:0.8rem;cursor:pointer">' +
-          '🗑 Borrar pedido' +
+          '🗑 Borrar todo' +
         '</button>' +
       '</div>' +
+      alertaDup +
       g.lineas.map(function(l) {
-        return '<div style="display:flex;justify-content:space-between;padding:4px 0;' +
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;' +
                'border-top:1px solid var(--border);font-size:0.85rem">' +
-          '<span style="color:var(--text)">' + getEmoji(l.producto) + ' ' + escHtml(l.producto) + '</span>' +
-          '<span style="color:var(--muted)">' + l.cantidad + ' ' + l.unidad + '</span>' +
+          '<span style="color:var(--text);flex:1">' + getEmoji(l.producto) + ' ' + escHtml(l.producto) + '</span>' +
+          '<span style="color:var(--muted);margin:0 10px">' + l.cantidad + ' ' + l.unidad + '</span>' +
+          '<button onclick="borrarLineaPedido(' + l.fila + ')" ' +
+                  'title="Borrar solo esta línea" ' +
+                  'style="background:transparent;border:none;color:var(--muted);' +
+                         'font-size:1rem;cursor:pointer;padding:2px 4px;line-height:1;' +
+                         'opacity:0.5;transition:opacity 0.2s" ' +
+                  'onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">✕</button>' +
         '</div>';
       }).join('') +
     '</div>';
@@ -2054,6 +2155,17 @@ async function borrarGrupoPedido(filas) {
   await postToScript({ modo: 'borrarLineasCompra', hoja: 'pedidos', filas: filas });
   showSuccess('PEDIDO BORRADO', '', '🗑️');
   await cargarPedidosRealizados();
+}
+
+async function borrarLineaPedido(fila) {
+  // Buscar el producto para mostrar en el confirm
+  var linea = pedidosRealizadosCache.find(function(p) { return p.fila === fila; });
+  var nombre = linea ? linea.producto : 'esta línea';
+  if (!confirm('¿Borrar solo "' + nombre + '"?')) return;
+  await postToScript({ modo: 'borrarLineasCompra', hoja: 'pedidos', filas: [fila] });
+  // Actualizar cache local sin recargar todo
+  pedidosRealizadosCache = pedidosRealizadosCache.filter(function(p) { return p.fila !== fila; });
+  renderPedidosRealizados();
 }
 
 var albaranesCache = [];
