@@ -250,6 +250,25 @@
                     <option value="Ortidal">Ortidal</option>
                     <option value="Otro">Otro</option>
                 </select>
+                <!-- Campo nombre personalizado — solo visible cuando se selecciona "Otro" -->
+                <div id="otroProveedorContainer" style="display:none;margin-top:10px">
+                    <input type="text" id="otroProveedorNombre"
+                           placeholder="✍️ Nombre del proveedor..."
+                           oninput="onOtroProveedorInput()"
+                           style="width:100%;padding:10px;border:1px solid var(--gold);
+                                  border-radius:10px;background:var(--surface2);
+                                  color:var(--text);font-size:0.9rem;box-sizing:border-box">
+                    <p id="otroProveedorHint" style="color:var(--muted);font-size:0.75rem;
+                       margin:4px 0 0 2px;display:none">
+                        💡 Pulsa Añadir para guardarlo como proveedor permanente
+                    </p>
+                    <button id="btnGuardarOtroProveedor" onclick="guardarNuevoProveedor()"
+                            style="display:none;margin-top:8px;background:var(--surface2);
+                                   border:1px solid var(--gold);color:var(--gold);
+                                   padding:7px 14px;border-radius:8px;font-size:0.8rem;cursor:pointer">
+                        ＋ Añadir a la lista
+                    </button>
+                </div>
             </div>
 
             <!-- Formulario añadir línea al pedido -->
