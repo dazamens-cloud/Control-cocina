@@ -1,0 +1,14 @@
+# Config del Apps Script: lleva el token y los IDs de la hoja y de Drive.
+# La plantilla sin valores sí se versiona (apps-script/Config.example.gs).
+apps-script/Config.gs
+
+# Secretos en general
+.env
+.env.local
+*.key
+*.pem
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
