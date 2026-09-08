@@ -179,6 +179,16 @@
                 <button id="btnGuardarTodoStock" class="btn-save" style="display:none" onclick="guardarTodoStock()">
                     💾 GUARDAR STOCK
                 </button>
+                <div style="display:flex;gap:10px;margin-top:10px">
+                    <button onclick="copiarInformeStock()"
+                            style="flex:1;background:transparent;border:1px solid var(--border);color:var(--gold);padding:12px;border-radius:10px;font-size:0.9rem;cursor:pointer">
+                        📋 COPIAR INFORME
+                    </button>
+                    <button onclick="enviarInformeStockWhatsApp()"
+                            style="flex:1;background:transparent;border:1px solid var(--border);color:var(--gold);padding:12px;border-radius:10px;font-size:0.9rem;cursor:pointer">
+                        💬 ENVIAR A WHATSAPP
+                    </button>
+                </div>
             </div>
 
             <div class="card">

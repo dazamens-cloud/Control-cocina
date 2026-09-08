@@ -11,6 +11,7 @@ let productosLibreria    = [];
 let currentElabSelected  = "";
 let cargandoProductos    = false;
 let WHATSAPP_PROVEEDORES = {};
+let WA_INFORMES          = "";
 let STOCK_ITEMS          = [];
 
 // ── CONSTANTES ──────────────────────────────
@@ -147,6 +148,7 @@ async function cargarProveedores() {
   var data = await getFromScript({ accion: 'proveedores' });
   if (data && data.proveedores) {
     WHATSAPP_PROVEEDORES = data.proveedores;
+    WA_INFORMES = data.waInformes || "";
     console.log('Proveedores cargados');
   } else {
     console.warn('No se pudieron cargar los proveedores');
@@ -750,6 +752,97 @@ async function guardarTodoStock() {
   delete stockHistorico[semana];
   renderListaStock();
   if (btn) btn.disabled = false;
+}
+
+// ── INFORME DE STOCK ─────────────────────────
+
+// Devuelve los items de la semana que se está viendo ahora mismo.
+function obtenerItemsStockVista() {
+  if (semanaVista === obtenerSemanaActual()) return stockActual;
+  return stockHistorico[semanaVista] || [];
+}
+
+// Arma el texto del informe. Agrupa por elaboración sumando cantidades
+// de la misma unidad, igual que hace la vista de semanas históricas.
+function generarInformeStock() {
+  var items = obtenerItemsStockVista();
+  if (items.length === 0) return null;
+
+  var resumen = {};
+  var orden   = [];
+  items.forEach(function(s) {
+    var clave = s.elaboracion + '|' + (s.unidad || '');
+    if (!resumen[clave]) {
+      resumen[clave] = { elaboracion: s.elaboracion, cantidad: 0, unidad: s.unidad || '', notas: [] };
+      orden.push(clave);
+    }
+    var n = parseFloat(s.cantidad);
+    resumen[clave].cantidad += isNaN(n) ? 0 : n;
+    if (s.notas) resumen[clave].notas.push(s.notas);
+  });
+
+  var lineas = orden.map(function(clave) {
+    var r = resumen[clave];
+    var cant = Math.round(r.cantidad * 100) / 100;
+    return '• ' + r.elaboracion + ': ' + cant + (r.unidad ? ' ' + r.unidad : '') +
+           (r.notas.length ? ' (' + r.notas.join('; ') + ')' : '');
+  });
+
+  return 'STOCK — Semana ' + semanaVista + '\n' +
+         'Divina Italia El Charco\n\n' +
+         lineas.join('\n') + '\n\n' +
+         orden.length + (orden.length === 1 ? ' elaboración' : ' elaboraciones');
+}
+
+function copiarInformeStock() {
+  var texto = generarInformeStock();
+  if (!texto) { showError('No hay stock que exportar en ' + semanaVista + '.'); return; }
+
+  function ok() { showSuccess('INFORME COPIADO', 'Pégalo donde quieras', '📋'); }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto).then(ok).catch(function() { copiarConFallback(texto, ok); });
+  } else {
+    copiarConFallback(texto, ok);
+  }
+}
+
+// Safari antiguo y contextos donde la API de portapapeles no está disponible.
+function copiarConFallback(texto, ok) {
+  var ta = document.createElement('textarea');
+  ta.value = texto;
+  ta.style.position = 'fixed';
+  ta.style.opacity  = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    ok();
+  } catch (err) {
+    showError('No se pudo copiar automáticamente.');
+  }
+  document.body.removeChild(ta);
+}
+
+function enviarInformeStockWhatsApp() {
+  var texto = generarInformeStock();
+  if (!texto) { showError('No hay stock que exportar en ' + semanaVista + '.'); return; }
+
+  if (!WA_INFORMES) {
+    showError('Falta el número propio. Configura WA_INFORMES en las propiedades del script.');
+    return;
+  }
+
+  // wa.me va en la URL, así que el mensaje no puede ser muy largo.
+  // Por encima de ~1800 caracteres los navegadores empiezan a truncar.
+  var url = 'https://wa.me/' + WA_INFORMES + '?text=' + encodeURIComponent(texto);
+  if (url.length > 1800) {
+    copiarInformeStock();
+    showError('El informe es largo para WhatsApp: se ha copiado al portapapeles. Pégalo en el chat.');
+    return;
+  }
+
+  window.open(url, '_blank');
 }
 
 async function cargarStock() {
