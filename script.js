@@ -4,7 +4,7 @@
 // =============================================
 
 const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbySRURSKUJRm77ap0k93k8ny_3x4tS0ICTCRfjYvMzMp32JptBOx7iqD6M8PyjN7eeChQ/exec";
-const WEB_APP_TOKEN = "DivinaItalia2026#Charco";
+const WEB_APP_TOKEN = "eT85DwKmX1vtCPrXrlKi7G0R9zzs0bxp";
 
 // ── ESTADO GLOBAL ───────────────────────────
 let productosLibreria    = [];
