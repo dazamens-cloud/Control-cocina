@@ -3,7 +3,7 @@
 // v3.1 — Bugs de sintaxis corregidos
 // =============================================
 
-const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbxduGCER4RXUwEXSptoAaGDL84u3zMKKHz6809gkfyMPrXHAgjw6Pe6Wl6nEViqGlyWow/exec";
+const URL_SCRIPT    = "https://script.google.com/macros/s/AKfycbypHxl8DkwvufxttyDuSWP4ePAWu79koG3_QicJaAgSSviLZzfEVUqnfKyXU2CbvXR60Q/exec";
 const WEB_APP_TOKEN = "eT85DwKmX1vtCPrXrlKi7G0R9zzs0bxp";
 
 // ── ESTADO GLOBAL ───────────────────────────
